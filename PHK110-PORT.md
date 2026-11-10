@@ -43,9 +43,34 @@
 | `docs/phk110/` | 全套项目文档：STATUS / PLAN / README / 阅读地图 / 复现指南 / 45 篇波告 / 8 篇调研 / 4 篇评审 |
 | `waveNN-scripts/` | 主机侧工具 22 组（loader 直连 `loader_talk.py`、SSH 宽窗 hunt `timed-ssh-v27.py`、march/logdump-pull/复位循环、自检 verify 系列、S3910 驱动五版源码快照、ath11k 检查器等） |
 | `logs/` | 内核日志关键行提取件（`*.keylines.txt`，对应 logdump 二进制的文本证据） |
+| **GitHub Release** | 当前在机镜像 `udon-hakios-grafted-v23.img`（192 MB，SHA256 `9e0609fb…`，绑定本分支 commit）——**只在 Release 资产里，不进 git 树** |
 
-**不含**：任何镜像/固件二进制（boot 镜像、UEFI FD、payload、厂商固件、IPSW
-衍生物）、任何私钥、任何分区备份。需要的原始材料（Apple IPSW、一加固件）
+## 克隆之后能做什么 / 还不能做什么（诚实清单）
+
+**能（clone 即得）**：
+
+| 能做的事 | 依据 |
+|---|---|
+| 读全套移植文档，理解每一步怎么来的、为什么 | `docs/phk110/`（62 篇） |
+| 在同机（PHK110）或同类机上复用主机侧方法学：loader USB 直连、相位探测、logdump 取证、march 零刷写循环、SSH 宽窗 hunt | `waveNN-scripts/`（脚本内工作区路径已脱敏为占位符，按 [REPRODUCE.md](docs/phk110/REPRODUCE.md) 改写后可用） |
+| 用 Release 资产里的在机镜像直接在 PHK110 上复现 v0.4 SSH 门状态 | 见 Release notes 的前置条件与规程 |
+| 读设备配置与 SoC 参数，作为自己 SM8475 移植的起点 | `devices/phk110/` |
+| 用 S3910 驱动五版源码快照 + 全部主机补丁脚本（`patch-loader-v*.py` 等）理解触摸/USB 攻坚的每一步 | `wave12*-scripts/`、`wave21-scripts/` |
+
+**不能（clone 得不到，如实告知）**：
+
+| 得不到的东西 | 现状 |
+|---|---|
+| **内核/UEFI/loader 的 PHK110 源码增量**（platform_phk110 平台表、GICR 步进、S3910 驱动本体、buttons v7、UFS 集成、hw_target fallback、loader.c 的 v15→v23 补丁链、en0 驱动等） | 长在本地 WSL 构建树（`~/hakios/kernel`、`~/hakios/uefi-udon`），**本分支只有波告叙述 + 驱动源码快照 + 二进制补丁脚本，不是可 `git apply` 的补丁序列**。整理成可重建形式是后续工作；clone + build 目前**不能**复现镜像 |
+| 从源码重建镜像所需的非公开输入 | udonPkg UEFI 底座（从你自己的手机 XBL 提取，上游同样不分发）、Apple IPSW（自备）、ColorOS 固件（自备） |
+| 数据卷内容 | system.apfs/root.apfs 等由你自己 IPSW + 工具生成（`devices/phk110/tools/` 是做法） |
+
+**一句话**：这是一个**文档 + 方法学 + 主机工具 + 在机镜像**的发布；源码级可重建
+（clone → build → 同样字节）还差"补丁序列导出"这一步，[`docs/phk110/PORT-NOTES.md`](devices/phk110/PORT-NOTES.md)
+§7 列了全部源码增量的清单。
+
+**不含**（git 树内）：任何其他镜像/固件二进制（UEFI FD、payload、厂商固件、
+IPSW 衍生物）、任何私钥、任何分区备份。需要的原始材料（Apple IPSW、一加固件）
 请自备——本仓按上游口径不含它们。
 
 ## 诚实的未解清单
