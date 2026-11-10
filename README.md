@@ -6,8 +6,9 @@
 这是 [HakiOS](https://github.com/oosexgang/hakios-xnu-kernel)（Apple XNU 内核
 直接跑在安卓高通手机上）向**一加 Ace 2（PHK110 / 骁龙 8+ Gen 1 SM8475 /
 16 GB）**的移植分支。上游唯一参考机是 POCO X5 Pro（redwood / SM7325）；本
-分支把它带上了第二台真机，并且**不改上游任何已有文件**——所有内容以新增
-形式存在（`devices/phk110/`、`docs/phk110/`、`wave*-scripts/`、`logs/`）。
+分支把它带上了第二台真机，并且除首页 README 的呈现层替换（上游原 README
+原样保留为 [README-UPSTREAM.md](README-UPSTREAM.md)）外，**不改上游任何已有文件**——
+所有内容以新增形式存在（`devices/phk110/`、`docs/phk110/`、`wave*-scripts/`、`logs/`）。
 启动只走 `boot_b` 槽位（RAM 级引导），日常安卓 `boot_a` 从未被刷写或修改；
 会话失败由 bootloader 自身的 A/B fallback 兜底回安卓。
 
