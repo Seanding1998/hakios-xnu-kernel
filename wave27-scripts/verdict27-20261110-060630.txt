@@ -1,0 +1,50 @@
+WAVE21-SSH-OK
+run-id: 20261110-060630
+when: 2026-11-10 06:19:51
+tool: wave27-scripts/timed-ssh-v27.py (fixed-protocol first full live run)
+tunnel: wave25-scripts/tunnel25w.py + B3 frame traces (pseudo-header fix)
+boot: boot_b = v23 graft 9e0609fb (loader_return_after=1800, maxvnodes=8192)
+
+[conn1] cmd: uname -a && id && echo WAVE21-SSH-OK W27-20261110-060630
+[conn1] rc: 0
+[conn1] stdout:
+Darwin localhost 22.5.0 Darwin Kernel Version 22.5.0: Mon Nov  9 09:55:02 AM CST 2026; <host>:xnu-8796.121.2[xnu-8796.121.2-dirty]/BUILD/obj/DEVELOPMENT_ARM64_BCM2837 iPhone10,3 arm Darwin
+uid=0(root) gid=0(wheel) groups=0(wheel)
+WAVE21-SSH-OK W27-20261110-060630
+
+[conn2] cmd: uname -a && id && echo W27-20261110-060630-acc2
+[conn2] rc: 0
+[conn2] stdout:
+Darwin localhost 22.5.0 Darwin Kernel Version 22.5.0: Mon Nov  9 09:55:02 AM CST 2026; <host>:xnu-8796.121.2[xnu-8796.121.2-dirty]/BUILD/obj/DEVELOPMENT_ARM64_BCM2837 iPhone10,3 arm Darwin
+uid=0(root) gid=0(wheel) groups=0(wheel)
+W27-20261110-060630-acc2
+
+[conn3] cmd: uname -a && id && echo W27-20261110-060630-acc3
+[conn3] rc: 0
+[conn3] stdout:
+Darwin localhost 22.5.0 Darwin Kernel Version 22.5.0: Mon Nov  9 09:55:02 AM CST 2026; <host>:xnu-8796.121.2[xnu-8796.121.2-dirty]/BUILD/obj/DEVELOPMENT_ARM64_BCM2837 iPhone10,3 arm Darwin
+uid=0(root) gid=0(wheel) groups=0(wheel)
+W27-20261110-060630-acc3
+
+[transfer 262144 B] cmd: wc -c
+[transfer 262144 B] rc: 0
+[transfer 262144 B] stdout:
+count=262144 want=262144
+
+transfer verdict: PASS
+management channel after exits: OKAY (alive)
+device evidence (tunnel stderr, hit attempt excerpt):
+tunnel25w: pkt OUT 10.0.0.1:27618 -> 10.0.0.2:22 flags=ACK seq=268437650 ack=2666002732 win=16384 len=0 cksum=ok | SND.UNA=268437650 SND.NXT=268437750 RCV.NXT=2666002732 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27618 -> 10.0.0.2:22 flags=PSH|ACK seq=268437650 ack=2666002732 win=16384 len=100 cksum=ok | SND.UNA=268437650 SND.NXT=268437750 RCV.NXT=2666002732 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27618 flags=ACK seq=2666002732 ack=268437750 win=65535 len=0 cksum=ok | SND.UNA=268437650 SND.NXT=268437750 RCV.NXT=2666002732 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27618 flags=PSH|ACK seq=2666002732 ack=268437750 win=65535 len=72 cksum=ok | SND.UNA=268437750 SND.NXT=268437750 RCV.NXT=2666002732 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27618 -> 10.0.0.2:22 flags=ACK seq=268437750 ack=2666002804 win=16384 len=0 cksum=ok | SND.UNA=268437750 SND.NXT=268437750 RCV.NXT=2666002804 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27618 flags=PSH|ACK seq=2666002804 ack=268437750 win=65535 len=228 cksum=ok | SND.UNA=268437750 SND.NXT=268437750 RCV.NXT=2666002804 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27618 -> 10.0.0.2:22 flags=ACK seq=268437750 ack=2666003032 win=16384 len=0 cksum=ok | SND.UNA=268437750 SND.NXT=268437750 RCV.NXT=2666003032 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27618 flags=PSH|ACK seq=2666003032 ack=268437750 win=65535 len=76 cksum=ok | SND.UNA=268437750 SND.NXT=268437750 RCV.NXT=2666003032 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27618 flags=PSH|ACK seq=2666003108 ack=268437750 win=65535 len=68 cksum=ok | SND.UNA=268437750 SND.NXT=268437750 RCV.NXT=2666003108 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27618 -> 10.0.0.2:22 flags=ACK seq=268437750 ack=2666003108 win=16384 len=0 cksum=ok | SND.UNA=268437750 SND.NXT=268437750 RCV.NXT=2666003176 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27618 -> 10.0.0.2:22 flags=ACK seq=268437750 ack=2666003176 win=16384 len=0 cksum=ok | SND.UNA=268437750 SND.NXT=268437750 RCV.NXT=2666003176 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27618 flags=PSH|ACK seq=2666003176 ack=268437750 win=65535 len=176 cksum=ok | SND.UNA=268437750 SND.NXT=268437750 RCV.NXT=2666003176 state=ESTABLISHED
+
+Darwin session evidence above: uname=Darwin confirmed

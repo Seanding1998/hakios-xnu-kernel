@@ -1,0 +1,20 @@
+import struct, sys, gzip, zlib
+data = open(sys.argv[1], 'rb').read()
+print(f'total={len(data)} magic={data[:8]!r}')
+(_, ksz, kaddr, rsz, raddr, ssz, saddr, tags, page, hver) = struct.unpack_from('<8s9I', data, 0)
+print(f'kernel_size={ksz} kernel_addr={kaddr:#x} ramdisk_size={rsz} ramdisk_addr={raddr:#x} page_size={page} hver={hver}')
+print(f'bytes@2048: {data[2048:2064].hex()}')
+print(f'bytes@{page}: {data[page:page+16].hex()}')
+i_gz = data.find(b'\x1f\x8b\x08')
+i_dtb = data.find(b'\xd0\x0d\xfe\xed')
+i_rd = data.find(b'dummy')
+print(f'gzip magic at {i_gz:#x}, dtb magic at {i_dtb:#x}, "dummy" at {i_rd:#x}')
+blob = gzip.decompress(data[i_gz:i_dtb])
+print(f'gunzipped blob: {len(blob)}')
+print(f'blob head 16: {blob[:16].hex()}')
+xnup = blob.find(b'XNUP')
+fvh = blob.find(b'_FVH')
+print(f'XNUP at {xnup:#x}, FVH at {fvh:#x} (FD start ~{fvh-40:#x})')
+# payload declared size
+xnup_size = struct.unpack_from('<I', blob, xnup+4)[0]
+print(f'XNUP declared size: {xnup_size} (payload file was 14924352)')

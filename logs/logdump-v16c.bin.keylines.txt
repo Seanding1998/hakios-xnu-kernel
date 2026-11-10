@@ -1,0 +1,8 @@
+dwc3 woken @500: k110 | usb: dwc3 soft reset did not settle in one second | usb: dwc3 woken (phy suspend off + core soft reset) | usb: the platform is asked up; twenty-five 
+soft reset did not settle @455: 0 | display 1240 x 2772 at b8000000 | platform phk110 | usb: dwc3 soft reset did not settle in one second | usb: dwc3 woken (phy suspend off + core soft reset) | usb: the plat
+twenty-five quiet seconds @578: spend off + core soft reset) | usb: the platform is asked up; twenty-five quiet seconds before the first try | usb: started | payload entry 'loader.efi' size 12800 | payload
+try failed: start_ex -> 0 hits
+warm-boot start failed -> 0 hits
+usb: started @625: is asked up; twenty-five quiet seconds before the first try | usb: started | payload entry 'loader.efi' size 12800 | payload entry 'kernel' size e3ad18 | payloa
+no payload at -> 0 hits
+UEFI EXCEPTION -> 0 hits

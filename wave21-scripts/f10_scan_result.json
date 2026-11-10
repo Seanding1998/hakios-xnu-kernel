@@ -1,0 +1,6753 @@
+[
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/ArmPkg/Drivers/ArmGic/ArmGicDxe.efi",
+  "size": 36864,
+  "word_0xF0000000": 36,
+  "word_offsets": [
+   3689,
+   8392,
+   8480,
+   9184,
+   9240,
+   9304,
+   9360,
+   9720
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/ArmPkg/Drivers/CpuDxe/CpuDxe.efi",
+  "size": 53248,
+  "word_0xF0000000": 27,
+  "word_offsets": [
+   3689,
+   20732,
+   20784,
+   21388,
+   21652,
+   21900,
+   22324,
+   22572
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/ArmPkg/Drivers/TimerDxe/TimerDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 11,
+  "word_offsets": [
+   3689,
+   7208,
+   7444,
+   7472,
+   7500,
+   7948,
+   8108,
+   8136
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/EmbeddedPkg/MetronomeDxe/MetronomeDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 16,
+  "word_offsets": [
+   3689,
+   6168,
+   6288,
+   6376,
+   6404,
+   6432,
+   6876,
+   6904
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.efi",
+  "size": 36864,
+  "word_0xF0000000": 48,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4772,
+   4832,
+   4892,
+   4944,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/FatPkg/EnhancedFatDxe/Fat.efi",
+  "size": 65536,
+  "word_0xF0000000": 46,
+  "word_offsets": [
+   3689,
+   3846,
+   4026,
+   4034,
+   32788,
+   32816,
+   32896,
+   33056
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   4034
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Core/Dxe/DxeMain.efi",
+  "size": 196608,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   3689,
+   3846,
+   4026,
+   4034,
+   127213,
+   167005,
+   173509,
+   173517
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.efi",
+  "size": 36864,
+  "word_0xF0000000": 33,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4764,
+   4816,
+   4876,
+   4936,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.efi",
+  "size": 36864,
+  "word_0xF0000000": 29,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4772,
+   4832,
+   4892,
+   4944,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.efi",
+  "size": 40960,
+  "word_0xF0000000": 44,
+  "word_offsets": [
+   3689,
+   8908,
+   9424,
+   9452,
+   9492,
+   9588,
+   9628,
+   9736
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.efi",
+  "size": 57344,
+  "word_0xF0000000": 39,
+  "word_offsets": [
+   3689,
+   25732,
+   25916,
+   26008,
+   26180,
+   26208,
+   26236,
+   26376
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.efi",
+  "size": 49152,
+  "word_0xF0000000": 36,
+  "word_offsets": [
+   3689,
+   12288,
+   12556,
+   12584,
+   12736,
+   12884,
+   12980,
+   13100
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   41543
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.efi",
+  "size": 77824,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   3689,
+   53812,
+   53900,
+   53968,
+   54088,
+   54184,
+   54324,
+   62581
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.efi",
+  "size": 45056,
+  "word_0xF0000000": 50,
+  "word_offsets": [
+   3689,
+   12424,
+   12452,
+   12480,
+   12620,
+   12648,
+   12728,
+   12804
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.efi",
+  "size": 53248,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   3689,
+   25544,
+   25572,
+   25744,
+   28696,
+   28740,
+   28848,
+   29064
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 7,
+  "word_offsets": [
+   3689,
+   7912,
+   7956,
+   8064,
+   15396,
+   15436,
+   15564
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.efi",
+  "size": 45056,
+  "word_0xF0000000": 63,
+  "word_offsets": [
+   3689,
+   17860,
+   18224,
+   18252,
+   18424,
+   18476,
+   18528,
+   18600
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.efi",
+  "size": 143360,
+  "word_0xF0000000": 11,
+  "word_offsets": [
+   3689,
+   109860,
+   109888,
+   109928,
+   110020,
+   110068,
+   110204,
+   110272
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/PrintDxe/PrintDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 35,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4764,
+   4816,
+   4876,
+   4936,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/RscRtDxe.efi",
+  "size": 40960,
+  "word_0xF0000000": 38,
+  "word_offsets": [
+   3689,
+   8224,
+   8300,
+   8356,
+   8436,
+   8516,
+   8576,
+   8632
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.efi",
+  "size": 53248,
+  "word_0xF0000000": 5,
+  "word_offsets": [
+   3689,
+   25300,
+   25348,
+   25456,
+   31916
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/SCHandlerRtDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 33,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4772,
+   4824,
+   4876,
+   4928,
+   4988
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.efi",
+  "size": 32768,
+  "word_0xF0000000": 4,
+  "word_offsets": [
+   3689,
+   14500,
+   14540,
+   14668
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Application/QcomChargerApp/QcomChargerApp.efi",
+  "size": 118784,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   3689
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/ASN1X509Dxe/ASN1X509Dxe.efi",
+  "size": 40960,
+  "word_0xF0000000": 15,
+  "word_offsets": [
+   3689,
+   12300,
+   12352,
+   15204,
+   15240,
+   15300,
+   15352,
+   15428
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/ButtonsDxe/ButtonsDxe.efi",
+  "size": 61440,
+  "word_0xF0000000": 3,
+  "word_offsets": [
+   3689,
+   3750,
+   35552
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/ButtonsDxe/ButtonsDxe.patched.efi",
+  "size": 61440,
+  "word_0xF0000000": 3,
+  "word_offsets": [
+   3689,
+   3750,
+   35552
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/CPRDxe/CPRDxe.efi",
+  "size": 86016,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   3689,
+   57376,
+   57560,
+   57692,
+   59840,
+   59884,
+   59928,
+   59972
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/ChargerExDxe/ChargerExDxe.efi",
+  "size": 53248,
+  "word_0xF0000000": 10,
+  "word_offsets": [
+   3689,
+   24760,
+   24804,
+   24912,
+   25128,
+   25156,
+   30456,
+   31440
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/ChipInfoDxe/ChipInfoDxe.efi",
+  "size": 65536,
+  "word_0xF0000000": 15,
+  "word_offsets": [
+   3689,
+   3846,
+   4026,
+   4034,
+   36960,
+   39108,
+   39152,
+   39196
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   4034
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/ClockDxe/ClockDxe.efi",
+  "size": 217088,
+  "word_0xF0000000": 69,
+  "word_offsets": [
+   3689,
+   4294,
+   111949,
+   120158,
+   123262,
+   126325,
+   134517,
+   134621
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   120158,
+   123262
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/ClockDxe/ClockDxe.patched.efi",
+  "size": 217088,
+  "word_0xF0000000": 69,
+  "word_offsets": [
+   3689,
+   4294,
+   111949,
+   120158,
+   123262,
+   126325,
+   134517,
+   134621
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   120158,
+   123262
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/CmdDbDxe/CmdDbDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4764,
+   4816,
+   4876,
+   4936,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/DALSYSDxe/DALSYSDxe.efi",
+  "size": 442368,
+  "word_0xF0000000": 200,
+  "word_offsets": [
+   3689,
+   3982,
+   12364,
+   16964,
+   17000,
+   17060,
+   17112,
+   17188
+  ],
+  "qword_ptr": 18,
+  "qword_offsets": [
+   152454,
+   159246,
+   169670,
+   170695,
+   170719,
+   171030,
+   175974,
+   177374
+  ],
+  "movk64": 0,
+  "movk32": 1,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/DDRInfoDxe/DDRInfoDxe.efi",
+  "size": 45056,
+  "word_0xF0000000": 29,
+  "word_offsets": [
+   3689,
+   17412,
+   18120,
+   18148,
+   18200,
+   18236,
+   18896,
+   18984
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/DisplayDxe/DisplayDxe.efi",
+  "size": 360448,
+  "word_0xF0000000": 50,
+  "word_offsets": [
+   3689,
+   241405,
+   241421,
+   241525,
+   241717,
+   270615,
+   276703,
+   282789
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.efi",
+  "size": 32768,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   3689,
+   6164,
+   6348,
+   6532,
+   6572,
+   6676,
+   6896,
+   6924
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/EnvDxe/EnvDxe.efi",
+  "size": 90112,
+  "word_0xF0000000": 2,
+  "word_offsets": [
+   3689,
+   74375
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/FeatureEnablerDxe/FeatureEnablerDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 15,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4764,
+   4816,
+   4876,
+   4936,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/FontDxe/FontDxe.efi",
+  "size": 40960,
+  "word_0xF0000000": 27,
+  "word_offsets": [
+   3689,
+   8228,
+   8264,
+   8324,
+   8360,
+   9584,
+   9780,
+   9820
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/FvUtilsDxe/FvUtilsDxe.efi",
+  "size": 77824,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   3689,
+   49412,
+   49508,
+   52616,
+   52932,
+   52960,
+   53072,
+   53100
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/GLinkDxe/GLinkDxe.efi",
+  "size": 61440,
+  "word_0xF0000000": 22,
+  "word_offsets": [
+   3689,
+   3750,
+   33160,
+   34652,
+   35052,
+   35088,
+   35148,
+   35200
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/GpiDxe/GpiDxe.efi",
+  "size": 106496,
+  "word_0xF0000000": 2,
+  "word_offsets": [
+   3689,
+   102450
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/HALIOMMUDxe/HALIOMMUDxe.efi",
+  "size": 147456,
+  "word_0xF0000000": 5,
+  "word_offsets": [
+   3689,
+   40120,
+   42588,
+   42616,
+   143429
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/HWIODxe/HWIODxe.efi",
+  "size": 36864,
+  "word_0xF0000000": 33,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4772,
+   4824,
+   4876,
+   4936,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/I2CDxe/I2CDxe.efi",
+  "size": 49152,
+  "word_0xF0000000": 11,
+  "word_offsets": [
+   3689,
+   20548,
+   20616,
+   24456,
+   25172,
+   25260,
+   25380,
+   29884
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/ICBDxe/ICBDxe.efi",
+  "size": 57344,
+  "word_0xF0000000": 20,
+  "word_offsets": [
+   3689,
+   31008,
+   31716,
+   31744,
+   33148,
+   33200,
+   33308,
+   33400
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/IPCCDxe/IPCCDxe.efi",
+  "size": 61440,
+  "word_0xF0000000": 2,
+  "word_offsets": [
+   3689,
+   3750
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/LimitsDxe/LimitsDxe.efi",
+  "size": 73728,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   3689,
+   3986,
+   3994,
+   4294,
+   42356,
+   42400,
+   42444,
+   42488
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   3994,
+   4294
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/NpaDxe/NpaDxe.efi",
+  "size": 81920,
+  "word_0xF0000000": 2,
+  "word_offsets": [
+   3689,
+   77874
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/OGaugeAuthDxe/OGaugeAuth.efi",
+  "size": 45056,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   3689,
+   16496,
+   16540,
+   16584,
+   16628,
+   16672,
+   16716,
+   16764
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/OcdtDxe/OplusProject.efi",
+  "size": 65536,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   3689,
+   3846,
+   4026,
+   4034,
+   37512,
+   38036,
+   38132,
+   38912
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   4034
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/OplusVibrDxe/OplusVibrDxe.efi",
+  "size": 36864,
+  "word_0xF0000000": 27,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4772,
+   4824,
+   4876,
+   4936,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/PILDxe/PILDxe.efi",
+  "size": 114688,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   3689
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/PILProxyDxe/PILProxyDxe.efi",
+  "size": 57344,
+  "word_0xF0000000": 9,
+  "word_offsets": [
+   3689,
+   34476,
+   34504,
+   34556,
+   34584,
+   34708,
+   34840,
+   34960
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/ParserDxe/ParserDxe.efi",
+  "size": 36864,
+  "word_0xF0000000": 29,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4764,
+   4816,
+   4876,
+   4936,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/PhoenixDxe/PhoenixDxe.efi",
+  "size": 90112,
+  "word_0xF0000000": 7,
+  "word_offsets": [
+   3689,
+   36908,
+   36992,
+   38048,
+   38180,
+   38300,
+   38469
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/PlatformInfoDxe/PlatformInfoDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 31,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4764,
+   4816,
+   4876,
+   4936,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/PmicDxe/PmicDxeLa.efi",
+  "size": 233472,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   3689,
+   200429,
+   206013,
+   207173,
+   207261,
+   208541,
+   210861,
+   229526
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/PmicDxe/PmicDxeLa.patched.efi",
+  "size": 233472,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   3689,
+   200429,
+   206013,
+   207173,
+   207261,
+   208541,
+   210861,
+   229526
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/PmicGlinkDxe/PmicGlinkDxe.efi",
+  "size": 69632,
+  "word_0xF0000000": 5,
+  "word_offsets": [
+   3689,
+   3986,
+   3994,
+   4294,
+   65674
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   3994,
+   4294
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/PwrUtilsDxe/PwrUtilsDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 31,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4772,
+   4824,
+   4876,
+   4936,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/QcomBds/QcomBds.efi",
+  "size": 118784,
+  "word_0xF0000000": 5,
+  "word_offsets": [
+   3689,
+   74708,
+   74772,
+   95421,
+   111893
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/QcomChargerDxe/QcomChargerDxeLA.efi",
+  "size": 147456,
+  "word_0xF0000000": 4,
+  "word_offsets": [
+   3689,
+   131895,
+   135909,
+   143498
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/QcomWDogDxe/QcomWDogDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 16,
+  "word_offsets": [
+   3689,
+   5700,
+   6784,
+   6968,
+   7152,
+   7192,
+   7296,
+   7440
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/RNGDxe/RngDxe.efi",
+  "size": 40960,
+  "word_0xF0000000": 16,
+  "word_offsets": [
+   3689,
+   15084,
+   15120,
+   15180,
+   15232,
+   15308,
+   15376,
+   20168
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/ResetRuntimeDxe/ResetRuntimeDxe.efi",
+  "size": 36864,
+  "word_0xF0000000": 40,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4772,
+   4832,
+   4892,
+   4944,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/RpmhDxe/RpmhDxe.efi",
+  "size": 65536,
+  "word_0xF0000000": 13,
+  "word_offsets": [
+   3689,
+   3846,
+   4026,
+   4034,
+   41296,
+   41424,
+   41452,
+   41480
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   4034
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/SPIDxe/SPIDxe.efi",
+  "size": 57344,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   3689
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/SPMIDxe/SPMIDxe.efi",
+  "size": 49152,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   3689,
+   22636,
+   23600,
+   23728,
+   29661,
+   33293
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/SPSSDxe/SPSSDxe.efi",
+  "size": 61440,
+  "word_0xF0000000": 15,
+  "word_offsets": [
+   3689,
+   3750,
+   38036,
+   38064,
+   38116,
+   38144,
+   38196,
+   38288
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/SdccDxe/SdccDxe.efi",
+  "size": 135168,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   3689
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/SecRSADxe/SecRSADxe.efi",
+  "size": 45056,
+  "word_0xF0000000": 35,
+  "word_offsets": [
+   3689,
+   12920,
+   13000,
+   13036,
+   13096,
+   13160,
+   13196,
+   14448
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/SerialPortDxe/SerialPortDxe.efi",
+  "size": 28672,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   3689,
+   6568,
+   6596,
+   6624,
+   7072,
+   7232,
+   7260,
+   7396
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/ShmBridgeDxe/ShmBridgeDxeLA.efi",
+  "size": 36864,
+  "word_0xF0000000": 30,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4764,
+   4816,
+   4876,
+   4936,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/SimpleTextInOutSerialDxe/SimpleTextInOutSerial.efi",
+  "size": 32768,
+  "word_0xF0000000": 35,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4764,
+   4816,
+   4876,
+   4936,
+   4996
+  ],
+  "qword_ptr": 4,
+  "qword_offsets": [
+   25277,
+   25293,
+   25309,
+   25325
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/SmemDxe/SmemDxe.efi",
+  "size": 40960,
+  "word_0xF0000000": 36,
+  "word_offsets": [
+   3689,
+   4572,
+   4712,
+   4764,
+   4816,
+   4876,
+   4936,
+   4996
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/TLMMDxe/TLMMDxe.efi",
+  "size": 65536,
+  "word_0xF0000000": 5,
+  "word_offsets": [
+   3689,
+   3846,
+   4026,
+   4034,
+   37372
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   4034
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/TsensDxe/TsensDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 24,
+  "word_offsets": [
+   3689,
+   6080,
+   6300,
+   6328,
+   6356,
+   6804,
+   6964,
+   6992
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/TzDxe/ScmDxeLA.efi",
+  "size": 61440,
+  "word_0xF0000000": 24,
+  "word_offsets": [
+   3689,
+   3750,
+   29572,
+   29600,
+   29628,
+   29768,
+   29796,
+   29900
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/TzDxe/TzDxeLA.efi",
+  "size": 69632,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   3689,
+   3986,
+   3994,
+   4294,
+   42836,
+   43336,
+   43408,
+   43460
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   3994,
+   4294
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/TzDxe/TzDxeLA.patched.efi",
+  "size": 69632,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   3689,
+   3986,
+   3994,
+   4294,
+   42836,
+   43336,
+   43408,
+   43460
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   3994,
+   4294
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UCDxe/UCDxe.efi",
+  "size": 176128,
+  "word_0xF0000000": 2,
+  "word_offsets": [
+   3689,
+   169061
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UFSDxe/UFSDxe.efi",
+  "size": 155648,
+  "word_0xF0000000": 7,
+  "word_offsets": [
+   3689,
+   3698,
+   3942,
+   3950,
+   48061,
+   151573,
+   151738
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UFSDxe/UFSDxe.patched.efi",
+  "size": 155648,
+  "word_0xF0000000": 7,
+  "word_offsets": [
+   3689,
+   3698,
+   3942,
+   3950,
+   48061,
+   151573,
+   151738
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/ULogDxe/ULogDxe.efi",
+  "size": 94208,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   3689,
+   69780,
+   86493,
+   86765,
+   86773,
+   86877,
+   86997,
+   90133
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UsbBusDxe/UsbBusDxe.efi",
+  "size": 77824,
+  "word_0xF0000000": 9,
+  "word_offsets": [
+   3689,
+   49224,
+   49420,
+   49460,
+   49568,
+   49604,
+   49632,
+   70285
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.efi",
+  "size": 106496,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   3689
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UsbConfigDxe/UsbConfigDxe.patched.efi",
+  "size": 106496,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   3689
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UsbDeviceDxe/UsbDeviceDxe.efi",
+  "size": 69632,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   3689,
+   3986,
+   3994,
+   4294,
+   35517,
+   62445,
+   62453,
+   65726
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   3994,
+   4294
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UsbInitDxe/UsbInitDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   3689,
+   5292,
+   5452,
+   5680,
+   5884,
+   6468,
+   6524,
+   6560
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UsbKbDxe/UsbKbDxe.efi",
+  "size": 53248,
+  "word_0xF0000000": 46,
+  "word_offsets": [
+   3689,
+   20800,
+   20960,
+   21060,
+   21232,
+   21260,
+   22380,
+   22424
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UsbMassStorageDxe/UsbMassStorageDxe.efi",
+  "size": 49152,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   3689,
+   20528,
+   20644,
+   20796,
+   20992,
+   21032,
+   21140,
+   21176
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.efi",
+  "size": 81920,
+  "word_0xF0000000": 2,
+  "word_offsets": [
+   3689,
+   78138
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UsbMsdDxe/UsbMsdDxe.patched.efi",
+  "size": 81920,
+  "word_0xF0000000": 2,
+  "word_offsets": [
+   3689,
+   78138
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UsbPwrCtrlDxe/UsbPwrCtrlDxe.efi",
+  "size": 57344,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   3689
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/UsbfnDwc3Dxe/UsbfnDwc3Dxe.efi",
+  "size": 98304,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   3689
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/VariableDxe/VariableDxe.efi",
+  "size": 77824,
+  "word_0xF0000000": 2,
+  "word_offsets": [
+   3689,
+   51160
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/VcsDxe/VcsDxe.efi",
+  "size": 65536,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   3689,
+   3846,
+   4026,
+   4034,
+   37408,
+   38056,
+   38084,
+   38136
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   4034
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/VerifiedBootDxe/VerifiedBootDxe.efi",
+  "size": 98304,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   3689
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/XhciDxe/XhciDxe.efi",
+  "size": 94208,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   3689
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/XhciPciEmulationDxe/XhciPciEmulationDxe.efi",
+  "size": 45056,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   3689,
+   16744,
+   17120,
+   17172,
+   18732,
+   18768,
+   18828,
+   18880
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Binaries/udon/QcomPkg/XBLCore/XBLCore.te",
+  "size": 286920,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   234191,
+   237773,
+   237781,
+   237789,
+   237797,
+   237805,
+   237813,
+   237821
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/AcpiPlatform.efi",
+  "size": 17920,
+  "word_0xF0000000": 19,
+  "word_offsets": [
+   137,
+   1152,
+   1188,
+   1228,
+   1268,
+   2068,
+   2360,
+   2376
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14439
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/AcpiTableDxe.efi",
+  "size": 42496,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   137,
+   13704,
+   14108,
+   14296,
+   14324,
+   14352,
+   14504,
+   14788
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   33415
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ArmCpuDxe.efi",
+  "size": 42496,
+  "word_0xF0000000": 13,
+  "word_offsets": [
+   137,
+   294,
+   554,
+   17968,
+   17980,
+   18152,
+   18564,
+   18968
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   38519
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ArmGicDxe.efi",
+  "size": 28672,
+  "word_0xF0000000": 19,
+  "word_offsets": [
+   137,
+   11380,
+   12128,
+   12196,
+   12260,
+   12328,
+   12548,
+   12584
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   24679
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ArmPkg/Drivers/ArmGicDxe/ArmGicDxe/DEBUG/ArmGicDxe.dll",
+  "size": 28672,
+  "word_0xF0000000": 19,
+  "word_offsets": [
+   137,
+   11380,
+   12128,
+   12196,
+   12260,
+   12328,
+   12548,
+   12584
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   24679
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ArmPkg/Drivers/ArmGicDxe/ArmGicDxe/DEBUG/ArmGicDxe.efi",
+  "size": 28672,
+  "word_0xF0000000": 19,
+  "word_offsets": [
+   137,
+   11380,
+   12128,
+   12196,
+   12260,
+   12328,
+   12548,
+   12584
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   24679
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ArmPkg/Drivers/ArmGicDxe/ArmGicDxe/OUTPUT/ArmGicDxe.efi",
+  "size": 28672,
+  "word_0xF0000000": 19,
+  "word_offsets": [
+   137,
+   11380,
+   12128,
+   12196,
+   12260,
+   12328,
+   12548,
+   12584
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   24679
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ArmPkg/Drivers/CpuDxe/CpuDxe/DEBUG/ArmCpuDxe.dll",
+  "size": 42496,
+  "word_0xF0000000": 13,
+  "word_offsets": [
+   137,
+   294,
+   554,
+   17968,
+   17980,
+   18152,
+   18564,
+   18968
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   38519
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ArmPkg/Drivers/CpuDxe/CpuDxe/DEBUG/ArmCpuDxe.efi",
+  "size": 42496,
+  "word_0xF0000000": 13,
+  "word_offsets": [
+   137,
+   294,
+   554,
+   17968,
+   17980,
+   18152,
+   18564,
+   18968
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   38519
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ArmPkg/Drivers/CpuDxe/CpuDxe/OUTPUT/ArmCpuDxe.efi",
+  "size": 42496,
+  "word_0xF0000000": 13,
+  "word_offsets": [
+   137,
+   294,
+   554,
+   17968,
+   17980,
+   18152,
+   18564,
+   18968
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   38519
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ArmPkg/Drivers/TimerDxe/TimerDxe/DEBUG/ArmTimerDxe.dll",
+  "size": 18944,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   137,
+   1140,
+   1176,
+   1216,
+   1256,
+   1300,
+   1376,
+   1536
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14951
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ArmPkg/Drivers/TimerDxe/TimerDxe/DEBUG/ArmTimerDxe.efi",
+  "size": 18944,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   137,
+   1140,
+   1176,
+   1216,
+   1256,
+   1300,
+   1376,
+   1536
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14951
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ArmPkg/Drivers/TimerDxe/TimerDxe/OUTPUT/ArmTimerDxe.efi",
+  "size": 18944,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   137,
+   1140,
+   1176,
+   1216,
+   1256,
+   1300,
+   1376,
+   1536
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14951
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ArmTimerDxe.efi",
+  "size": 18944,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   137,
+   1140,
+   1176,
+   1216,
+   1256,
+   1300,
+   1376,
+   1536
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14951
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/BdsDxe.efi",
+  "size": 387072,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   137,
+   86315,
+   86583,
+   86803,
+   87077,
+   87637,
+   89157,
+   89205
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   380407
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/BootGraphicsResourceTableDxe.efi",
+  "size": 20992,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   1132,
+   1168,
+   1208,
+   1248,
+   1400,
+   1496,
+   1596
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/BootManagerMenuApp.efi",
+  "size": 92672,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   137,
+   59568,
+   59596,
+   59624,
+   59652,
+   61016,
+   61048,
+   61080
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   67846,
+   86455
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/CapsuleRuntimeDxe.efi",
+  "size": 19456,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   11499,
+   11767,
+   11987,
+   15991,
+   18071
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   15991
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ConPlatformDxe.efi",
+  "size": 28160,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   137,
+   9640,
+   9672,
+   9772,
+   9800,
+   9948,
+   10004,
+   10040
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   24215
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ConSplitterDxe.efi",
+  "size": 37888,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   137,
+   17408,
+   17584,
+   17808,
+   17880,
+   17912,
+   18392,
+   18428
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   32407
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/DarwinBoot.efi",
+  "size": 31744,
+  "word_0xF0000000": 34,
+  "word_offsets": [
+   137,
+   9284,
+   9300,
+   10028,
+   10056,
+   10372,
+   10492,
+   10552
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   27767
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/DarwinBootPkg/Driver/DarwinBoot/DEBUG/DarwinBoot.dll",
+  "size": 31744,
+  "word_0xF0000000": 34,
+  "word_offsets": [
+   137,
+   9284,
+   9300,
+   10028,
+   10056,
+   10372,
+   10492,
+   10552
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   27767
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/DarwinBootPkg/Driver/DarwinBoot/DEBUG/DarwinBoot.efi",
+  "size": 31744,
+  "word_0xF0000000": 34,
+  "word_offsets": [
+   137,
+   9284,
+   9300,
+   10028,
+   10056,
+   10372,
+   10492,
+   10552
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   27767
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/DarwinBootPkg/Driver/DarwinBoot/OUTPUT/DarwinBoot.efi",
+  "size": 31744,
+  "word_0xF0000000": 34,
+  "word_offsets": [
+   137,
+   9284,
+   9300,
+   10028,
+   10056,
+   10372,
+   10492,
+   10552
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   27767
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/DevicePathDxe.efi",
+  "size": 61440,
+  "word_0xF0000000": 15,
+  "word_offsets": [
+   137,
+   474,
+   34256,
+   34568,
+   34660,
+   34888,
+   34920,
+   35920
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   56423
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/DiskIoDxe.efi",
+  "size": 28160,
+  "word_0xF0000000": 27,
+  "word_offsets": [
+   137,
+   9256,
+   9416,
+   9492,
+   9616,
+   9700,
+   9852,
+   9924
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   24167
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/DisplayReEnablerDxe.efi",
+  "size": 17408,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   137,
+   1136,
+   1172,
+   1212,
+   1464,
+   1704,
+   1996,
+   2012
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   13943
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/DtPlatformDxe.efi",
+  "size": 21504,
+  "word_0xF0000000": 30,
+  "word_offsets": [
+   137,
+   1148,
+   1184,
+   1224,
+   1264,
+   1344,
+   1424,
+   1504
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/DxeCore.efi",
+  "size": 160768,
+  "word_0xF0000000": 9,
+  "word_offsets": [
+   137,
+   116459,
+   116727,
+   116947,
+   117061,
+   117629,
+   149269,
+   151143
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   151143
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedMonotonicCounter.efi",
+  "size": 17408,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   9963,
+   10231,
+   10451,
+   13943,
+   16023
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   13943
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/Drivers/DtPlatformDxe/DtPlatformDxe/DEBUG/DtPlatformDxe.dll",
+  "size": 21504,
+  "word_0xF0000000": 30,
+  "word_offsets": [
+   137,
+   1148,
+   1184,
+   1224,
+   1264,
+   1344,
+   1424,
+   1504
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/Drivers/DtPlatformDxe/DtPlatformDxe/DEBUG/DtPlatformDxe.efi",
+  "size": 21504,
+  "word_0xF0000000": 30,
+  "word_offsets": [
+   137,
+   1148,
+   1184,
+   1224,
+   1264,
+   1344,
+   1424,
+   1504
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/Drivers/DtPlatformDxe/DtPlatformDxe/OUTPUT/DtPlatformDxe.efi",
+  "size": 21504,
+  "word_0xF0000000": 30,
+  "word_offsets": [
+   137,
+   1148,
+   1184,
+   1224,
+   1264,
+   1344,
+   1424,
+   1504
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter/DEBUG/EmbeddedMonotonicCounter.dll",
+  "size": 17408,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   9963,
+   10231,
+   10451,
+   13943,
+   16023
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   13943
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter/DEBUG/EmbeddedMonotonicCounter.efi",
+  "size": 17408,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   9963,
+   10231,
+   10451,
+   13943,
+   16023
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   13943
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter/OUTPUT/EmbeddedMonotonicCounter.efi",
+  "size": 17408,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   9963,
+   10231,
+   10451,
+   13943,
+   16023
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   13943
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/MetronomeDxe/MetronomeDxe/DEBUG/MetronomeDxe.dll",
+  "size": 17920,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   137,
+   1132,
+   1168,
+   1208,
+   1248,
+   1324,
+   1848,
+   1864
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   13927
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/MetronomeDxe/MetronomeDxe/DEBUG/MetronomeDxe.efi",
+  "size": 17920,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   137,
+   1132,
+   1168,
+   1208,
+   1248,
+   1324,
+   1848,
+   1864
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   13927
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/MetronomeDxe/MetronomeDxe/OUTPUT/MetronomeDxe.efi",
+  "size": 17920,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   137,
+   1132,
+   1168,
+   1208,
+   1248,
+   1324,
+   1848,
+   1864
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   13927
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe/DEBUG/RealTimeClock.dll",
+  "size": 18944,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   11531,
+   11799,
+   12019,
+   15463,
+   17543
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   15463
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe/DEBUG/RealTimeClock.efi",
+  "size": 18944,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   11531,
+   11799,
+   12019,
+   15463,
+   17543
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   15463
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe/OUTPUT/RealTimeClock.efi",
+  "size": 18944,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   11531,
+   11799,
+   12019,
+   15463,
+   17543
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   15463
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial/DEBUG/SimpleTextInOutSerial.dll",
+  "size": 19968,
+  "word_0xF0000000": 27,
+  "word_offsets": [
+   137,
+   1136,
+   1172,
+   1212,
+   1252,
+   1356,
+   1420,
+   1496
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16007
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial/DEBUG/SimpleTextInOutSerial.efi",
+  "size": 19968,
+  "word_0xF0000000": 27,
+  "word_offsets": [
+   137,
+   1136,
+   1172,
+   1212,
+   1252,
+   1356,
+   1420,
+   1496
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16007
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial/OUTPUT/SimpleTextInOutSerial.efi",
+  "size": 19968,
+  "word_0xF0000000": 27,
+  "word_offsets": [
+   137,
+   1136,
+   1172,
+   1212,
+   1252,
+   1356,
+   1420,
+   1496
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16007
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EmmcDxe.efi",
+  "size": 42496,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   18544,
+   18732,
+   19032,
+   19064,
+   19096,
+   19208,
+   19284
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   37479
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/EnglishDxe.efi",
+  "size": 18944,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   137,
+   469,
+   1132,
+   1168,
+   1208,
+   1444,
+   2556,
+   2848
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14951
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/Fat.efi",
+  "size": 52224,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   137,
+   294,
+   554,
+   26036,
+   27220,
+   27504,
+   27628,
+   27872
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   47239
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/FatPkg/EnhancedFatDxe/Fat/DEBUG/Fat.dll",
+  "size": 52224,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   137,
+   294,
+   554,
+   26036,
+   27220,
+   27504,
+   27628,
+   27872
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   47239
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/FatPkg/EnhancedFatDxe/Fat/DEBUG/Fat.efi",
+  "size": 52224,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   137,
+   294,
+   554,
+   26036,
+   27220,
+   27504,
+   27628,
+   27872
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   47239
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/FatPkg/EnhancedFatDxe/Fat/OUTPUT/Fat.efi",
+  "size": 52224,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   137,
+   294,
+   554,
+   26036,
+   27220,
+   27504,
+   27628,
+   27872
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   47239
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/GraphicsConsoleDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 24,
+  "word_offsets": [
+   137,
+   9324,
+   9736,
+   9772,
+   9888,
+   9960,
+   9992,
+   10488
+  ],
+  "qword_ptr": 3,
+  "qword_offsets": [
+   26391,
+   28487,
+   31613
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/HiiDatabase.efi",
+  "size": 121856,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   278,
+   514,
+   91156,
+   91184,
+   91380,
+   91568,
+   91596
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   116423
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/IortDtDxe.efi",
+  "size": 23040,
+  "word_0xF0000000": 11,
+  "word_offsets": [
+   137,
+   5148,
+   5492,
+   5528,
+   5772,
+   8560,
+   14075,
+   14343
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19047
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/LinuxBootDxe.efi",
+  "size": 24576,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   137,
+   5256,
+   5340,
+   5700,
+   5768,
+   5800,
+   6272,
+   6308
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   21111
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MassStorage.efi",
+  "size": 294400,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   22299,
+   22567,
+   22787,
+   290567,
+   292647
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   290567
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp/DEBUG/BootManagerMenuApp.dll",
+  "size": 92672,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   137,
+   59568,
+   59596,
+   59624,
+   59652,
+   61016,
+   61048,
+   61080
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   67846,
+   86455
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp/DEBUG/BootManagerMenuApp.efi",
+  "size": 92672,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   137,
+   59568,
+   59596,
+   59624,
+   59652,
+   61016,
+   61048,
+   61080
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   67846,
+   86455
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp/OUTPUT/BootManagerMenuApp.efi",
+  "size": 92672,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   137,
+   59568,
+   59596,
+   59624,
+   59652,
+   61016,
+   61048,
+   61080
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   67846,
+   86455
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe/DEBUG/EmmcDxe.dll",
+  "size": 42496,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   18544,
+   18732,
+   19032,
+   19064,
+   19096,
+   19208,
+   19284
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   37479
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe/DEBUG/EmmcDxe.efi",
+  "size": 42496,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   18544,
+   18732,
+   19032,
+   19064,
+   19096,
+   19208,
+   19284
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   37479
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe/OUTPUT/EmmcDxe.efi",
+  "size": 42496,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   18544,
+   18732,
+   19032,
+   19064,
+   19096,
+   19208,
+   19284
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   37479
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Sd/SdDxe/SdDxe/DEBUG/SdDxe.dll",
+  "size": 33792,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   137,
+   14236,
+   14420,
+   14836,
+   14868,
+   14900,
+   15032,
+   15120
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   29287
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Sd/SdDxe/SdDxe/DEBUG/SdDxe.efi",
+  "size": 33792,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   137,
+   14236,
+   14420,
+   14836,
+   14868,
+   14900,
+   15032,
+   15120
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   29287
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Sd/SdDxe/SdDxe/OUTPUT/SdDxe.efi",
+  "size": 33792,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   137,
+   14236,
+   14420,
+   14836,
+   14868,
+   14900,
+   15032,
+   15120
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   29287
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe/DEBUG/UsbBusDxe.dll",
+  "size": 50688,
+  "word_0xF0000000": 10,
+  "word_offsets": [
+   137,
+   198,
+   21976,
+   22852,
+   23212,
+   33515,
+   33783,
+   34003
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   46263
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe/DEBUG/UsbBusDxe.efi",
+  "size": 50688,
+  "word_0xF0000000": 10,
+  "word_offsets": [
+   137,
+   198,
+   21976,
+   22852,
+   23212,
+   33515,
+   33783,
+   34003
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   46263
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe/OUTPUT/UsbBusDxe.efi",
+  "size": 50688,
+  "word_0xF0000000": 10,
+  "word_offsets": [
+   137,
+   198,
+   21976,
+   22852,
+   23212,
+   33515,
+   33783,
+   34003
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   46263
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe/DEBUG/UsbKbDxe.dll",
+  "size": 34816,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   137,
+   13440,
+   13556,
+   14328,
+   14500,
+   14900,
+   14932,
+   14964
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   28775
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe/DEBUG/UsbKbDxe.efi",
+  "size": 34816,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   137,
+   13440,
+   13556,
+   14328,
+   14500,
+   14900,
+   14932,
+   14964
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   28775
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe/OUTPUT/UsbKbDxe.efi",
+  "size": 34816,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   137,
+   13440,
+   13556,
+   14328,
+   14500,
+   14900,
+   14932,
+   14964
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   28775
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe/DEBUG/UsbMassStorageDxe.dll",
+  "size": 33280,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   137,
+   10516,
+   11588,
+   11624,
+   11744,
+   11924,
+   21771,
+   22039
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   29479
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe/DEBUG/UsbMassStorageDxe.efi",
+  "size": 33280,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   137,
+   10516,
+   11588,
+   11624,
+   11744,
+   11924,
+   21771,
+   22039
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   29479
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe/OUTPUT/UsbMassStorageDxe.efi",
+  "size": 33280,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   137,
+   10516,
+   11588,
+   11624,
+   11744,
+   11924,
+   21771,
+   22039
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   29479
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Core/Dxe/DxeMain/DEBUG/DxeCore.dll",
+  "size": 160768,
+  "word_0xF0000000": 9,
+  "word_offsets": [
+   137,
+   116459,
+   116727,
+   116947,
+   117061,
+   117629,
+   149269,
+   151143
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   151143
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Core/Dxe/DxeMain/DEBUG/DxeCore.efi",
+  "size": 160768,
+  "word_0xF0000000": 9,
+  "word_offsets": [
+   137,
+   116459,
+   116727,
+   116947,
+   117061,
+   117629,
+   149269,
+   151143
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   151143
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Core/Dxe/DxeMain/OUTPUT/DxeCore.efi",
+  "size": 160768,
+  "word_0xF0000000": 9,
+  "word_offsets": [
+   137,
+   116459,
+   116727,
+   116947,
+   117061,
+   117629,
+   149269,
+   151143
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   151143
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Core/RuntimeDxe/RuntimeDxe/DEBUG/RuntimeDxe.dll",
+  "size": 20992,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   12011,
+   12279,
+   12499,
+   16999,
+   19079
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Core/RuntimeDxe/RuntimeDxe/DEBUG/RuntimeDxe.efi",
+  "size": 20992,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   12011,
+   12279,
+   12499,
+   16999,
+   19079
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Core/RuntimeDxe/RuntimeDxe/OUTPUT/RuntimeDxe.efi",
+  "size": 20992,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   12011,
+   12279,
+   12499,
+   16999,
+   19079
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe/DEBUG/AcpiPlatform.dll",
+  "size": 17920,
+  "word_0xF0000000": 19,
+  "word_offsets": [
+   137,
+   1152,
+   1188,
+   1228,
+   1268,
+   2068,
+   2360,
+   2376
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14439
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe/DEBUG/AcpiPlatform.efi",
+  "size": 17920,
+  "word_0xF0000000": 19,
+  "word_offsets": [
+   137,
+   1152,
+   1188,
+   1228,
+   1268,
+   2068,
+   2360,
+   2376
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14439
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe/OUTPUT/AcpiPlatform.efi",
+  "size": 17920,
+  "word_0xF0000000": 19,
+  "word_offsets": [
+   137,
+   1152,
+   1188,
+   1228,
+   1268,
+   2068,
+   2360,
+   2376
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14439
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe/DEBUG/AcpiTableDxe.dll",
+  "size": 42496,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   137,
+   13704,
+   14108,
+   14296,
+   14324,
+   14352,
+   14504,
+   14788
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   33415
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe/DEBUG/AcpiTableDxe.efi",
+  "size": 42496,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   137,
+   13704,
+   14108,
+   14296,
+   14324,
+   14352,
+   14504,
+   14788
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   33415
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe/OUTPUT/AcpiTableDxe.efi",
+  "size": 42496,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   137,
+   13704,
+   14108,
+   14296,
+   14324,
+   14352,
+   14504,
+   14788
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   33415
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe/DEBUG/BootGraphicsResourceTableDxe.dll",
+  "size": 20992,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   1132,
+   1168,
+   1208,
+   1248,
+   1400,
+   1496,
+   1596
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe/DEBUG/BootGraphicsResourceTableDxe.efi",
+  "size": 20992,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   1132,
+   1168,
+   1208,
+   1248,
+   1400,
+   1496,
+   1596
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe/OUTPUT/BootGraphicsResourceTableDxe.efi",
+  "size": 20992,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   1132,
+   1168,
+   1208,
+   1248,
+   1400,
+   1496,
+   1596
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/BdsDxe/BdsDxe/DEBUG/BdsDxe.dll",
+  "size": 387072,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   137,
+   86315,
+   86583,
+   86803,
+   87077,
+   87637,
+   89157,
+   89205
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   380407
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/BdsDxe/BdsDxe/DEBUG/BdsDxe.efi",
+  "size": 387072,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   137,
+   86315,
+   86583,
+   86803,
+   87077,
+   87637,
+   89157,
+   89205
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   380407
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/BdsDxe/BdsDxe/OUTPUT/BdsDxe.efi",
+  "size": 387072,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   137,
+   86315,
+   86583,
+   86803,
+   87077,
+   87637,
+   89157,
+   89205
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   380407
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe/DEBUG/CapsuleRuntimeDxe.dll",
+  "size": 19456,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   11499,
+   11767,
+   11987,
+   15991,
+   18071
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   15991
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe/DEBUG/CapsuleRuntimeDxe.efi",
+  "size": 19456,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   11499,
+   11767,
+   11987,
+   15991,
+   18071
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   15991
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe/OUTPUT/CapsuleRuntimeDxe.efi",
+  "size": 19456,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   11499,
+   11767,
+   11987,
+   15991,
+   18071
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   15991
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe/DEBUG/ConPlatformDxe.dll",
+  "size": 28160,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   137,
+   9640,
+   9672,
+   9772,
+   9800,
+   9948,
+   10004,
+   10040
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   24215
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe/DEBUG/ConPlatformDxe.efi",
+  "size": 28160,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   137,
+   9640,
+   9672,
+   9772,
+   9800,
+   9948,
+   10004,
+   10040
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   24215
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe/OUTPUT/ConPlatformDxe.efi",
+  "size": 28160,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   137,
+   9640,
+   9672,
+   9772,
+   9800,
+   9948,
+   10004,
+   10040
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   24215
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe/DEBUG/ConSplitterDxe.dll",
+  "size": 37888,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   137,
+   17408,
+   17584,
+   17808,
+   17880,
+   17912,
+   18392,
+   18428
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   32407
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe/DEBUG/ConSplitterDxe.efi",
+  "size": 37888,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   137,
+   17408,
+   17584,
+   17808,
+   17880,
+   17912,
+   18392,
+   18428
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   32407
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe/OUTPUT/ConSplitterDxe.efi",
+  "size": 37888,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   137,
+   17408,
+   17584,
+   17808,
+   17880,
+   17912,
+   18392,
+   18428
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   32407
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe/DEBUG/GraphicsConsoleDxe.dll",
+  "size": 32768,
+  "word_0xF0000000": 24,
+  "word_offsets": [
+   137,
+   9324,
+   9736,
+   9772,
+   9888,
+   9960,
+   9992,
+   10488
+  ],
+  "qword_ptr": 3,
+  "qword_offsets": [
+   26391,
+   28487,
+   31613
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe/DEBUG/GraphicsConsoleDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 24,
+  "word_offsets": [
+   137,
+   9324,
+   9736,
+   9772,
+   9888,
+   9960,
+   9992,
+   10488
+  ],
+  "qword_ptr": 3,
+  "qword_offsets": [
+   26391,
+   28487,
+   31613
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe/OUTPUT/GraphicsConsoleDxe.efi",
+  "size": 32768,
+  "word_0xF0000000": 24,
+  "word_offsets": [
+   137,
+   9324,
+   9736,
+   9772,
+   9888,
+   9960,
+   9992,
+   10488
+  ],
+  "qword_ptr": 3,
+  "qword_offsets": [
+   26391,
+   28487,
+   31613
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe/DEBUG/DevicePathDxe.dll",
+  "size": 61440,
+  "word_0xF0000000": 15,
+  "word_offsets": [
+   137,
+   474,
+   34256,
+   34568,
+   34660,
+   34888,
+   34920,
+   35920
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   56423
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe/DEBUG/DevicePathDxe.efi",
+  "size": 61440,
+  "word_0xF0000000": 15,
+  "word_offsets": [
+   137,
+   474,
+   34256,
+   34568,
+   34660,
+   34888,
+   34920,
+   35920
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   56423
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe/OUTPUT/DevicePathDxe.efi",
+  "size": 61440,
+  "word_0xF0000000": 15,
+  "word_offsets": [
+   137,
+   474,
+   34256,
+   34568,
+   34660,
+   34888,
+   34920,
+   35920
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   56423
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe/DEBUG/DiskIoDxe.dll",
+  "size": 28160,
+  "word_0xF0000000": 27,
+  "word_offsets": [
+   137,
+   9256,
+   9416,
+   9492,
+   9616,
+   9700,
+   9852,
+   9924
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   24167
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe/DEBUG/DiskIoDxe.efi",
+  "size": 28160,
+  "word_0xF0000000": 27,
+  "word_offsets": [
+   137,
+   9256,
+   9416,
+   9492,
+   9616,
+   9700,
+   9852,
+   9924
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   24167
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe/OUTPUT/DiskIoDxe.efi",
+  "size": 28160,
+  "word_0xF0000000": 27,
+  "word_offsets": [
+   137,
+   9256,
+   9416,
+   9492,
+   9616,
+   9700,
+   9852,
+   9924
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   24167
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe/DEBUG/PartitionDxe.dll",
+  "size": 35328,
+  "word_0xF0000000": 10,
+  "word_offsets": [
+   137,
+   15956,
+   16136,
+   16172,
+   16644,
+   24331,
+   24599,
+   24819
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   31383
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe/DEBUG/PartitionDxe.efi",
+  "size": 35328,
+  "word_0xF0000000": 10,
+  "word_offsets": [
+   137,
+   15956,
+   16136,
+   16172,
+   16644,
+   24331,
+   24599,
+   24819
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   31383
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe/OUTPUT/PartitionDxe.efi",
+  "size": 35328,
+  "word_0xF0000000": 10,
+  "word_offsets": [
+   137,
+   15956,
+   16136,
+   16172,
+   16644,
+   24331,
+   24599,
+   24819
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   31383
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe/DEBUG/EnglishDxe.dll",
+  "size": 18944,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   137,
+   469,
+   1132,
+   1168,
+   1208,
+   1444,
+   2556,
+   2848
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14951
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe/DEBUG/EnglishDxe.efi",
+  "size": 18944,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   137,
+   469,
+   1132,
+   1168,
+   1208,
+   1444,
+   2556,
+   2848
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14951
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe/OUTPUT/EnglishDxe.efi",
+  "size": 18944,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   137,
+   469,
+   1132,
+   1168,
+   1208,
+   1444,
+   2556,
+   2848
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14951
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe/DEBUG/HiiDatabase.dll",
+  "size": 121856,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   278,
+   514,
+   91156,
+   91184,
+   91380,
+   91568,
+   91596
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   116423
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe/DEBUG/HiiDatabase.efi",
+  "size": 121856,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   278,
+   514,
+   91156,
+   91184,
+   91380,
+   91568,
+   91596
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   116423
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe/OUTPUT/HiiDatabase.efi",
+  "size": 121856,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   278,
+   514,
+   91156,
+   91184,
+   91380,
+   91568,
+   91596
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   116423
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/PCD/Dxe/Pcd/DEBUG/PcdDxe.dll",
+  "size": 35840,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   137,
+   13548,
+   13572,
+   13596,
+   13856,
+   13932,
+   14776,
+   14940
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   30871
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/PCD/Dxe/Pcd/DEBUG/PcdDxe.efi",
+  "size": 35840,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   137,
+   13548,
+   13572,
+   13596,
+   13856,
+   13932,
+   14776,
+   14940
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   30871
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/PCD/Dxe/Pcd/OUTPUT/PcdDxe.efi",
+  "size": 35840,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   137,
+   13548,
+   13572,
+   13596,
+   13856,
+   13932,
+   14776,
+   14940
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   30871
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/PrintDxe/PrintDxe/DEBUG/PrintDxe.dll",
+  "size": 22528,
+  "word_0xF0000000": 34,
+  "word_offsets": [
+   137,
+   1132,
+   1168,
+   1208,
+   1308,
+   1408,
+   1660,
+   1728
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   18535
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/PrintDxe/PrintDxe/DEBUG/PrintDxe.efi",
+  "size": 22528,
+  "word_0xF0000000": 34,
+  "word_offsets": [
+   137,
+   1132,
+   1168,
+   1208,
+   1308,
+   1408,
+   1660,
+   1728
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   18535
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/PrintDxe/PrintDxe/OUTPUT/PrintDxe.efi",
+  "size": 22528,
+  "word_0xF0000000": 34,
+  "word_offsets": [
+   137,
+   1132,
+   1168,
+   1208,
+   1308,
+   1408,
+   1660,
+   1728
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   18535
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe/DEBUG/ReportStatusCodeRouterRuntimeDxe.dll",
+  "size": 9216,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   137
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe/DEBUG/ReportStatusCodeRouterRuntimeDxe.efi",
+  "size": 9216,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   137
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe/OUTPUT/ReportStatusCodeRouterRuntimeDxe.efi",
+  "size": 9216,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   137
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe/DEBUG/ResetSystemRuntimeDxe.dll",
+  "size": 22528,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   137,
+   13579,
+   13847,
+   14067,
+   18535,
+   20615,
+   21229,
+   21237
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   18535
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe/DEBUG/ResetSystemRuntimeDxe.efi",
+  "size": 22528,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   137,
+   13579,
+   13847,
+   14067,
+   18535,
+   20615,
+   21229,
+   21237
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   18535
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe/OUTPUT/ResetSystemRuntimeDxe.efi",
+  "size": 22528,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   137,
+   13579,
+   13847,
+   14067,
+   18535,
+   20615,
+   21229,
+   21237
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   18535
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe/DEBUG/SecurityStubDxe.dll",
+  "size": 37888,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   137,
+   15300,
+   22251,
+   22519,
+   22739,
+   23973,
+   33911,
+   35991
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   33911
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe/DEBUG/SecurityStubDxe.efi",
+  "size": 37888,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   137,
+   15300,
+   22251,
+   22519,
+   22739,
+   23973,
+   33911,
+   35991
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   33911
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe/OUTPUT/SecurityStubDxe.efi",
+  "size": 37888,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   137,
+   15300,
+   22251,
+   22519,
+   22739,
+   23973,
+   33911,
+   35991
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   33911
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe/DEBUG/SetupBrowser.dll",
+  "size": 107520,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   137,
+   198,
+   79456,
+   79660,
+   80372,
+   80412,
+   80440,
+   80524
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   102023
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe/DEBUG/SetupBrowser.efi",
+  "size": 107520,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   137,
+   198,
+   79456,
+   79660,
+   80372,
+   80412,
+   80440,
+   80524
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   102023
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe/OUTPUT/SetupBrowser.efi",
+  "size": 107520,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   137,
+   198,
+   79456,
+   79660,
+   80372,
+   80412,
+   80440,
+   80524
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   102023
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe/DEBUG/SmbiosDxe.dll",
+  "size": 29696,
+  "word_0xF0000000": 28,
+  "word_offsets": [
+   137,
+   9232,
+   9428,
+   9460,
+   9568,
+   9596,
+   9852,
+   9936
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   25767
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe/DEBUG/SmbiosDxe.efi",
+  "size": 29696,
+  "word_0xF0000000": 28,
+  "word_offsets": [
+   137,
+   9232,
+   9428,
+   9460,
+   9568,
+   9596,
+   9852,
+   9936
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   25767
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe/OUTPUT/SmbiosDxe.efi",
+  "size": 29696,
+  "word_0xF0000000": 28,
+  "word_offsets": [
+   137,
+   9232,
+   9428,
+   9460,
+   9568,
+   9596,
+   9852,
+   9936
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   25767
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe/DEBUG/StatusCodeHandlerRuntimeDxe.dll",
+  "size": 19968,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   12011,
+   12279,
+   12499,
+   16487,
+   18567
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16487
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe/DEBUG/StatusCodeHandlerRuntimeDxe.efi",
+  "size": 19968,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   12011,
+   12279,
+   12499,
+   16487,
+   18567
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16487
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe/OUTPUT/StatusCodeHandlerRuntimeDxe.efi",
+  "size": 19968,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   12011,
+   12279,
+   12499,
+   16487,
+   18567
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16487
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe/DEBUG/VariableRuntimeDxe.dll",
+  "size": 61952,
+  "word_0xF0000000": 9,
+  "word_offsets": [
+   137,
+   562,
+   4204,
+   43755,
+   44023,
+   44243,
+   57271,
+   59351
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   562,
+   57271
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe/DEBUG/VariableRuntimeDxe.efi",
+  "size": 61952,
+  "word_0xF0000000": 9,
+  "word_offsets": [
+   137,
+   562,
+   4204,
+   43755,
+   44023,
+   44243,
+   57271,
+   59351
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   562,
+   57271
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe/OUTPUT/VariableRuntimeDxe.efi",
+  "size": 61952,
+  "word_0xF0000000": 9,
+  "word_offsets": [
+   137,
+   562,
+   4204,
+   43755,
+   44023,
+   44243,
+   57271,
+   59351
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   562,
+   57271
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer/DEBUG/WatchdogTimer.dll",
+  "size": 18432,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   1136,
+   1172,
+   1212,
+   1252,
+   1364,
+   1436,
+   1496
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14439
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer/DEBUG/WatchdogTimer.efi",
+  "size": 18432,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   1136,
+   1172,
+   1212,
+   1252,
+   1364,
+   1436,
+   1496
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14439
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer/OUTPUT/WatchdogTimer.efi",
+  "size": 18432,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   1136,
+   1172,
+   1212,
+   1252,
+   1364,
+   1436,
+   1496
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14439
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MetronomeDxe.efi",
+  "size": 17920,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   137,
+   1132,
+   1168,
+   1208,
+   1248,
+   1324,
+   1848,
+   1864
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   13927
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/MsBootPolicy.efi",
+  "size": 353280,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   137,
+   64315,
+   64583,
+   64803,
+   66725,
+   66837,
+   347591,
+   349671
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   347591
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/PartitionDxe.efi",
+  "size": 35328,
+  "word_0xF0000000": 10,
+  "word_offsets": [
+   137,
+   15956,
+   16136,
+   16172,
+   16644,
+   24331,
+   24599,
+   24819
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   31383
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/PcBdsPkg/MsBootPolicy/MsBootPolicy/DEBUG/MsBootPolicy.dll",
+  "size": 353280,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   137,
+   64315,
+   64583,
+   64803,
+   66725,
+   66837,
+   347591,
+   349671
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   347591
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/PcBdsPkg/MsBootPolicy/MsBootPolicy/DEBUG/MsBootPolicy.efi",
+  "size": 353280,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   137,
+   64315,
+   64583,
+   64803,
+   66725,
+   66837,
+   347591,
+   349671
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   347591
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/PcBdsPkg/MsBootPolicy/MsBootPolicy/OUTPUT/MsBootPolicy.efi",
+  "size": 353280,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   137,
+   64315,
+   64583,
+   64803,
+   66725,
+   66837,
+   347591,
+   349671
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   347591
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/PcdDxe.efi",
+  "size": 35840,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   137,
+   13548,
+   13572,
+   13596,
+   13856,
+   13932,
+   14776,
+   14940
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   30871
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/PrintDxe.efi",
+  "size": 22528,
+  "word_0xF0000000": 34,
+  "word_offsets": [
+   137,
+   1132,
+   1168,
+   1208,
+   1308,
+   1408,
+   1660,
+   1728
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   18535
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/QcomPkg/Applications/MassStorage/MassStorage/DEBUG/MassStorage.dll",
+  "size": 294400,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   22299,
+   22567,
+   22787,
+   290567,
+   292647
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   290567
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/QcomPkg/Applications/MassStorage/MassStorage/DEBUG/MassStorage.efi",
+  "size": 294400,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   22299,
+   22567,
+   22787,
+   290567,
+   292647
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   290567
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/QcomPkg/Applications/MassStorage/MassStorage/OUTPUT/MassStorage.efi",
+  "size": 294400,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   22299,
+   22567,
+   22787,
+   290567,
+   292647
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   290567
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/QcomPkg/Drivers/DisplayReEnablerDxe/DisplayReEnablerDxe/DEBUG/DisplayReEnablerDxe.dll",
+  "size": 17408,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   137,
+   1136,
+   1172,
+   1212,
+   1464,
+   1704,
+   1996,
+   2012
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   13943
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/QcomPkg/Drivers/DisplayReEnablerDxe/DisplayReEnablerDxe/DEBUG/DisplayReEnablerDxe.efi",
+  "size": 17408,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   137,
+   1136,
+   1172,
+   1212,
+   1464,
+   1704,
+   1996,
+   2012
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   13943
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/QcomPkg/Drivers/DisplayReEnablerDxe/DisplayReEnablerDxe/OUTPUT/DisplayReEnablerDxe.efi",
+  "size": 17408,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   137,
+   1136,
+   1172,
+   1212,
+   1464,
+   1704,
+   1996,
+   2012
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   13943
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/QcomPkg/Drivers/IortDtDxe/IortDtDxe/DEBUG/IortDtDxe.dll",
+  "size": 23040,
+  "word_0xF0000000": 11,
+  "word_offsets": [
+   137,
+   5148,
+   5492,
+   5528,
+   5772,
+   8560,
+   14075,
+   14343
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19047
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/QcomPkg/Drivers/IortDtDxe/IortDtDxe/DEBUG/IortDtDxe.efi",
+  "size": 23040,
+  "word_0xF0000000": 11,
+  "word_offsets": [
+   137,
+   5148,
+   5492,
+   5528,
+   5772,
+   8560,
+   14075,
+   14343
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19047
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/QcomPkg/Drivers/IortDtDxe/IortDtDxe/OUTPUT/IortDtDxe.efi",
+  "size": 23040,
+  "word_0xF0000000": 11,
+  "word_offsets": [
+   137,
+   5148,
+   5492,
+   5528,
+   5772,
+   8560,
+   14075,
+   14343
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19047
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/RamManagerDxe.efi",
+  "size": 25600,
+  "word_0xF0000000": 20,
+  "word_offsets": [
+   137,
+   4756,
+   5392,
+   5408,
+   6236,
+   6640,
+   6820,
+   6892
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   21623
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/RealTimeClock.efi",
+  "size": 18944,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   11531,
+   11799,
+   12019,
+   15463,
+   17543
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   15463
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ReportStatusCodeRouterRuntimeDxe.efi",
+  "size": 9216,
+  "word_0xF0000000": 1,
+  "word_offsets": [
+   137
+  ],
+  "qword_ptr": 0,
+  "qword_offsets": [],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ResetSystemRuntimeDxe.efi",
+  "size": 22528,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   137,
+   13579,
+   13847,
+   14067,
+   18535,
+   20615,
+   21229,
+   21237
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   18535
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/RuntimeDxe.efi",
+  "size": 20992,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   12011,
+   12279,
+   12499,
+   16999,
+   19079
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SdDxe.efi",
+  "size": 33792,
+  "word_0xF0000000": 18,
+  "word_offsets": [
+   137,
+   14236,
+   14420,
+   14836,
+   14868,
+   14900,
+   15032,
+   15120
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   29287
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/Sec.efi",
+  "size": 69632,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   137,
+   278,
+   514,
+   522,
+   36220,
+   36284,
+   36312,
+   45307
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   522,
+   57015
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SecurityStubDxe.efi",
+  "size": 37888,
+  "word_0xF0000000": 8,
+  "word_offsets": [
+   137,
+   15300,
+   22251,
+   22519,
+   22739,
+   23973,
+   33911,
+   35991
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   33911
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SetupBrowser.efi",
+  "size": 107520,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   137,
+   198,
+   79456,
+   79660,
+   80372,
+   80412,
+   80440,
+   80524
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   102023
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/ShengBootMemoryDxe.efi",
+  "size": 26112,
+  "word_0xF0000000": 19,
+  "word_offsets": [
+   137,
+   5484,
+   5648,
+   5672,
+   5688,
+   5808,
+   5844,
+   5876
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   22135
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Applications/UFPLoader/UFPLoader/DEBUG/UFPLoader.dll",
+  "size": 20480,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   137,
+   1152,
+   1188,
+   1228,
+   1268,
+   1444,
+   1836,
+   2068
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Applications/UFPLoader/UFPLoader/DEBUG/UFPLoader.efi",
+  "size": 20480,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   137,
+   1152,
+   1188,
+   1228,
+   1268,
+   1444,
+   1836,
+   2068
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Applications/UFPLoader/UFPLoader/OUTPUT/UFPLoader.efi",
+  "size": 20480,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   137,
+   1152,
+   1188,
+   1228,
+   1268,
+   1444,
+   1836,
+   2068
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Drivers/RamManagerDxe/RamManagerDxe/DEBUG/RamManagerDxe.dll",
+  "size": 25600,
+  "word_0xF0000000": 20,
+  "word_offsets": [
+   137,
+   4756,
+   5392,
+   5408,
+   6236,
+   6640,
+   6820,
+   6892
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   21623
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Drivers/RamManagerDxe/RamManagerDxe/DEBUG/RamManagerDxe.efi",
+  "size": 25600,
+  "word_0xF0000000": 20,
+  "word_offsets": [
+   137,
+   4756,
+   5392,
+   5408,
+   6236,
+   6640,
+   6820,
+   6892
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   21623
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Drivers/RamManagerDxe/RamManagerDxe/OUTPUT/RamManagerDxe.efi",
+  "size": 25600,
+  "word_0xF0000000": 20,
+  "word_offsets": [
+   137,
+   4756,
+   5392,
+   5408,
+   6236,
+   6640,
+   6820,
+   6892
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   21623
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Drivers/SimpleFbDxe/SimpleFbDxe/DEBUG/SimpleFbDxe.dll",
+  "size": 23040,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   137,
+   5268,
+   5448,
+   5800,
+   5916,
+   5952,
+   6452,
+   6488
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19047
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Drivers/SimpleFbDxe/SimpleFbDxe/DEBUG/SimpleFbDxe.efi",
+  "size": 23040,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   137,
+   5268,
+   5448,
+   5800,
+   5916,
+   5952,
+   6452,
+   6488
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19047
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Drivers/SimpleFbDxe/SimpleFbDxe/OUTPUT/SimpleFbDxe.efi",
+  "size": 23040,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   137,
+   5268,
+   5448,
+   5800,
+   5916,
+   5952,
+   6452,
+   6488
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19047
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Drivers/SmBiosTableDxe/SmBiosTableDxe/DEBUG/SmBiosTableDxe.dll",
+  "size": 26112,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   5748,
+   5848,
+   5968,
+   6028,
+   6192,
+   6216,
+   6232
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   21095
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Drivers/SmBiosTableDxe/SmBiosTableDxe/DEBUG/SmBiosTableDxe.efi",
+  "size": 26112,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   5748,
+   5848,
+   5968,
+   6028,
+   6192,
+   6216,
+   6232
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   21095
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Drivers/SmBiosTableDxe/SmBiosTableDxe/OUTPUT/SmBiosTableDxe.efi",
+  "size": 26112,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   5748,
+   5848,
+   5968,
+   6028,
+   6192,
+   6216,
+   6232
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   21095
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Sec/Sec/DEBUG/Sec.dll",
+  "size": 69632,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   137,
+   278,
+   514,
+   522,
+   36220,
+   36284,
+   36312,
+   45307
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   522,
+   57015
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Sec/Sec/DEBUG/Sec.efi",
+  "size": 69632,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   137,
+   278,
+   514,
+   522,
+   36220,
+   36284,
+   36312,
+   45307
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   522,
+   57015
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SiliciumPkg/Sec/Sec/OUTPUT/Sec.efi",
+  "size": 69632,
+  "word_0xF0000000": 12,
+  "word_offsets": [
+   137,
+   278,
+   514,
+   522,
+   36220,
+   36284,
+   36312,
+   45307
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   522,
+   57015
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SimpleFbDxe.efi",
+  "size": 23040,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   137,
+   5268,
+   5448,
+   5800,
+   5916,
+   5952,
+   6452,
+   6488
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19047
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SimpleTextInOutSerial.efi",
+  "size": 19968,
+  "word_0xF0000000": 27,
+  "word_offsets": [
+   137,
+   1136,
+   1172,
+   1212,
+   1252,
+   1356,
+   1420,
+   1496
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16007
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SmBiosTableDxe.efi",
+  "size": 26112,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   5748,
+   5848,
+   5968,
+   6028,
+   6192,
+   6216,
+   6232
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   21095
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/SmbiosDxe.efi",
+  "size": 29696,
+  "word_0xF0000000": 28,
+  "word_offsets": [
+   137,
+   9232,
+   9428,
+   9460,
+   9568,
+   9596,
+   9852,
+   9936
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   25767
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/StatusCodeHandlerRuntimeDxe.efi",
+  "size": 19968,
+  "word_0xF0000000": 6,
+  "word_offsets": [
+   137,
+   12011,
+   12279,
+   12499,
+   16487,
+   18567
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16487
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UFPLoader.efi",
+  "size": 20480,
+  "word_0xF0000000": 25,
+  "word_offsets": [
+   137,
+   1152,
+   1188,
+   1228,
+   1268,
+   1444,
+   1836,
+   2068
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   16999
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UdonLogExport.efi",
+  "size": 23040,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   137,
+   1152,
+   1188,
+   1228,
+   1268,
+   1900,
+   1992,
+   2008
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19559
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UniXNU.efi",
+  "size": 100352,
+  "word_0xF0000000": 11,
+  "word_offsets": [
+   137,
+   69387,
+   69655,
+   69875,
+   71957,
+   75364,
+   75687,
+   76373
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   95335
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UniXNUDxe.efi",
+  "size": 22528,
+  "word_0xF0000000": 20,
+  "word_offsets": [
+   137,
+   5160,
+   5192,
+   5688,
+   5724,
+   6224,
+   6292,
+   6352
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19063
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UniXNUPkg/Application/UniXNU/UniXNU/DEBUG/UniXNU.dll",
+  "size": 100352,
+  "word_0xF0000000": 11,
+  "word_offsets": [
+   137,
+   69387,
+   69655,
+   69875,
+   71957,
+   75364,
+   75687,
+   76373
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   95335
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UniXNUPkg/Application/UniXNU/UniXNU/DEBUG/UniXNU.efi",
+  "size": 100352,
+  "word_0xF0000000": 11,
+  "word_offsets": [
+   137,
+   69387,
+   69655,
+   69875,
+   71957,
+   75364,
+   75687,
+   76373
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   95335
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UniXNUPkg/Application/UniXNU/UniXNU/OUTPUT/UniXNU.efi",
+  "size": 100352,
+  "word_0xF0000000": 11,
+  "word_offsets": [
+   137,
+   69387,
+   69655,
+   69875,
+   71957,
+   75364,
+   75687,
+   76373
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   95335
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UniXNUPkg/Driver/UniXNUDxe/UniXNUDxe/DEBUG/UniXNUDxe.dll",
+  "size": 22528,
+  "word_0xF0000000": 20,
+  "word_offsets": [
+   137,
+   5160,
+   5192,
+   5688,
+   5724,
+   6224,
+   6292,
+   6352
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19063
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UniXNUPkg/Driver/UniXNUDxe/UniXNUDxe/DEBUG/UniXNUDxe.efi",
+  "size": 22528,
+  "word_0xF0000000": 20,
+  "word_offsets": [
+   137,
+   5160,
+   5192,
+   5688,
+   5724,
+   6224,
+   6292,
+   6352
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19063
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UniXNUPkg/Driver/UniXNUDxe/UniXNUDxe/OUTPUT/UniXNUDxe.efi",
+  "size": 22528,
+  "word_0xF0000000": 20,
+  "word_offsets": [
+   137,
+   5160,
+   5192,
+   5688,
+   5724,
+   6224,
+   6292,
+   6352
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19063
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UsbBusDxe.efi",
+  "size": 50688,
+  "word_0xF0000000": 10,
+  "word_offsets": [
+   137,
+   198,
+   21976,
+   22852,
+   23212,
+   33515,
+   33783,
+   34003
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   46263
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UsbKbDxe.efi",
+  "size": 34816,
+  "word_0xF0000000": 21,
+  "word_offsets": [
+   137,
+   13440,
+   13556,
+   14328,
+   14500,
+   14900,
+   14932,
+   14964
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   28775
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/UsbMassStorageDxe.efi",
+  "size": 33280,
+  "word_0xF0000000": 14,
+  "word_offsets": [
+   137,
+   10516,
+   11588,
+   11624,
+   11744,
+   11924,
+   21771,
+   22039
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   29479
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/VariableRuntimeDxe.efi",
+  "size": 61952,
+  "word_0xF0000000": 9,
+  "word_offsets": [
+   137,
+   562,
+   4204,
+   43755,
+   44023,
+   44243,
+   57271,
+   59351
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   562,
+   57271
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/WatchdogTimer.efi",
+  "size": 18432,
+  "word_0xF0000000": 23,
+  "word_offsets": [
+   137,
+   1136,
+   1172,
+   1212,
+   1252,
+   1364,
+   1436,
+   1496
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   14439
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/udonPkg/Applications/UdonLogExport/UdonLogExport/DEBUG/UdonLogExport.dll",
+  "size": 23040,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   137,
+   1152,
+   1188,
+   1228,
+   1268,
+   1900,
+   1992,
+   2008
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19559
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/udonPkg/Applications/UdonLogExport/UdonLogExport/DEBUG/UdonLogExport.efi",
+  "size": 23040,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   137,
+   1152,
+   1188,
+   1228,
+   1268,
+   1900,
+   1992,
+   2008
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19559
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/udonPkg/Applications/UdonLogExport/UdonLogExport/OUTPUT/UdonLogExport.efi",
+  "size": 23040,
+  "word_0xF0000000": 26,
+  "word_offsets": [
+   137,
+   1152,
+   1188,
+   1228,
+   1268,
+   1900,
+   1992,
+   2008
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   19559
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/udonPkg/Drivers/ShengBootMemoryDxe/ShengBootMemoryDxe/DEBUG/ShengBootMemoryDxe.dll",
+  "size": 26112,
+  "word_0xF0000000": 19,
+  "word_offsets": [
+   137,
+   5484,
+   5648,
+   5672,
+   5688,
+   5808,
+   5844,
+   5876
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   22135
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/udonPkg/Drivers/ShengBootMemoryDxe/ShengBootMemoryDxe/DEBUG/ShengBootMemoryDxe.efi",
+  "size": 26112,
+  "word_0xF0000000": 19,
+  "word_offsets": [
+   137,
+   5484,
+   5648,
+   5672,
+   5688,
+   5808,
+   5844,
+   5876
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   22135
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/udonPkg/Drivers/ShengBootMemoryDxe/ShengBootMemoryDxe/OUTPUT/ShengBootMemoryDxe.efi",
+  "size": 26112,
+  "word_0xF0000000": 19,
+  "word_offsets": [
+   137,
+   5484,
+   5648,
+   5672,
+   5688,
+   5808,
+   5844,
+   5876
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   22135
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/udonPkg/LinuxBoot/LinuxBootDxe/DEBUG/LinuxBootDxe.dll",
+  "size": 24576,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   137,
+   5256,
+   5340,
+   5700,
+   5768,
+   5800,
+   6272,
+   6308
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   21111
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/udonPkg/LinuxBoot/LinuxBootDxe/DEBUG/LinuxBootDxe.efi",
+  "size": 24576,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   137,
+   5256,
+   5340,
+   5700,
+   5768,
+   5800,
+   6272,
+   6308
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   21111
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/AARCH64/udonPkg/LinuxBoot/LinuxBootDxe/OUTPUT/LinuxBootDxe.efi",
+  "size": 24576,
+  "word_0xF0000000": 17,
+  "word_offsets": [
+   137,
+   5256,
+   5340,
+   5700,
+   5768,
+   5800,
+   6272,
+   6308
+  ],
+  "qword_ptr": 1,
+  "qword_offsets": [
+   21111
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ },
+ {
+  "file": "/home/<host>/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd",
+  "size": 4194304,
+  "word_0xF0000000": 10,
+  "word_offsets": [
+   514,
+   522,
+   36220,
+   36284,
+   36312,
+   45307,
+   45575,
+   45795
+  ],
+  "qword_ptr": 2,
+  "qword_offsets": [
+   522,
+   57015
+  ],
+  "movk64": 0,
+  "movk32": 0,
+  "movz24": 0
+ }
+]
