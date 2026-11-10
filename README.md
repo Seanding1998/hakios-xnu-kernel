@@ -5,8 +5,10 @@
 
 这是 [HakiOS](https://github.com/oosexgang/hakios-xnu-kernel)（Apple XNU 内核
 直接跑在安卓高通手机上）向**一加 Ace 2（PHK110 / 骁龙 8+ Gen 1 SM8475 /
-16 GB）**的移植分支。上游唯一参考机是 POCO X5 Pro（redwood / SM7325）；本
-分支把它带上了第二台真机，并且除首页 README 的呈现层替换（上游原 README
+16 GB）**的移植分支。上游的参考机是 POCO X5 Pro（redwood / SM7325）；社区
+已在 SM8475 上完成了多台设备的移植（K60/mondrian、MIX Fold 2、POCO F5 Pro
+等同 SoC 先例），本分支将上游扩展到 PHK110，并且除首页 README 的呈现层替换
+（上游原 README
 原样保留为 [README-UPSTREAM.md](README-UPSTREAM.md)）外，**不改上游任何已有文件**——
 所有内容以新增形式存在（`devices/phk110/`、`docs/phk110/`、`wave*-scripts/`、`logs/`）。
 启动只走 `boot_b` 槽位（RAM 级引导），日常安卓 `boot_a` 从未被刷写或修改；
@@ -106,7 +108,7 @@ v2.0（`LICENSE.APSL`）。致谢：
 - **[oosexgang/hakios-xnu-kernel](https://github.com/oosexgang/hakios-xnu-kernel)**（以及 hakios-metal / hakios-sm7325 / hakios-uefi）——一切工作的基座
 - **takasugl/uefi-udon**（与 UniXNU-udon）——本机 UEFI 底座（udonPkg）的来源
 - **OnePlusOSS**（`android_kernel_oneplus_sm8475`、`android_kernel_modules_and_devicetree_oneplus_sm8475`，GPL-2.0）——SM8475 dts/驱动研究参照；**本分支不再分发其任何文件**，soc.args 等数值是从手机自带的 FDT 提取的
-- **Mu-Silicium** 与 **HeliumStudio-Dev/hackios-xnu-kernel**（raphael/SM8150 移植）——"第二台设备移植"形状与 UEFI 构建方式的参考
+- **Mu-Silicium** 与 **HeliumStudio-Dev/hackios-xnu-kernel**（raphael/SM8150 移植）——多设备移植形态与 UEFI 构建方式的参考
 - Apple 的 macOS/iOS 镜像（IPSW）不属于本仓也不由本仓分发，使用者自备自己的副本
 
 ## 出处与脱敏说明
