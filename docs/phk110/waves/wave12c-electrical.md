@@ -1,11 +1,11 @@
-# Wave 12c — S3910 触摸 probe 攻坚三刷（Boot #19/#20/#21，v10c→v10d→v10e）：**PASS——`TouchComm v1 firmware` 硬验收行到手，v0.3「触感」四项全部达成**
+# 阶段 12c · 2026-11-03 · 触摸探针第三轮：误诊推翻与探针通过
 
-Date: 2026-11-03. Agent: Wave 12c 执行子代理（全循环：6 项修复单实施 → 三轮重编/重打/打包/自检
+Date: 2026-11-03. Agent: 阶段 12c 执行记录（全循环：6 项修复单实施 → 三轮重编/重打/打包/自检
 40/40 ×3 → 自刷 ×3 → 自取证 ×3 → 判定 PASS）。
 
 **一句话**：wave12b 判定的"芯片电气应答层故障"是**误诊**——芯片从 Boot #18 起就在 v1 TouchComm
-帧里完整应答（b19 原始字节铁证），真正的病灶是 `v1_read` 的**续读组装**：这块芯片**每个 CS 帧只
-吐一个 9 字节块**（`[a5 03]`+7 负载字节），且**块按 ~20 ms 节拍重新武装**（b20 铁证：节拍外的帧
+帧里完整应答（b19 原始字节证据），真正的病灶是 `v1_read` 的**续读组装**：这块芯片**每个 CS 帧只
+吐一个 9 字节块**（`[a5 03]`+7 负载字节），且**块按 ~20 ms 节拍重新武装**（b20 证据：节拍外的帧
 读回错位填充且不消耗流）。v10e 把续读改为"20 ms 节拍 + 9 字节分帧收割"，Boot #21 首轮即出：
 
 ```
@@ -20,24 +20,24 @@ max x/y 12399/27719 = 1240×2772 面板 0 基坐标，与 live FDT `display-coor
 
 ---
 
-## 0. 三刷总览
+## 0. 第三次刷写总览
 
 | Boot | 镜像/内核 | 改动 | 结果 |
 | --- | --- | --- | --- |
-| #19 | v10c `a6d3d007…` / `181bfc57…` | 修复单 6 项全带（原始字节取证 + 5 相位电气扫描 + loopback 探针 + boot-arg 旋钮） | ❌ probe 未达，但**取证破案**：芯片在 v1 帧里活着，`v1_read` 续读组装是断点 |
-| #20 | v10d `d69ff2c6…` / `49268c95…` | 续读改 9 字节分帧收割（无节奏） | ❌ 续读帧紧贴 header 帧（µs 级）踩进芯片未武装窗口，读回 `30 ff…` 错位字节 → **块 20 ms 节拍规律落网** |
+| #19 | v10c `a6d3d007…` / `181bfc57…` | 修复单 6 项全带（原始字节取证 + 5 相位电气扫描 + loopback 探针 + boot-arg 旋钮） | ❌ probe 未达，但**取证定位根因**：芯片在 v1 帧里活着，`v1_read` 续读组装是断点 |
+| #20 | v10d `d69ff2c6…` / `49268c95…` | 续读改 9 字节分帧收割（无节奏） | ❌ 续读帧紧贴 header 帧（µs 级）踩进芯片未武装窗口，读回 `30 ff…` 错位字节 → **块 20 ms 节拍规律捕获** |
 | #21 | **v10e `0762e1bf…` / `b777ff5d…`** | 分帧收割 + 20 ms 节拍重试 + header 帧重试 + idle 尾块容忍 + 脏帧日志 | ✅ **PASS**：首轮 identify → app info → config → ready 全链走通 |
 
 ## 1. 修复单 6 项实施记录（v10c = fix1-v10c-electrical.py，9 处替换全过断言）
 
 | # | 修复单项 | 实施 | 真机结果（b19） |
 | --- | --- | --- | --- |
-| 1 | **bitbang 原始字节取证** | v1 窗第 1/2/3 轮 + 每 10 轮打印 9 字节；v2 读头 4 字节 + CRC-6 余数 | **一击破案**：`a5 10 1c 00 01 01 53 33 39` = 合法 v1 IDENTIFY 帧 |
+| 1 | **bitbang 原始字节取证** | v1 窗第 1/2/3 轮 + 每 10 轮打印 9 字节；v2 读头 4 字节 + CRC-6 余数 | **一击定位根因**：`a5 10 1c 00 01 01 53 33 39` = 合法 v1 IDENTIFY 帧 |
 | 2 | **MISO 上拉重试** | boot-arg `touch_miso_pull=0..3` + 扫描相位 1 上拉探一轮 | 原始字节与基线逐字节相同 → 芯片主动驱动 MISO，偏置无关 |
 | 3 | **RESET 极性实验** | boot-arg `touch_reset_active_high=1` + 相位 4 反极性整套上电 | 相位 4 芯片静音（全 ff）→ 极性确系 active-low，DT `reset-on-state=0` 一致 |
 | 4 | **位拍节奏 boot-arg 化** | boot-arg `touch_bitbang_us=N` + 相位 2/3 用 5 µs 探 | 字节与基线相同 → 应答与位拍速率无关 |
 | 5 | **pad/mux 复核（文档侧）** | live FDT 反编译 + OnePlus GPL 树 | qup4 = gpio16/17/18(+19cs) func "qup4"、bias-disable、6 mA——引脚映射逐字正确；活跃节点 = `synaptics_tcm_hbp@0`（S3910，okay） |
-| 6 | **GENI DMA/GSI 备选** | 按报告定位 = 远期备选 | 未实施（第 5 环由软件破案，无需） |
+| 6 | **GENI DMA/GSI 备选** | 按报告定位 = 远期备选 | 未实施（第 5 环由软件定位根因，无需） |
 
 超计划加项：**loopback 探针**（RESET 按住/释放各拍一帧已知图案）+ **扫描相位 5**（VDD 开关
 GPIO97 拉低重跑上电，boot-arg `touch_vdd_active_high=0`）→ b19 实测拉低后芯片照常应答 →
@@ -45,7 +45,7 @@ DT 里 `vdd-gpio` 的 active-low flag 是烟雾弹（vendor 驱动 legacy API �
 
 ## 2. 判定证据链（b19 → b20 → b21，逐字节）
 
-### 2.1 b19：芯片活着 + "钳低"误诊翻案
+### 2.1 b19：芯片活着 + "钳低"误诊推翻
 
 ```
 [   10.818309]: s3910: loopback probe, reset asserted, rx: ff ff ff ff ff ff ff ff ff    ← 芯片静音，线悬空高
@@ -61,7 +61,7 @@ ESD 钳低为正常物理，网调报告同判）；②**芯片活着且只讲 v
 v1 语义 STATUS_ERROR 拒绝 v2 框架的命令，v2 fallback 死路实锤）；③**`v1_read` 续读分支是断点**
 ——IDENTIFY 匹配条件本应命中，续读返回 false。
 
-### 2.2 b20：块 20 ms 节拍规律落网
+### 2.2 b20：块 20 ms 节拍规律捕获
 
 ```
 [   10.917209]: s3910: v1 chunk 1: 30 ff ff ff ff ff ff ff ff    ← 续读帧紧贴 header 帧（µs 级）→ 错位
@@ -92,7 +92,7 @@ payload[5] 起送 = b20 的错位帧没消耗任何东西）。b19 的"长帧 26
 identify 28 负载字节 = 帧头 5 + 4 块 × 7 恰好收满（含 padding）；app info 36 字节、report config
 128 字节同款收割全过；probe 总耗时 ~1.0 s。max x/y 12399/27719 与 1240×2772 面板 0 基坐标吻合。
 会话质量：7/7 核（t=10.419）、零真 panic（14 条 panic_trace 噪音同形）、60 s expired 干净返回、
-按键链照常（1256 reads 0 failed）、loader `payload entry 'kernel' size e2c000` = 14,860,288 = v10e 上机。
+按键链照常（1256 reads 0 failed）、loader `payload entry 'kernel' size e2c000` = 14,860,288 = v10e 真机验证。
 
 ## 3. 构建/打包/自检三轮（同一管线）
 
@@ -116,7 +116,7 @@ verify 40 项（形状 + 条目级 cmp + 内核新串在 graft + 无新 boot-arg
 adb devices（SERIAL_REDACTED, boot_completed=1）→ adb reboot bootloader → sleep 8-10
 usbipd attach --wsl --busid 2-2（18d1:d00d，重枚举必重 attach）→ getvar product = taro ✓（×3）
 sha256sum 对包 ✓（×3）→ fastboot flash boot_b（Sending/Writing 全 OKAY）→ set_active b → reboot
-8 轮 × 60 s 兜底自然回安卓（8.3 / 8.7 / 8.7 分钟）→ su dd logdump（bs=4096 count=32）→ adb pull
+8 轮 × 60 s 回退自然回安卓（8.3 / 8.7 / 8.7 分钟）→ su dd logdump（bs=4096 count=32）→ adb pull
 → extract-logdump.py → intel/m3-boot1/b19|b20|b21-kernel-log.txt（32,886 / 32,895 / 25,260 B 全完整）
 ```
 
@@ -139,7 +139,7 @@ clean 遵守（树内叠加 = devices/phk110 驱动源三轮叠加，经 sync-dr
 BootShim 禁重建遵守（FD `8924cb67…`、shim `108ce972…` 三轮原样）；loader.c 零改动（loader.efi
 `66c6b342…` 三轮 cmp 同）；Windows device-layer 只新增；每次源码替换脚本全带 count==1 断言
 （fix1 九处 + fix2 两处 + fix3 三处全命中）；刷写失败 0 次；probe 判定失败 2 次（b19 取证轮、
-b20 节奏轮）后第 3 刷 PASS，第 3 刷由主代理转发网调报告授权续刷（"根因 3 重组作保险丝同刷"
+b20 节奏轮）后第 3 刷 PASS，第 3 刷经外部网调报告确认后续刷（"根因 3 重组作保险丝同刷"
 + 任务书课程修正条款），未超预算滥用。
 
 ## 7. 交付物清单（全部只新增）
@@ -156,10 +156,10 @@ b20 节奏轮）后第 3 刷 PASS，第 3 刷由主代理转发网调报告授�
 | **v10f 备选（未刷）** | `wave12c-scripts/fix4-v10f-vendorbits.py`（MOSI 0xFF 读填充 + CS setup/hold + ATTN 进日志，boot-arg `touch_read_fill`） | — | 备而未用 |
 | Boot logdump / 内核日志 | `logdump-v10c.bin` / `logdump-v10d.bin` / `logdump-v10e.bin` + `intel/m3-boot1/b19|b20|b21-kernel-log.txt` | 128 KiB ×3 | `8ee9d8df…` / `f5278ff3…` / `06fd11c9…`；日志 `ab51972b…` / `4ee92f1c…` / `e3aacdd9…` |
 
-## 8. 下一步（v0.3 收官 → v0.4）
+## 8. 下一步（v0.3 完成 → v0.4）
 
 1. **真人点屏验证**：驱动已在 8 ms 轮询 ATTN 并收 touch report（report config 128 B 已收编），
-   用户点屏预期出现 `s3910: finger N at x, y (of 12399 x 27719)` 行——下一轮会话或本轮日志尾验；
+   点屏预期出现 `s3910: finger N at x, y (of 12399 x 27719)` 行——下一轮会话或本轮日志尾验；
 2. 若坐标/置信异常：`touch_flip` boot-arg 免重编可调；若报告断流，v10f 三件（0xFF 读填充、
    CS 时序、ATTN 日志）脚本已备好即刷；
-3. 触摸 probe 达成后，v0.3 全绿 → 转入 v0.4 Darwin IPSW 存储施工（Wave 15 施工单已备）。
+3. 触摸 probe 达成后，v0.3 全绿 → 转入 v0.4 Darwin IPSW 存储施工（阶段 15 施工单已备）。

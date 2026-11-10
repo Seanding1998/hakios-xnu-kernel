@@ -1,11 +1,11 @@
-# Wave 21 设计预稿 — loader 桥接网络（v0.4 SSH 数据面）
+# 阶段 21 · 2026-11-08 · 设计稿：经 loader USB 通道的网络（SSH 数据面）
 
-> 2026-11-08 · 主代理设计稿（基于 wave19-prep 方案 A + 源码实证）。实施波开工前如有 Wave 20 新事实再修订。
+> 2026-11-08 · 设计稿（基于 wave19-prep 方案 A + 源码实证）。实施波开工前如有 阶段 20 新事实再修订。
 > 三端预估：loader.c ~200-300 行 / 内核 en0 ~150-250 行 / loader_talk.py ~300-400 行。
 
 ## 0. 目标
 
-Darwin 用户空间（launchd + sshd，Wave 20 产物）的 sshd 监听 TCP:22；主机 `ssh -o ProxyCommand="python loader_talk.py tunnel %h 10.0.0.2" 10.0.0.2` 免 WiFi/免内核 USB 栈直连。方案 A（wave19-prep）：零 UEFI 二进制改动，复用 loader 现有 USB 字节管线。
+Darwin 用户空间（launchd + sshd，阶段 20 产物）的 sshd 监听 TCP:22；主机 `ssh -o ProxyCommand="python loader_talk.py tunnel %h 10.0.0.2" 10.0.0.2` 免 WiFi/免内核 USB 栈直连。方案 A（wave19-prep）：零 UEFI 二进制改动，复用 loader 现有 USB 字节管线。
 
 ## 1. 通道事实（源码实证）
 
@@ -59,7 +59,7 @@ Darwin 用户空间（launchd + sshd，Wave 20 产物）的 sshd 监听 TCP:22�
 |---|---|---|
 | N1 | loader 网环 + `oem netmode/netstat` + loader_talk `netmode` 搬运循环 + 内核 en0 tx/rx 环（**不含 inet**，先裸帧环回） | 主机发任意帧 → Darwin 侧环回原样回传（`oem netstat` 计数对账） |
 | N2 | 内核 ifnet + inet 栈接线 + 主机 wintun + 地址 10.0.0.1/2 | 主机 `ping 10.0.0.2` 通（ICMP over 桥） |
-| N3 | sshd 起来（Wave 20 产物）+ `ssh 10.0.0.2` | **v0.4 达成：SSH shell** |
+| N3 | sshd 起来（阶段 20 产物）+ `ssh 10.0.0.2` | **v0.4 达成：SSH shell** |
 
 ## 5. 风险与对策
 
@@ -68,7 +68,7 @@ Darwin 用户空间（launchd + sshd，Wave 20 产物）的 sshd 监听 TCP:22�
 | USB bulk 吞吐不足 | SSH 文本流量 KB 级，60MB 管道余量巨大；fastboot bulk 实测可达 MB/s 级 |
 | 轮询延迟（250ms）→ SSH 卡顿 | 可调：block_poll 节奏 / upload 轮询间隔；SSH 交互在 100-300ms RTT 可用 |
 | loader core-0 预算 | net_poll 摊入既有 block_poll 空转周期（mailbox 每写已有 flush+读回，增量极小） |
-| XNU ifnet 最小实现未知数 | 先查 fork/upstream 有无网络驱动先例（redwood v0.6 WiFi 未做——可能无先例，需读 XNU ifnet API；Wave 21 实施首日任务） |
+| XNU ifnet 最小实现未知数 | 先查 fork/upstream 有无网络驱动先例（redwood v0.6 WiFi 未做——可能无先例，需读 XNU ifnet API；阶段 21 实施首日任务） |
 | wintun 与火绒 | 用户态 dll，无内核组件，预判无冲突（hrdevmon 只拦 usbipd 的 VBoxUSB） |
 
 ## 6. 备选降级链

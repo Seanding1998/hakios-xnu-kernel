@@ -1,6 +1,6 @@
-# Wave 3 · 集成报告 — HakiOS→PHK110：UEFI 平台包 + 内核 + 打包链全通，boot.img 已产出
+# 阶段 3 · 2026-11-02 · 内核与平台包的集成打包：第一份 boot 镜像
 
-实现代理（Wave 3 集成）· 2026-11-02 · **结论先行：`xnu-phk110.img`（7,882,752 B）已产出并拷到 Windows
+实现代理（阶段 3 集成）· 2026-11-02 · **结论先行：`xnu-phk110.img`（7,882,752 B）已产出并拷到 Windows
 `device-layer/`，镜像内 shim/FD/payload 三层常量逐字节验证通过；全程未碰手机（无 adb/fastboot 调用）。**
 
 一条链：内核仓 3 个全局文件参数化（redwood 默认逐指令不变，已证）→ `uefi/apply.sh phk110` 生成构建树
@@ -85,7 +85,7 @@ apply.sh 原序重做：`git -C Mu-Silicium apply --whitespace=nowarn <绝对路
 - V-3：Mu 树 XnuLoader.h == 设备覆盖版（0xC0000000）`diff -q` 为空；
 - V-8：`Silicium-ACPI/Platforms/Xiaomi/ingres/` 有 AcpiTables.inf/SSDT.asl/SSDT.aml（BASE 版路径与 phk110.dsc
   引用一致，**无需修 dsc/fdf**，任务书预警的 BASE≠HEAD 差异未发生——phk110Pkg 对 BASE 一次构建通过）；
-- 厂商 blob：`Binaries/phk110/` 从 Wave2-D 的 F 树（`~/hakios/Mu-Silicium/Binaries/phk110`，322 文件）整目录
+- 厂商 blob：`Binaries/phk110/` 从 阶段 2-D 的 F 树（`~/hakios/Mu-Silicium/Binaries/phk110`，322 文件）整目录
   拷入（apply.sh 只带来 README.md，提交外本地填充，与 D 的流程一致）；84 个 INF 引用按 PackagesPath 解析
   **missing=0**；
 - `git status` 汇总：9 M（patch 4 文件 + BootShim.S 设备版 + Binaries 子模块）+ 6 ??（phk110Pkg、DTBs、
@@ -170,7 +170,7 @@ soc_ipa_stream_uc=0x5c2 soc_ipa_fw=ipa_fws
 
 ---
 
-## 5. 产物清单与上机清单（给主代理）
+## 5. 产物清单与真机验证清单
 
 ### 5.1 产物（Windows `device-layer/`，sha256）
 
@@ -184,7 +184,7 @@ WSL 源：`~/hakios/kernel/{xnu-phk110.img, run-payload.bin}`、
 `~/hakios/kernel/Mu-Silicium/Build/phk110Pkg/RELEASE_CLANGPDB/FV/SILICIUM_UEFI.fd`。
 （device-layer/ 里旧的 `hakios-kernel`/`payload.bin` 是前序 wave 的 qemu 产物，未动。）
 
-### 5.2 上机步骤（RAM boot，零写入分区）
+### 5.2 真机验证步骤（RAM boot，零写入分区）
 
 ```sh
 # 手机进 bootloader（fastboot）后：
@@ -227,11 +227,11 @@ adb pull /data/local/tmp/logdump.bin
    uart 0、cores 8、core_shift 8、small_cores 0x0f）+ loader.c:4346 处按 `SCREEN.base==0xB8000000` 选台；
    之后 cmdline 再放 `cpus=8 bootcpu=7`（内核才是 8 核大核启动）。
 2. **单核 + qemu 平台的次生影响**：PSCI 一次都不会被调（无 CPU_ON、无 SYSTEM_OFF——重启走看门狗/冷复位
-   兜底）；串口已关（serial=0）规避未知 MMIO 写。
-3. **payload 窗**：0xC0000000..0xC3FFFFFF 按 Wave2-D 的 DT/iomem 证据是真 RAM；loader.efi 的 PE 首选基址
+   回退）；串口已关（serial=0）规避未知 MMIO 写。
+3. **payload 窗**：0xC0000000..0xC3FFFFFF 按 阶段 2-D 的 DT/iomem 证据是真 RAM；loader.efi 的 PE 首选基址
    0xA1000000 落在 0xA0400000-0xA6DFFFFF（真 RAM 段 4），UEFI 拿不到首选地址会自动重定位，无碍。
-4. **V-1/V-2/V-4/V-6/V-7**（Wave2-D §5）仍需首跑 logfs/屏显复核，其中 V-2/V-6 已在构建侧闭环
-   （FD 固定地址 + payload 常量逐字节验证），其余等上机。
+4. **V-1/V-2/V-4/V-6/V-7**（阶段 2-D §5）仍需首跑 logfs/屏显复核，其中 V-2/V-6 已在构建侧闭环
+   （FD 固定地址 + payload 常量逐字节验证），其余等真机验证。
 5. `modem_ipa_fw_at=0x8b910000`、`soc_pas_mpss=0x4` 仍是未真机验证值（wave1 §2/§3 已标注验证法）。
 
 ---
@@ -242,10 +242,10 @@ adb pull /data/local/tmp/logdump.bin
 |---|---|
 | loader.c 加 phk110 平台表 + FB 选台（§5.3 风险 1） | 内核侧下一 wave；本 wave 严守任务边界未动 |
 | `cpus=8 bootcpu=7` 上命令行 | 依赖上项；当前加了也是错的几何 |
-| `tools/provenance.allow` 两行（Wave2-D §5.3/规格 §6.13） | **本 wave 已加**（`pending …/phk110.dtb` + `vendor …/Binaries/phk110/*`）；`provenance-check.py` 的 2 个 FAIL（`tools/mkdatavol.py:7`、`tools/sparse-split.py:8` 缺 flash 行）**是本仓既有问题**（stash 复核过），另有 redwood dtb 行的 stale warn 属同类（文件未提交时必 warn） |
-| `devices/manifest.conf` 登记 | 按流程等上机验证后主代理决定 |
+| `tools/provenance.allow` 两行（阶段 2-D §5.3/规格 §6.13） | **本 wave 已加**（`pending …/phk110.dtb` + `vendor …/Binaries/phk110/*`）；`provenance-check.py` 的 2 个 FAIL（`tools/mkdatavol.py:7`、`tools/sparse-split.py:8` 缺 flash 行）**是本仓既有问题**（stash 复核过），另有 redwood dtb 行的 stale warn 属同类（文件未提交时必 warn） |
+| `devices/manifest.conf` 登记 | 按流程等真机验证后再定 |
 | userland/root.apfs（真根镜像） | 未构建（redwood 流程另行构建）；v0.1 用 hello/mockfs |
-| `Mu-phk110.img`（build_uefi 自产的无 payload 镜像） | 留在 MU 树作参考，上机用 `xnu-phk110.img` |
+| `Mu-phk110.img`（build_uefi 自产的无 payload 镜像） | 留在 MU 树作参考，真机验证用 `xnu-phk110.img` |
 | 20 核/8GB 下全量重建 | venv 在 `~/hakios/kernel/venv`，MU 树 `Build/` 存在时增量构建跳过 setup/update，改文件后直接重跑 §3 命令 |
 
 ## 7. 复跑手册（WSL，全部可重入）

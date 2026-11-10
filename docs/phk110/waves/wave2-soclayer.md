@@ -1,4 +1,4 @@
-# Wave 2 · 实现代理 E — sm8475 SoC 层与 phk110 设备配置填充 + 配置系统验证
+# 阶段 2 · 2026-11-02 · sm8475 SoC 层与设备配置填充
 
 > 2026-11-02 · 输入：`docs/waves/wave1-socargs.md`（代理 A）、`docs/waves/wave1-hwmap.md`（代理 B）、
 > `upstream/hakios-sm7325/`（redwood 范本）、`upstream/hakios-xnu-kernel/docs/porting/index.md` + `docs/configs.md` + `docs/porting/repositories.md`。
@@ -148,7 +148,7 @@ firmware wanted from the phone: none
 ```
 
 SOC=sm8475 / CPUS=8 / BOOTCPU=7 生效 ✓；无 PROBLEM 行（类型/依赖/固件/命令行长度检查全过）✓。
-CONFIG_UFS=2 来自 common 内核（UFS 参数符号），无对应驱动编入，v0.1 上机只是带参不带驱动，属新设备默认形态。
+CONFIG_UFS=2 来自 common 内核（UFS 参数符号），无对应驱动编入，v0.1 真机验证只是带参不带驱动，属新设备默认形态。
 
 ### 2.4 `make kernel`
 
@@ -184,9 +184,9 @@ make-kernel: (exit status 2 is the kext symbol-set checks failing, as they do on
 | 1 | 骨架 `phk110.config` unset 了 4 个 SoC 家族驱动，按 overlay 规则会覆盖 `sm8475.config` 的 `=y`（设备片段胜出） | 删掉这四行 unset；`make config` 证实 cpufreq/thermal/socinfo/pmic 编入 | 已闭环 |
 | 2 | 任务书建议 status 标 "unknown"，但 `hakios-device.py` 只接受 works/partial/missing（写 unknown 报错） | 未验证项一律 `missing` + 说明注记；cpu 注记写明预期值（expected 8 cores bootcpu=7）；display 沿用模板 `partial` | 已闭环（规范内最接近 unknown 的写法） |
 | 3 | `device.conf` 增加 `firmware pull-firmware.sh` 后工具要求该文件存在 | 新增占位脚本，exit 1 防静默；`needs` 输出 "nothing of the phone's own is needed" | 已闭环 |
-| 4 | 命令行预算：本树未检出 redwood，`soc_only_changes` 无参照文件时把全部 16 条 soc_*（338 字符）发上内核命令行；52（配置）+338+~260（运行自身）≈650 > 607 上限，可能丢尾巴（loader 会警告） | README 增加说明：上机前 `tools/hakios-device.py sync redwood`（对照后只发 8 条，≈200 字符，总长 ≈512，安全）或设 `SOC_DEFAULTS`；不改脚本（非本文件域） | wave 2 上机执行者 |
+| 4 | 命令行预算：本树未检出 redwood，`soc_only_changes` 无参照文件时把全部 16 条 soc_*（338 字符）发上内核命令行；52（配置）+338+~260（运行自身）≈650 > 607 上限，可能丢尾巴（loader 会警告） | README 增加说明：真机验证前 `tools/hakios-device.py sync redwood`（对照后只发 8 条，≈200 字符，总长 ≈512，安全）或设 `SOC_DEFAULTS`；不改脚本（非本文件域） | wave 2 真机验证执行者 |
 | 5 | WSL 调用时 Git Bash 的 MSYS 路径转换与引号展开把带 `$var` 的内联循环打碎 | 全部改为脚本文件（Windows 暂存 → `wsl bash /mnt/c/...`）执行 | 环境备忘 |
-| 6 | （转录 wave1-socargs.md §2，未动上游）驱动编译期常量 `MPSS_MEMORY_SIZE=0x0f600000`（246 MB）< Cape `mpss_region` 的 306 MB；modem 启动（wave 2+）可能越界检查失败 | 不动 upstream/；soc.args 注释与报告均记录此点 | Wave 3 / 主代理决策 |
+| 6 | （转录 wave1-socargs.md §2，未动上游）驱动编译期常量 `MPSS_MEMORY_SIZE=0x0f600000`（246 MB）< Cape `mpss_region` 的 306 MB；modem 启动（wave 2+）可能越界检查失败 | 不动 upstream/；soc.args 注释与报告均记录此点 | 阶段 3 / 决策 |
 
 除此之外 `make kernel` 无任何配置性或上游代码错误——本 wave 没有需要改上游的项。
 
@@ -203,4 +203,4 @@ make-kernel: (exit status 2 is the kext symbol-set checks failing, as they do on
 - 构建产物：`/home/<host>/hakios/kernel/hakios-kernel`（14,841,368 B）
 
 未触碰：`devices/phk110/uefi/**`（代理 D 域）、`upstream/**`、手机（本 wave 纯本地构建验证）。
-manifest（`devices/manifest.conf`）未加 phk110 条目——按 repositories.md 的发布流程，等上机验证后由主代理决定（`list` 显示 "(not in the manifest)" 属预期）。
+manifest（`devices/manifest.conf`）未加 phk110 条目——按 repositories.md 的发布流程，等真机验证验证后再决定（`list` 显示 "(not in the manifest)" 属预期）。

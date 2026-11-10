@@ -1,8 +1,8 @@
-# Wave 18 报告：v0.4 存储闭环 —— S3-S8 开写（Boot #23 v12）+ 真实 init 链换装收官（Boot #24 v13）
+# 阶段 18 · 2026-11-04 · UFS 写路径与真实 init 链：/private/var 跨启动保留
 
-> 2026-11-04 · 执行子代理产出 · 两刷闭环 · 输入 = Wave15 §4 施工单（S3-S8）+ Wave19-prep Q2 八步单（真实 init 链）+ Wave17 Procursus/ssh 物料 + Wave16c P0 现场
-> 用户暂停一次（Boot #23 后手机交还），唤醒后按主代理裁定把 S6-S8 与 Wave 20 真实 init 链合并实施
-> 结论先行：**S3 ✅ S4 ✅ S5 ✅ S6 ✅ S7 ✅ S8 ✅（S1 补行使 ✅ / R1 清白）——v0.4 存储六步全闭环**。Boot #23（v12，cmdline-only）拿到 S3/S4/S5 硬验收行 + ufs_check FNV 16/16 全等；Boot #24（v13，双 ramdisk 真实 init 链 + darwin 前段灌卷）拿到 `/private/var: HFS Plus from /dev/ufs_darwin_data, kept between boots` + 骨架 112 目录/22 文件 + 跨 boot journal replay 物证 + **Apple launchd 真身接管 pid 1**（起 ~0.6 s 后因 `failed to query hardware target: 22` 退出 = Wave 20 的第一个定位点）。HFS+ 数据卷物理被写（全卷 sha 88c1cd99… → 6e40eaef…）。
+> 2026-11-04 · 执行记录产出 · 两刷闭环 · 输入 = 阶段 15 §4 施工单（S3-S8）+ 阶段 19-prep Q2 八步单（真实 init 链）+ 阶段 17 Procursus/ssh 物料 + 阶段 16c P0 现场
+> 中途暂停一次（Boot #23 后手机回安卓），唤醒后决定把 S6-S8 与 阶段 20 真实 init 链合并实施
+> 结论先行：**S3 ✅ S4 ✅ S5 ✅ S6 ✅ S7 ✅ S8 ✅（S1 补行使 ✅ / R1 清白）——v0.4 存储六步全闭环**。Boot #23（v12，cmdline-only）拿到 S3/S4/S5 硬验收行 + ufs_check FNV 16/16 全等；Boot #24（v13，双 ramdisk 真实 init 链 + darwin 前段灌卷）拿到 `/private/var: HFS Plus from /dev/ufs_darwin_data, kept between boots` + 骨架 112 目录/22 文件 + 跨 boot journal replay 物证 + **Apple launchd 真身接管 pid 1**（起 ~0.6 s 后因 `failed to query hardware target: 22` 退出 = 阶段 20 的第一个定位点）。HFS+ 数据卷物理被写（全卷 sha 88c1cd99… → 6e40eaef…）。
 
 ---
 
@@ -11,7 +11,7 @@
 | 刷 | 镜像 | 判定 |
 |---|---|---|
 | **Boot #23** | v12（`udon-hakios-grafted-v12.img`，sha `d07b2e27…`）= v11 内核字节不动 + cmdline 追加 `ufs_write=1 var_hfs=ufs_darwin_data ufs_check=1`（428 B） | **S3 ✅ / S4 ✅ / S5 ✅ / S1 ✅（补行使）/ R1 清白**；S6-S8 ❌ 结构性缺口（stub 不跑 init.c）→ 定根因，暂停点收束 |
-| **Boot #24** | v13（`udon-hakios-grafted-v13.img`，sha `465308f1…`）= 双 ramdisk（resident=flashboot.apfs 4 MB → md0 root；ramdisk=root.apfs 4 MB → md1 /redwood）+ 同款 v11 内核字节 + cmdline 追加 ` root_apfs=ufs_darwin`（449 B）+ **darwin 前段灌卷**（system.apfs 2.47 GB @块 0 + cryptex-os 2.7 GB @604420 + cryptex-app 10 MB @1270020） | **S6 ✅ / S7 ✅ / S8 ✅ / 真实 init 跑起 ✅ / Apple launchd 接管 pid 1（超预期，起后即亡 = Wave 20 事项）** |
+| **Boot #24** | v13（`udon-hakios-grafted-v13.img`，sha `465308f1…`）= 双 ramdisk（resident=flashboot.apfs 4 MB → md0 root；ramdisk=root.apfs 4 MB → md1 /redwood）+ 同款 v11 内核字节 + cmdline 追加 ` root_apfs=ufs_darwin`（449 B）+ **darwin 前段灌卷**（system.apfs 2.47 GB @块 0 + cryptex-os 2.7 GB @604420 + cryptex-app 10 MB @1270020） | **S6 ✅ / S7 ✅ / S8 ✅ / 真实 init 跑起 ✅ / Apple launchd 接管 pid 1（超预期，起后即亡 = 阶段 20 事项）** |
 
 两刷均零构建事故、刷写一次通过、失败重试 0 次；手机以安卓在线收尾（slot a）。
 
@@ -19,17 +19,17 @@
 
 ## 1. Boot #23（v12）：S3-S5 开写 + S1 补行使 + R1 判决
 
-### 1.1 施工（照 Wave15 §S3-S5 单）
+### 1.1 施工（照 阶段 15 §S3-S5 单）
 
-- config 2 行：`devices/phk110/configs/phk110.config` 追加 `CONFIG_UFS_WRITE=y` + `CONFIG_VAR_STORE=y`；`make kernel` 产物与 v11 **字节级相同**（sha `a7f4641f…`）——铁证这两个 CONFIG 是**运行期 boot-arg**（docs/boot-args.md:309 ufs_write=KL / :432 var_store=U），非编译门；写路径/check/saver 代码已随 CONFIG_HAKIOS_UFS=y 全量编入 v11 内核，v5 代 loader 亦自带 darwin 写 offer（`wave18-scripts/strings-check-v12.sh` 双向取证）。
+- config 2 行：`devices/phk110/configs/phk110.config` 追加 `CONFIG_UFS_WRITE=y` + `CONFIG_VAR_STORE=y`；`make kernel` 产物与 v11 **字节级相同**（sha `a7f4641f…`）——证据这两个 CONFIG 是**运行期 boot-arg**（docs/boot-args.md:309 ufs_write=KL / :432 var_store=U），非编译门；写路径/check/saver 代码已随 CONFIG_HAKIOS_UFS=y 全量编入 v11 内核，v5 代 loader 亦自带 darwin 写 offer（`wave18-scripts/strings-check-v12.sh` 双向取证）。
 - cmdline v12 = v10e/v11 字节 + ` ufs_write=1 var_hfs=ufs_darwin_data ufs_check=1`（428 B，预算 427+68=495<608）。
 - repack（基 = v11 payload，**仅 cmdline 换新**，loader.efi 66c6b342 / kernel a7f4641f / ramdisk 4f72da61 / kernel.ver afd473f5 四 entry cmp 断言字节等）→ 46/46 自检全绿 → 标准通道一次刷入（getvar taro ✓ / flash OKAY 4.9s+0.55s / set_active b）。
 
-### 1.2 判定（Wave15 §4 逐字，`intel/m3-boot1/b23-kernel-log.txt`）
+### 1.2 判定（阶段 15 §4 逐字，`intel/m3-boot1/b23-kernel-log.txt`）
 
 | 步 | 判定 | 证据行 |
 |---|---|---|
-| **S3** | ✅ | :325 `ufs: /dev/rufs_darwin takes writes, whole blocks from 2042368 on (12501 MB of it); everything else of the storage is read only`。12501 = (5,242,875−2,042,368) 块 ×4096 = 13,109,276,672 B = 12,501.98 MiB 取整——**与 P0 灌卷几何逐字节吻合**。本轮尚无用户态写者（4K/256K/越界矩阵移交真实 init 波——b24 的骨架写入即首次真实写） |
+| **S3** | ✅ | :325 `ufs: /dev/rufs_darwin takes writes, whole blocks from 2042368 on (12501 MB of it); everything else of the storage is read only`。12501 = (5,242,875−2,042,368) 块 ×4096 = 13,109,276,672 B = 12,501.98 MiB 取整——**与 P0 灌卷几何逐字节吻合**。本轮尚无用户态写者（4K/256K/越界矩阵留给真实 init 阶段——b24 的骨架写入即首次真实写） |
 | **S4** | ✅ | :326 `ufs: /dev/ufs_darwin_data: the same 12501 MB as a block device, for the data volume; writes flushed when the file system asks`——**fast 路文案**（loader 给 BLOCK_CAN_FAST，write_caps 生效），R5 前哨答案：flush 语义 = HFS journal 问时 BLOCK_OP_FLUSH（b24 的 journal replay 即其真机行使） |
 | **S5** | ✅ | :326 同行（数据卷块设备发布）；S0 行 :324 = **130 partitions**（darwin 在列，129→130）；last_parti×4 EEXIST 同 b22（良性 F1） |
 | **S1** | ✅（补行使） | :379-396 `ufs_check=1` 真跑完：**16 份 FNV（8 参考分区 × a/b）对拍 adb 直读基线 16/16 全等**；`check done: 568 requests, 0 errors, 586735616 bytes, 474 ms waiting`——mailbox 实测 ~460-530 MB/s（modem 214 MB/465 ms） |
@@ -45,7 +45,7 @@
 
 ## 2. 暂停点与唤醒后路线裁定
 
-用户暂停（Boot #23 后手机交还，安卓在线）。唤醒后主代理裁定：S6-S8 与 Wave 20 真实 init 链**合并实施**，按 Wave19-prep Q2 八步单执行（`docs/waves/wave19-prep.md` §2.3）。两条候选路线的代码级评估结论：
+中途暂停（Boot #23 后手机回安卓，安卓在线）。唤醒后的决定：S6-S8 与 阶段 20 真实 init 链**合并实施**，按 阶段 19-prep Q2 八步单执行（`docs/waves/wave19-prep.md` §2.3）。两条候选路线的代码级评估结论：
 
 | 路线 | 评估 | 裁定 |
 |---|---|---|
@@ -68,9 +68,9 @@
 |---|---|---|
 | **system.apfs** | 2,475,704,320 B（604,420 块） | Darwin 根卷：select-system 20F66 子集 zlib 压缩，`mv sbin/launchd → sbin/launchd.darwin + stage0 → sbin/launchd`，/jb 未嵌（见 §6） |
 | **flashboot.apfs** | 4,194,304 B（1024 块） | md0 resident：stage0 为 /sbin/launchd + /redwood 空挂点 + /dev /flash /Cryptexes；CRYPTEXES=flash = boot 卷独立（cryptex 不进 RAM） |
-| **root.apfs** | 4,194,304 B（1024 块） | md1：init/sbin + etc/rc + etc/**var.skel**（112 行）+ LaunchDaemons + **ssh 密钥**（`~/hakios/kernel/ssh/` ← Wave17 `procursus-prep/ssh`，16 KB，经 build.sh var.skel f-行通道种子进 HFS+ 卷） |
+| **root.apfs** | 4,194,304 B（1024 块） | md1：init/sbin + etc/rc + etc/**var.skel**（112 行）+ LaunchDaemons + **ssh 密钥**（`~/hakios/kernel/ssh/` ← 阶段 17 `procursus-prep/ssh`，16 KB，经 build.sh var.skel f-行通道种子进 HFS+ 卷） |
 
-工作区：`~/hakios/kernel/sysimage/`（build.sh 的 `DARWIN=../sysimage` = **kernel 树内**；首次误建 `~/hakios/sysimage` 致两段静默跳过，搬运合并修复）。**jb（155 MB）不进树**：flashboot /jb 嵌入会顶爆 payload 64 MB 窗口（23.4+155 MB ≫ 64 MB），SSH 数据面本不在本轮验收 → Wave 21 改走 system.apfs 侧 /jb（flash 卷承载零 RAM 成本，init.c `stat("/jb")` 换根后同路径可达）或扩窗。
+工作区：`~/hakios/kernel/sysimage/`（build.sh 的 `DARWIN=../sysimage` = **kernel 树内**；首次误建 `~/hakios/sysimage` 致两段静默跳过，搬运合并修复）。**jb（155 MB）不进树**：flashboot /jb 嵌入会顶爆 payload 64 MB 窗口（23.4+155 MB ≫ 64 MB），SSH 数据面本不在本轮验收 → 阶段 21 改走 system.apfs 侧 /jb（flash 卷承载零 RAM 成本，init.c `stat("/jb")` 换根后同路径可达）或扩窗。
 
 ### 3.2 darwin 前段灌卷（任务书授权范围内：darwin 分区内；数据卷区零触碰）
 
@@ -80,7 +80,7 @@
 | 容器 1 | cryptex-os.dmg（Apple 原像） | **604,420** | 665,600 | `2279bf44…` same |
 | 容器 2 | cryptex-app.dmg | **1,270,020** | 2,560 | `6b9d1f09…` same |
 
-每段：push → 手机端 sha 对拍 → 同 shell 内身份门（`readlink by-name/darwin = sda15` + `getsize64 = 21,474,816,000`）→ guarded dd（bs=4096 seek/count conv=notrunc,fsync）→ 读回 sha。写前 preflight：darwin 块 0 = 全零哈希 `ad7facb2…`、数据卷头 @2,042,368 = `33711438…`（P0 原值）。总写 5.2 GB 恰在前段只读区（≤1,272,580 < 2,042,368），收口于容器步进布局（容器 2 末 = 4961 MiB，dmesg 实证）。`wave18-scripts/darwin-front-write.sh` 全程留痕。
+每段：push → 手机端 sha 对拍 → 同 shell 内身份门（`readlink by-name/darwin = sda15` + `getsize64 = 21,474,816,000`）→ guarded dd（bs=4096 seek/count conv=notrunc,fsync）→ 读回 sha。写前 preflight：darwin 块 0 = 全零哈希 `ad7facb2…`、数据卷头 @2,042,368 = `33711438…`（P0 原值）。总写 5.2 GB 恰在前段只读区（≤1,272,580 < 2,042,368），收尾于容器步进布局（容器 2 末 = 4961 MiB，dmesg 实证）。`wave18-scripts/darwin-front-write.sh` 全程留痕。
 
 ### 3.3 payload / 打包 / 自检
 
@@ -123,12 +123,12 @@
 | **S7** | ✅ | `112 directories, 22 files` + `[ ok ] create the directories of the data volume`（var.skel 112 目录行 + ssh 密钥等 22 文件种子进卷；`check(ok && made > 50)` 过） |
 | **S8** | ✅ | 三重证据：①最后轮 dmesg **`jnl: ufs_darwin_data: replay_journal: from: 876544 to: 1048576` → `journal replay done.` → `hfs: mounted Data on device ufs_darwin_data`**（journal 里躺着上一轮的未落盘状态 = **跨 boot 状态直接物证**）；②console 另一轮 init 以 EEXIST 容忍语义重挂（`112 directories, 11 files`——骨架文件"卷上已有则跳过"路径）；③**数据卷全区域 sha `88c1cd99…`（P0 pristine）→ `6e40eaef…`**、卷头块 `33711438…` → `1e4cd367…`（安卓侧回读，内核经 S3 写路径真写了卷） |
 | 真实 init | ✅ | stage0（md0 root 的 /sbin/launchd）→ 挂 md1 于 /redwood → `exec /redwood/sbin/init` → 上述全链 → rc → `exec /sbin/launchd.darwin` |
-| **Apple launchd（超预期）** | 起了又亡 | console `Darwin Ignition Sequence Version 1.0.0`（launchd 真身 ignition 输出）→ dmesg `shared_region: … [4(hello_dyn)] check_np`（**dyld 共享缓存从 cryptex 容器加载，动态二进制 hello_dyn 真跑**）→ t=38.17 `pid 1 exited -- exit reason namespace 35 subcode 0x6, description failed to query hardware target: 22` → `panic: initproc failed to start` → stackshot → 返回。**Wave 20 第一定位点**（launchd 硬件目标查询 EINVAL = 内核缺某 sysctl/hostinfo 语义，R-B1 类） |
-| loader_return | 未行使 | 最后轮 panic 路径（不走近返回），循环节奏 = panic 循环 ~45 s/轮，300 s 后 ABL 兜底回安卓（F4） |
+| **Apple launchd（超预期）** | 起了又亡 | console `Darwin Ignition Sequence Version 1.0.0`（launchd 真身 ignition 输出）→ dmesg `shared_region: … [4(hello_dyn)] check_np`（**dyld 共享缓存从 cryptex 容器加载，动态二进制 hello_dyn 真跑**）→ t=38.17 `pid 1 exited -- exit reason namespace 35 subcode 0x6, description failed to query hardware target: 22` → `panic: initproc failed to start` → stackshot → 返回。**阶段 20 第一定位点**（launchd 硬件目标查询 EINVAL = 内核缺某 sysctl/hostinfo 语义，R-B1 类） |
+| loader_return | 未行使 | 最后轮 panic 路径（不走近返回），循环节奏 = panic 循环 ~45 s/轮，300 s 后 ABL 自动回退到安卓（F4） |
 
 ### 4.3 console forensics 注记（如实记录，不影响判定）
 
-logdump 的 console 段为**帧缓冲滚动环跨周期残留**：可见两个 init 段（A=成功 22 文件；B=`mount /dev/ufs_darwin: No such file or directory` + HFS `Resource busy` → ramfs 回落 11 文件）+ 最后轮 dmesg（switch_root/HFS 全成功）。段间无内核重启行，归属与环覆盖机制待 Wave 20 专查（F3）；**判定以最后轮 dmesg（内核缓冲，权威）+ 物理卷 sha 为准**——两者互相印证全链成功。loader_return_after 未打出行、stub 心跳绝迹（新链无 stub）为交叉旁证。
+logdump 的 console 段为**帧缓冲滚动环跨周期残留**：可见两个 init 段（A=成功 22 文件；B=`mount /dev/ufs_darwin: No such file or directory` + HFS `Resource busy` → ramfs 回落 11 文件）+ 最后轮 dmesg（switch_root/HFS 全成功）。段间无内核重启行，归属与环覆盖机制待 阶段 20 专查（F3）；**判定以最后轮 dmesg（内核缓冲，权威）+ 物理卷 sha 为准**——两者互相印证全链成功。loader_return_after 未打出行、stub 心跳绝迹（新链无 stub）为交叉旁证。
 
 ---
 
@@ -141,18 +141,18 @@ logdump 的 console 段为**帧缓冲滚动环跨周期残留**：可见两个 i
 | R5 flush 真落盘 | **兑现**：journal replay 机制真机工作，掉电/panic 后卷完好挂载 |
 | R-B3 cryptex flash 回落 | 未触发回落——`/dev/ufs_darwin,c=1/c=2` 一次命中（容器步进布局与灌卷逐块吻合） |
 | R-B4 dyld cache | 兑现：hello_dyn 经共享缓存跑通 |
-| R-B6 staged_system_apps | 兑现为 FAIL（0 apps）——非阻塞， Wave 20 可离线预置 |
-| R-B1 launchd 兼容性 | **部分兑现**：launchd 起但 0.6 s 内退（hardware target EINVAL）——Wave 20 主事项 |
+| R-B6 staged_system_apps | 兑现为 FAIL（0 apps）——非阻塞， 阶段 20 可离线预置 |
+| R-B1 launchd 兼容性 | **部分兑现**：launchd 起但 0.6 s 内退（hardware target EINVAL）——阶段 20 主事项 |
 | panic 循环回安卓 | ~300 s（比 60 s×8 慢循环快；panic 路径安全网行为正常） |
 
 ---
 
-## 6. Wave 20 剩余清单（真实 launchd 收官）
+## 6. 阶段 20 剩余清单（真实 launchd 完成）
 
 1. **launchd `failed to query hardware target: 22`**：定位 launchd 硬件目标查询（sysctl/hostinfo 路径）在本内核的 EINVAL 缺口并补齐（对照 upstream redwood 内核树 kern_hvg/pe 相关实现）；或过渡方案 = 换 rc 不交接 launchd（init 自己跑场景作业）先解 SSH。
 2. **/jb 接线**：155 MB 前缀嵌 system.apfs 侧 /jb（flash 卷承载）+ build.sh flashboot 侧 1 行守卫（../jb 存在但 FLASHBOOT=1 时跳过 flashboot 嵌入），或扩 payload 窗（需动 shim = 升级审批）。
 3. **console forensics F3**：帧缓冲滚动环跨周期残留机制专查（logdump console 段的周期归属标注）。
-4. **SSH 数据面 = Wave 21 loader 桥接网络**（Wave19-prep 方案 A 三端）；sshd 由 rc.jobs.ssh 起，密钥已在卷上。
+4. **SSH 数据面 = 阶段 21 loader 桥接网络**（阶段 19-prep 方案 A 三端）；sshd 由 rc.jobs.ssh 起，密钥已在卷上。
 5. 可选：`staged_system_apps` 离线预置消掉 b24 的一个 [FAIL]（美观项）。
 
 ---

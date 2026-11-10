@@ -1,6 +1,6 @@
-# Wave 16b 报告：P0 准备 —— darwin carve 工具 PHK110 化 + 执行脚本（只勘察、零刷写）
+# 阶段 16b · 2026-11-03 · 数据卷准备工具的适配（只勘察，不写盘）
 
-> 2026-11-03 · P0 准备子代理产出 · 输入 = docs/waves/wave15-ufs-research.md §4 P0 段（施工蓝本）+ fork `~/hakios/kernel/tools/`（只读）+ 真机 adb（**全程只读**：ls / blockdev --getsize64 / dd if= 备份件 → /data/local/tmp → pull）
+> 2026-11-03 · P0 准备产出 · 输入 = docs/waves/wave15-ufs-research.md §4 P0 段（施工蓝本）+ fork `~/hakios/kernel/tools/`（只读）+ 真机 adb（**全程只读**：ls / blockdev --getsize64 / dd if= 备份件 → /data/local/tmp → pull）
 > 结论先行：**P0 可以按 GIB=20 一次落位**——20 GiB = 整 10,240 个 f2fs 段，carve 后 darwin = LBA 56,271,872..61,514,746 = **5,242,875 块（4096），与 redwood 的 UFS_DARWIN_MIN 一块不差**，内核/loader/mkdatavol 全部零改动；且 **20 GiB 尾段（段 102224..112463）当前零数据**（最后有数据的段 = 58,005），f2fs 缩减无需搬移任何数据。dry-run 全绿（双表 CRC、仅 2 个 entry 变化、死规矩精确命中）。
 
 ---
@@ -136,7 +136,7 @@ EXIT=0
 
 独立复核（verifynew2.py，不信工具自述）：新表 header/table CRC 对、双表一致、**其余 13 个 entry 逐字节相同**、备份表 == 主表、darwin = 5,242,875 块 ✓、GUID/类型 ✓。
 
-`darwin-write-phk110.py selftest`（真机只读）：**本机 refusals 11/11 全拒**（越 PROTECTED、越 BLOCKS、非数字串等）；GPT 现读段因手机在 carve 前无 darwin entry 而按预期报"0 entries named darwin"（中途手机被 Wave 16 循环重启占走断开 adb，执行波 preflight 时会自动重验，脚本 preflight 含同款 GPT 基线哈希断言）。产出 `.new` 文件已复核：
+`darwin-write-phk110.py selftest`（真机只读）：**本机 refusals 11/11 全拒**（越 PROTECTED、越 BLOCKS、非数字串等）；GPT 现读段因手机在 carve 前无 darwin entry 而按预期报"0 entries named darwin"（中途手机被 阶段 16 循环重启占走断开 adb，执行波 preflight 时会自动重验，脚本 preflight 含同款 GPT 基线哈希断言）。产出 `.new` 文件已复核：
 
 ```
 gpt-head.new  eee081b02bff10867fd63f5225a199bbcdbcc5891da3c76db63e01d2e27cfc3c
@@ -148,16 +148,16 @@ darwin-guid.txt  6E9D0187-62E7-4887-B50E-FB241BF4BE6D
 
 ## 4. 执行脚本（wave16-scripts/p0-carve-run.sh）：步骤与每步验收
 
-运行环境：WSL（adb/fastboot/mkfs.hfsplus/clang 俱在），`P0_APPROVED=yes` 可跳过逐键确认（执行波用户在场时用）。每步一个子命令，失败即停并打印回退路径。
+运行环境：WSL（adb/fastboot/mkfs.hfsplus/clang 俱在），`P0_APPROVED=yes` 可跳过逐键确认（执行时用）。每步一个子命令，失败即停并打印回退路径。
 
 | 步 | 子命令 | 动作 | 验收（不过即停） |
 |---|---|---|---|
 | 0 | `preflight` | 设备/根/GPT 基线/工具链盘点 | userdata→sda14、无 darwin、sda=251,964,424,192、getss=4096、dm "userdata" 在；GPT 头尾 sha256 = 勘察基线（变了即拒绝，防"GPT 已漂移还按旧数 carve"） |
 | 1 | `backup` | **只读**：头尾 8 块 + dm 超级块 + segment_info → `$RUN_DIR`，手机端+宿主端双哈希比对 | 三件哈希 = 基线（8dc1919b…/7ed16c87…/da2fee90…）；f2fs 参数 = (57757967, 112464, 176128)；产物进 `backups-slotb/p0-run/` |
-| 2 | `resize` | 建 f2fs-resize（clang 静态 arm64 → /tmp，**不写 fork 树**）→ push → probe → 确认 f2fs 仍 = 57,757,967 → 确认键 `RESIZE` → `/data 52514816` | resize-rc=0；sb-after = (52,515,087, 102,224)；segment_info-after = 102,224 段；df 正常；**打印"4 步前禁重启"横幅**；请用户亲眼验数据 |
+| 2 | `resize` | 建 f2fs-resize（clang 静态 arm64 → /tmp，**不写 fork 树**）→ push → probe → 确认 f2fs 仍 = 57,757,967 → 确认键 `RESIZE` → `/data 52514816` | resize-rc=0；sb-after = (52,515,087, 102,224)；segment_info-after = 102,224 段；df 正常；**打印"4 步前禁重启"横幅**；执行前亲眼验数据 |
 | 3 | `dryrun` | carve 工具 `--dry-run`（带 sb-after 二次校验缩减值） | 工具全检通过 + 死规矩命中 |
 | 4 | `carve` | 工具真跑（仅宿主侧产物）→ 内建独立验证器（不信工具自述：CRC/entry15/双表一致/死规矩/GUID）→ 确认键 `CARVE` → push → **table→header、主→备** 写入 → 读回 8+8 块 cmp | cmp 双双全等；写后 dm 超级块可读（f2fs 无恙）；失败路径 = `rollback-gpt` |
-| 5 | `verify-android` | 重启进安卓后跑 | by-name/darwin 在、`--getsize64` = 21,474,816,000、sysfs sda15 start=450,174,976 size=41,943,000、PARTNAME=darwin、df 正常、`darwin-write-phk110.py check` 全链身份通过；用户确认数据完好 |
+| 5 | `verify-android` | 重启进安卓后跑 | by-name/darwin 在、`--getsize64` = 21,474,816,000、sysfs sda15 start=450,174,976 size=41,943,000、PARTNAME=darwin、df 正常、`darwin-write-phk110.py check` 全链身份通过；确认数据完好 |
 | 6 | `volume` | `mkdatavol.py darwin.simg`（**零改**，mkfs.hfsplus 在 WSL）→ fastboot `getvar all` 探 darwin 可见性 → `fastboot flash darwin`；不可见/失败则 `P0_VOLUME_VIA=adb` 回退：simg2img → 截取 DATA_FIRST 起的卷区 → `darwin-write-phk110.py write`（guarded + 读回） | fastboot 返回 OK / 或工具读回 sha256 相等 |
 | 7 | `verify-volume` | 重启进安卓 | darwin 块 2,042,368 的 1024..1025 字节 = **H+/HX**；`sum 2042368 1` 落日志；块 0（未来 Darwin 卷）未被本步触碰 |
 | E | `rollback-gpt` | 把第 1 步的 gpt-head.bin/gpt-tail.bin 按 table→header 写回双表 | 重启后 fs_mgr resize.f2fs 把 fs 长回原分区——数据无损，回到 P0 前 |
@@ -177,7 +177,7 @@ fastboot 通道提示已写进脚本（usbipd bind+attach 到 WSL，Windows 侧 
 | R-new | dm 设备号变化（dm-73 → dm-N） | `phone_dm()` 按 dm name "userdata" 现查，不写死号 | — |
 | R-new | fastboot 看不见新分区（bootloader GPT 视图缓存） | `getvar all | grep darwin` 探测 + flash 失败即提示 | adb 通道：simg2img + darwin-write-phk110 write（身份/读回全链保留；只写 DATA_FIRST 起，0..2042367 不触碰） |
 | R-new | resize 与 carve 之间被重启 | carve 前重读 dm 超级块 = 52,515,087 断言（dryrun 工具内也查 sb-after） | 重启后 fs 已长回 → 从 resize 重来（数据无损） |
-| R-new | Wave 16 boot_b 循环与 P0 撞车 | 脚本头注 + preflight 要求 Android 在位 | 执行波错峰（等 boot_b 波落定） |
+| R-new | 阶段 16 boot_b 循环与 P0 撞车 | 脚本头注 + preflight 要求 Android 在位 | 执行波错峰（等 boot_b 波落定） |
 
 备份件哈希（backups-slotb/MANIFEST-p0.sha256，节选）：
 
@@ -193,18 +193,18 @@ eee081b02bff10867fd63f5225a199bbcdbcc5891da3c76db63e01d2e27cfc3c  p0-staging-run
 
 ---
 
-## 6. 执行清单（执行波逐项打勾用；用户在场，逐键确认或 P0_APPROVED=yes）
+## 6. 执行清单（执行时逐项打勾；逐键确认或 P0_APPROVED=yes）
 
-- [ ] 前提：boot_b 波（Wave 16）落定、无并行刷写；手机进 Android、adb root 可用
+- [ ] 前提：boot_b 波（阶段 16）落定、无并行刷写；手机进 Android、adb root 可用
 - [ ] `p0-carve-run.sh preflight` —— GPT 基线哈希过（否则重跑勘察）
 - [ ] `p0-carve-run.sh backup` —— 三件哈希登记进 p0-run/
-- [ ] **用户确认点 A**：明白"接下来缩 20G 文件系统（数据不搬不移），失败可无损重启回退"
+- [ ] **确认点 A**：明白"接下来缩 20G 文件系统（数据不搬不移），失败可无损重启回退"
 - [ ] `p0-carve-run.sh resize` —— sb-after = (52,515,087, 102,224)；**此后到 carve 完成前禁重启/禁 fastboot**
-- [ ] 用户亲眼验 /data 数据完好（相册/文件）
+- [ ] 亲眼验 /data 数据完好（相册/文件）
 - [ ] `p0-carve-run.sh dryrun` —— 死规矩 5,242,875 命中
-- [ ] **用户确认点 B**：明白"接下来改 GPT（userdata 缩到 200.33 GiB、新增 darwin 20 GiB），错表可 rollback-gpt"
+- [ ] **确认点 B**：明白"接下来改 GPT（userdata 缩到 200.33 GiB、新增 darwin 20 GiB），错表可 rollback-gpt"
 - [ ] `p0-carve-run.sh carve` —— 读回 cmp 全等
-- [ ] `adb reboot` → `p0-carve-run.sh verify-android` —— darwin = 21,474,816,000 B；用户再验数据
+- [ ] `adb reboot` → `p0-carve-run.sh verify-android` —— darwin = 21,474,816,000 B；再验数据
 - [ ] `p0-carve-run.sh volume`（fastboot 优先；失败 `P0_VOLUME_VIA=adb` 重试）
 - [ ] 重启 → `p0-carve-run.sh verify-volume` —— H+/HX 签名在位
 - [ ] 收尾登记：本清单勾选结果 + 实测 darwin getsize64 + 卷签名块哈希，回填 STATUS.md

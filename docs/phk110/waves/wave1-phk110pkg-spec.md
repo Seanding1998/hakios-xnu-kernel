@@ -1,6 +1,6 @@
-# Wave1 规格书：phk110Pkg（UEFI 平台包）逐文件适配方案
+# 阶段 1 · 2026-11-02 · UEFI 平台包（phk110Pkg）逐文件适配方案
 
-> 调查代理 C · 2026-11-02 · 只读调查产物，供 Wave2 实现代理机械执行。
+> 调查代理 C · 2026-11-02 · 只读调查产物，供 阶段 2 实现代理机械执行。
 > 调查环境：Mu-Silicium 为 WSL Fedora-44 `~/hakios/Mu-Silicium/`（HEAD=6b3d90b "Version 4.1"）；
 > 已用 `git fetch origin e51cd87` + diff 验证：**BASE(e51cd87, HakiOS 钉住) 与 HEAD 在本规格涉及的全部路径上无差异**
 >（全仓库仅 2 处差异：ErrataPatchesLib.c 一条 DEBUG 字符串、build_uefi.py 的 MuPatches 列表少一项 `AsmMacroLib.patch`）。
@@ -37,7 +37,7 @@
 
 ## 1. build_uefi.py 的设备解析：全部硬编码约定（读源码确认）
 
-源：`build_uefi.py`（523 行）。`-d <device>` 之后发生的事，每一条都是 Wave2 必须满足的约定：
+源：`build_uefi.py`（523 行）。`-d <device>` 之后发生的事，每一条都是 阶段 2 必须满足的约定：
 
 | # | 约定 | 代码位置 | phk110 需要的文件 |
 |---|------|----------|-------------------|
@@ -211,17 +211,17 @@ build_uefi.py/EDK2 对 Binaries 目录名**没有机制性强约束**——约�
    （`git ls-files`）。本地不 commit → 完全不受影响。若将来推设备仓：`Binaries/phk110/*` 属 `vendor`
    语义（check 会 fail 直到移出），正确姿势与 redwood 相同——git 里只留 README.md，DTB 单独一条
    `pending`（redwood 的 allow 表里两条先例：`pending devices/redwood/uefi/files/Resources/DTBs/redwood.dtb`、
-   `vendor devices/redwood/uefi/files/Binaries/redwood/*`）。Wave2 需在 kernel 仓
+   `vendor devices/redwood/uefi/files/Binaries/redwood/*`）。阶段 2 需在 kernel 仓
    `tools/provenance.allow` 照抄两行换成 phk110 路径（§6.11）。
 
 ingres 驱动的预期问题（写进 README 风险栏）：Poco F4 GT 无 side keys 之外的按键差异不大，但 PMIC/GLink
 电池/充电链路是 Xiaomi 私有 GLink 对接，PHK110 是 Oplus 私有协议 → 充电/电量类 DXE（QcomChargerDxe、
-ChargerExDxe、PmicGlinkDxe、GLinkDxe、OGaugeAuth 等）首次跑可能挂或无功能；显示靠 SimpleFb 兜底
+ChargerExDxe、PmicGlinkDxe、GLinkDxe、OGaugeAuth 等）首次跑可能挂或无功能；显示靠 SimpleFb 回退
 （见 §6.2 的 USE_CUSTOM_DISPLAY_DRIVER=0）。这些不影响"UEFI 起来 + SimpleFb 出画面 + USB/logfs 通路"的 v1 目标。
 
 ---
 
-## 6. 逐文件适配规格（Wave2 机械执行单）
+## 6. 逐文件适配规格（阶段 2 机械执行单）
 
 目标树根：`~/hakios/kernel/devices/phk110/uefi/files/`（apply.sh 会把它整体拷进 Mu-Silicium 根）。
 13 个平台包文件全部来自模板复制 + 定点修改；`<...>` 占位符汇总见 §6.12。
@@ -261,7 +261,7 @@ devices/phk110/uefi/files/
   - `!include WaipioPkg/WaipioPkg.dsc.inc`（照抄，不改 KonaPkg）；
   - `PcdSystemMemoryBase|0x80000000`；
   - `PcdCPUCoresStackBase|<STACK>`（占位符：ingres 值 0xA760D000，**必须**与 MemoryMapLib "UEFI Stack" 行地址一致，
-    Wave2 生成 MemoryMapLib 后回填）+ `PcdCPUCorePrimaryStackSize|0x40000`；
+    阶段 2 生成 MemoryMapLib 后回填）+ `PcdCPUCorePrimaryStackSize|0x40000`；
   - `gQcomPkgTokenSpaceGuid.PcdPlatformType|"LA"`；
   - LibraryClasses 两行 → `phk110Pkg/Library/...`；
   - `[Components] ingres/AcpiTables.inf` **原文保留**（同硅复用 ACPI，redwood 复用 lisa 的同款先例；
@@ -322,7 +322,7 @@ devices/phk110/uefi/files/
   XhciDxe, XhciPciEmulationDxe`。
 - USE_CUSTOM_DISPLAY_DRIVER=0 时：DXE/APRIORI 的 `!if` 分支自动挂 SimpleFbDxe、跳过 DisplayDxe/CPRDxe；
   RAW.inc 的 41 个 panel 段整体被 `!if` 跳过，恒定 3 个 RAW（SecParti.cfg/uefipil.cfg/QcomChargerCfg.cfg）仍编入。
-- 二进制补丁提示（Wave2 后续，非 v1 阻塞）：redwood README 记录的 5 个补丁中 4 个可平移到 ingres 二进制
+- 二进制补丁提示（阶段 2 后续，非 v1 阻塞）：redwood README 记录的 5 个补丁中 4 个可平移到 ingres 二进制
   （ButtonsDxe 键码、DALSYSDxe cache coherence、TzDxeLA applet=TRUE、UsbConfigDxe 去 deinit、UsbMsdDxe 不可移动位），
   做法 = 二进制 hexpatch + README 记录（ButtonsDxe 在 Binaries/bitra 里有 `.patched.efi` 先例可参照手法）。
 
@@ -394,7 +394,7 @@ header_version = 1        # 与内核仓 mkxnuimg.py 的 --header_version 1 对�
     Project-Silicium/Device-Binaries 子模块 `Binaries/ingres`（Binaries @ 9f4dbfd）"；
   - 已知差异/风险（面板 NT37705 不在 panel 集、Oplus 充电协议 vs Qualcomm GLink、side-key 布局）；
   - Patches/Fixes 栏（§6.7 的 4 个平移补丁做了再记，含 patcher 名）。
-- 本体填充命令（Wave2 执行，在 apply.sh 之后的 Mu-Silicium 树里做，或直接拷进设备树）：
+- 本体填充命令（阶段 2 执行，在 apply.sh 之后的 Mu-Silicium 树里做，或直接拷进设备树）：
   ```bash
   cp -r "$MU/Binaries/ingres/." devices/phk110/uefi/files/Binaries/phk110/   # QcomPkg/ + RawFiles/
   rm  devices/phk110/uefi/files/Binaries/phk110/QcomPkg/XBLCore 2>/dev/null  # XBLCore 无引用，可留可删
@@ -409,8 +409,8 @@ header_version = 1        # 与内核仓 mkxnuimg.py 的 --header_version 1 对�
   = MemoryMapLib "XNU Payload" 行地址；候选：PHK110 低 4G 内 64MB 对齐空闲窗，与 UEFI 自用簇同窗规划；
   apply.sh 拷贝顺序保证设备副本覆盖全局副本）。
 - BootShim.S：若 P-2 落点 ≠ 0xF0000000，还需要 `files/BootShim/BootShim.S` 的设备副本
-  （用 hakios.patch 版全文 + 改搬移目标常数）。**此项牵动全局启动链，Wave2 前先和 orchestrator 确认**：
-  若 Wave1-socargs 给出 PHK110 低 4G 确有 ≥64MB 空闲窗（XBL 大多在低 4G 留有大块 frpwst/审计区），只在
+  （用 hakios.patch 版全文 + 改搬移目标常数）。**此项牵动全局启动链，阶段 2 前先和 orchestrator 确认**：
+  若 阶段 1-socargs 给出 PHK110 低 4G 确有 ≥64MB 空闲窗（XBL 大多在低 4G 留有大块 frpwst/审计区），只在
   设备树覆盖两个文件即可，零上游改动。
 - [待验证 V-3] 见 §8。
 
@@ -422,7 +422,7 @@ header_version = 1        # 与内核仓 mkxnuimg.py 的 --header_version 1 对�
   ```
 - `devices/manifest.conf`：本地开发不加；开源后补 `device phk110` 块（repository+revision）。
 
-### 6.14 占位符汇总（Wave1 socargs 产出后回填）
+### 6.14 占位符汇总（阶段 1 socargs 产出后回填）
 
 | 占位符 | 所在文件 | 来源 |
 |--------|----------|------|
@@ -500,7 +500,7 @@ python3 build_uefi.py -d phk110 -r RELEASE      # 产物 Build/phk110Pkg/RELEASE
 
 ---
 
-## 9. Wave2 执行顺序建议
+## 9. 阶段 2 执行顺序建议
 
 1. 等 wave1-socargs.md → 回填 P-1/P-2/P-3~P-7，定稿 MemoryMapLib + toml + XnuLoader.h 设备副本（§6.8/6.9/6.12）。
 2. 生成 13 个平台包文件（§6.1–6.7，纯复制+改名，半天量级）+ phk110.dtb（§6.10）+ Binaries/phk110 README 与本地填充（§6.11）。

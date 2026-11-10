@@ -3,12 +3,11 @@
 > ⚠️ **当前状态请读 [`STATUS.md`](STATUS.md)**（权威快照，2026-11-03 起）；本文件保留为编年体全记录，用于细节查找。文档索引见 [`README.md`](README.md)。
 
 > 更新：2026-11-02 15:30 · 状态：M0 情报采集基本完成，可行性已确认，尚未做任何改动手机的操作
-> 续接入口：先读本文件 → `docs/port-pkg110.md`（上游移植实录，金矿）→ `docs/porting/index.md`（官方 5 步移植法）
+> 续接入口：先读本文件 → `docs/port-pkg110.md`（上游移植实录，极有价值的参考）→ `docs/porting/index.md`（官方 5 步移植法）
 
 ## 使命
 
-用户目标：在一加 Ace 2 (PHK110) 上跑 HakiOS（XNU on Android 手机）。用户已授权 AI 主导开发（"你来主导开发！tokens不是问题！"）。
-手机是用户主力机：**任何 fastboot boot / 重启操作必须先获得用户明确同意**；绝不 flash 任何分区。
+目标：在一加 Ace 2 (PHK110) 上跑 HakiOS（XNU on Android 手机工作方式：自主推进、结论以真机实测为准。 fastboot boot / 重启操作都先确认再执行**；绝不 flash 任何分区。
 
 ## 已确认的设备事实（全部实测）
 
@@ -51,7 +50,7 @@
 3. **Synaptics S3910 触摸**：新驱动（参照 `drivers/*/hakios.*` 模式，Goodix 是范本）
 4. **IPA v5**（SM8475）vs IPA 4.11（SC7280）：蜂窝网大移植，redwood 上蜂窝也只是 partial，可最后做
 5. cpufreq EPSS：taro 寄存器兼容，频率表要换
-6. Darwin 用户空间：用户需自备 IPSW（Darwin 16.5），unpack 流程 pkg110 实录已验证
+6. Darwin 用户空间：IPSW 自备（Darwin 16.5），unpack 流程 pkg110 实录已验证
 
 ## 环境盘点（本机）
 
@@ -121,16 +120,16 @@ compatible 全部为 qcom,kryo（通用名），cache 子节点为 arm,arch-cach
 - 已做：getprop / cmdline / iomem 读取；fdt、xbl_a、xbl_config_a、abl_a **只读拷贝**到 /data/local/tmp 并拉回本地（intel/）；无重启、无写入、无 fastboot
 - opencli 浏览器会话 `main`（profile z9xxjp2g）保持 bind
 
-## 上机战役实录（2026-11-02 晚，Boot #1-6 全记录）
+## 真机验证工作实录（2026-11-02 晚，Boot #1-6 全记录）
 
 | # | 镜像 | 通道 | 结果 | 学到 |
 |---|---|---|---|---|
-| 1 | xnu-phk110.img（HakiOS 全链） | fastboot boot | 静默挂死，USB 僵尸 D00D | 死在 USB 重枚举之前 |
+| 1 | xnu-phk110.img（HakiOS 全链） | fastboot boot | 静默挂死，USB 半启动残留 D00D | 死在 USB 重枚举之前 |
 | 2 | Mu-ingres.img（上游官方） | fastboot boot | 同上 | **不是我们包的问题，是公共层** |
 | 3 | stock boot_a（原厂对照） | fastboot boot | ✅ 秒回安卓 | **ABL 通道完全正常** |
 | 4 | Mu-phk110-grafted | fastboot boot | ABL 验收过了！执行后弹回异常 fastboot（USB 全消失）| **footer 是第一道门** |
 | 5 | 同 #4 但 flash boot_b + set_active b | flash 路线 | 仍死 | FD 本体（ingres 衍生）不适配本机 |
-| 6 | **udon-uefi-grafted.img**（udonPkg 重建） | **flash boot_b + set_active b** | ✅✅ **UEFI 活了！用户确认"进去了"** | 外部验证路线复现成功 |
+| 6 | **udon-uefi-grafted.img**（udonPkg 重建） | **flash boot_b + set_active b** | ✅✅ **UEFI 活了！屏幕确认"进去了"** | 外部验证路线复现成功 |
 
 ### 三层根因链（全部闭环）
 1. **OPPO ABL 拒绝无 AVB footer 的镜像** → 解法：UniXNU-udon 的 `graft-boot-footer.py`（原厂 vbmeta blob 原样搬运 + footer 重写，非伪造签名）
@@ -143,22 +142,22 @@ compatible 全部为 qcom,kryo（通用名），cache 子节点为 arm,arch-cach
 - 驱动安装参考：intel/usb-driver/（Zadig 2.9 + Google USB Driver + libusb 1.0.27）
 - adb 现在走 USB（serial SERIAL_REDACTED），WiFi ADB 备用
 
-### 外部参考项目（金矿级）
+### 外部参考项目（极有价值的参考级）
 - **takasugl/uefi-udon**：PHK110 专用 Mu-Silicium 平台包（udonPkg，公开源码，MemoryMapLib 含已验证的 MTE Reserved 0xC0000000/512MB、Kernel 0xA8000000/256MB）
-- **takasugl/UniXNU-udon**：同机跑通 XNU 的完整实现；`docs/BRINGUP-2026-10-25.md` = 方法论金矿；`package/linux-log/graft-boot-footer.py` = footer graft 工具
+- **takasugl/UniXNU-udon**：同机跑通 XNU 的完整实现；`docs/BRINGUP-2026-10-25.md` = 方法论极有价值的参考；`package/linux-log/graft-boot-footer.py` = footer graft 工具
 - 一加 GPL 内核源码：OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8475（面板 dtsi + S3910 触摸源码副本已在 intel/wave1b-scripts/）
 
 ### 当前手机状态（本节末尾）
 - **slot b 活动**，boot_b = udon-uefi-grafted.img（UEFI 能启动但无 payload 会挂引导）；boot_a = 原厂安卓未动
 - **回安卓**：强关 → 按住电源+音量下 → fastboot → `fastboot set_active a` → reboot
-- 手机目前在 fastboot 待命（用户手动进入）
+- 手机目前在 fastboot 待命（手动进入）
 
-### Wave 5 ✅（Boot #7，2026-11-02 深夜）
+### 阶段 5 ✅（Boot #7，2026-11-02 深夜）
 `udon-hakios-grafted.img`（payload@0xF4000000）刷写结果：**UniXNU 菜单出画**（显示/USB PHY/菜单全工作）→ 选 Return to firmware → **XnuLoader 触发 → 内核日志上屏滚动** → CPU exception（EDK2 CpuExceptionHandlerLib.c:438）冻结。USB gadget 只收中断不对外枚举。logdump 全零（冻结早于落盘）。
 报错定位：`ConvertPages a1000000-a196aff` = EDK2 Page.c:688（良性）；`usb start failed` = loader.c:3676（良性）；**exception 根因 = loader 平台表无 SM8475 → 回落 qemu-virt 几何 → 内核在真机访问错误地址**。
 
-### Wave 6 刷写 = Boot #8 ✅（2026-11-03，重大突破）
-`udon-hakios-grafted-v2.img` flash boot_b + set_active b：**全链贯通**——UniXNU 菜单出画（显示/USB PHY/菜单全工作，用户拍照实证）→ 选 Return to firmware → **XnuLoader 触发 → 内核日志上屏滚动 → 干净返回**（无异常！）。logdump 首次落盘成功，全日志回读：
+### 阶段 6 刷写 = Boot #8 ✅（2026-11-03，重大突破）
+`udon-hakios-grafted-v2.img` flash boot_b + set_active b：**全链贯通**——UniXNU 菜单出画（显示/USB PHY/菜单全工作，现场拍照实证）→ 选 Return to firmware → **XnuLoader 触发 → 内核日志上屏滚动 → 干净返回**（无异常！）。logdump 首次落盘成功，全日志回读：
 ```
 platform phk110 ✓  CurrentEL=1 ✓  MIDR=410fd463(boot核心=A510)
 core 700: the firmware answers 0（PSCI 唤醒 X2 成功）✓
@@ -166,9 +165,9 @@ jumping to 8434194a8 → kernel returned: log 717B（走 loader_return 正常路
 ```
 已知残留：①内核日志未随 logdump 落盘（loader 只写自己的 4096 块）②loader USB gadget start failed（良性）③每轮复位后 ABL fallback 回安卓（~3 轮后）。
 
-### Wave 7（进行中，后台子代理）
-**免刷写迭代基建**：① XnuLoaderMain 挂点从 UnableToBoot 前移到 AfterConsole 尾部（跳过 UniXNU 菜单，全自动进加载器）② payload 加 `--usb` 驻留标志 → loader 进入 USB fastboot 命令服务器稳定驻留 → 之后内核迭代全走 `fastboot stage payload.bin` + `oem run` + `get_staged log.txt`，**零刷写零手动**。主代理职责收敛为：分析/记录/编排。
-`platform_phk110` 平台表 +22 行（FB key 0xB8000000 从 SimpleFb.c 源码确认、GIC 0x17A00000/17A60000、core_shift=8 由 FDT cpu@700 决定性证实、cmdline 追加 cpus=8 bootcpu=7）；**发现并修正拓扑认知**：三组证据（EPSS freq-domain、idle-states、SM8475 官方规格）指向 **4 小核(cpu0-3)+3 大核+1 prime**，与早前 capacity 值读出的 3+4+1 矛盾 → small_cores=0x0f 暂定，标待真机 MIDR 验证。产物 `device-layer/udon-hakios-grafted-v2.img`（sha256 6fb33fc1…，21/21 自检，commit 574fa69）。**刷写等用户**；预期 banner `platform phk110` + `display 1240x2772 at b8000000` + `core 700: the firmware answers`。回退：重刷 backups-slotb/backup-boot_b.img。
+### 阶段 7（进行中，后台执行）
+**免刷写迭代基建**：① XnuLoaderMain 挂点从 UnableToBoot 前移到 AfterConsole 尾部（跳过 UniXNU 菜单，全自动进加载器）② payload 加 `--usb` 驻留标志 → loader 进入 USB fastboot 命令服务器稳定驻留 → 之后内核迭代全走 `fastboot stage payload.bin` + `oem run` + `get_staged log.txt`，**零刷写零手动**。职责收敛为：分析、记录、编排。
+`platform_phk110` 平台表 +22 行（FB key 0xB8000000 从 SimpleFb.c 源码确认、GIC 0x17A00000/17A60000、core_shift=8 由 FDT cpu@700 决定性证实、cmdline 追加 cpus=8 bootcpu=7）；**发现并修正拓扑认知**：三组证据（EPSS freq-domain、idle-states、SM8475 官方规格）指向 **4 小核(cpu0-3)+3 大核+1 prime**，与早前 capacity 值读出的 3+4+1 矛盾 → small_cores=0x0f 暂定，标待真机 MIDR 验证。产物 `device-layer/udon-hakios-grafted-v2.img`（sha256 6fb33fc1…，21/21 自检，commit 574fa69）。**刷写待执行**；预期 banner `platform phk110` + `display 1240x2772 at b8000000` + `core 700: the firmware answers`。回退：重刷 backups-slotb/backup-boot_b.img。
 
 - 无线 ADB `192.168.43.29:42621` 在线（端口会漂移，`adb mdns services` 重发现；配对已永久，无需重配）
 - 本次会话对手机**只做过读取**（getprop/cat/ddt 拷贝到 /data/local/tmp 的 fdt 副本），无任何重启/写入

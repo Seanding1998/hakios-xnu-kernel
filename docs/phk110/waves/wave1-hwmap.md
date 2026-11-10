@@ -1,4 +1,4 @@
-# Wave 1 · 调查 B — PHK110 硬件清单 → redwood 驱动集映射规格书
+# 阶段 1 · 2026-11-02 · PHK110 硬件清单与上游驱动集的对应关系
 
 > 版本：1.0（2026-11-02）· 调查代理 B（只读取证 + GPL 源码调查）
 > 服务于：R1（NT37705 面板序列）、R2（S3910 触摸驱动）、v0.2「第一缕光」、v0.3「触感」、v0.6「连接」、v0.7「全网」
@@ -97,7 +97,7 @@ PMIC 从机基址：PHK110 spmi arbiter `qcom,spmi-pmic-arb@c42d000`（core c42d
 | 项 | redwood | PHK110 | 判定 |
 |---|---|---|---|
 | EPSS | `qcom,cpufreq-hw-epss` @0x17d91000，3 freq-domain | **同址** 0x17d91000/92000/93000，3 domain，LUT row 4B，dcvsh 中断 [30,31,19] | `相同`（真机首验时核对 LUT 行数） |
-| CPU 拓扑 | 1×A710? (sm7325) | 3×A510 + 4×A710 + 1×X2(cpu7)（Wave1-A 已证） | `相同`（CONFIG_BOOTCPU=7 沿用） |
+| CPU 拓扑 | 1×A710? (sm7325) | 3×A510 + 4×A710 + 1×X2(cpu7)（阶段 1-A 已证） | `相同`（CONFIG_BOOTCPU=7 沿用） |
 
 ### 2.5 GPU（v0.5）
 
@@ -220,7 +220,7 @@ PMIC 从机基址：PHK110 spmi arbiter `qcom,spmi-pmic-arb@c42d000`（core c42d
 
 **v0.2「第一缕光」（显示）**
 1. 用 §4 的 dtsi 抽取 `timing@sdc_fhd_120` 的 on-command（DSC/时钟/复位时序已在 §2.1）→ 生成 Mu-Silicium RAW 面板配置（建议固定 120Hz 单档，qsync/ADFR/OFP 全部先不做）。
-2. 面板供电链：vddio 1.8V + vci 3.0V（`dsi_panel_oplus_optimization_pwr_supply`）+ AVDD（Iris 7 电源轨 `dsi_iris_pwr_supply`，若 DisplayDxe 不跑 oplus iris 驱动需评估 AVDD 是否由 PMIC 直给——**风险点，可在上机时用 `dmesg`/面板点亮与否二分**）。reset GPIO3，TE GPIO86（cmd 模式必需 TE，DisplayDxe 需配 TE 脚 pinctrl）。
+2. 面板供电链：vddio 1.8V + vci 3.0V（`dsi_panel_oplus_optimization_pwr_supply`）+ AVDD（Iris 7 电源轨 `dsi_iris_pwr_supply`，若 DisplayDxe 不跑 oplus iris 驱动需评估 AVDD 是否由 PMIC 直给——**风险点，可在真机验证时用 `dmesg`/面板点亮与否二分**）。reset GPIO3，TE GPIO86（cmd 模式必需 TE，DisplayDxe 需配 TE 脚 pinctrl）。
 3. DSI-ctrl v2.6 + 4nm D-PHY：bitra DisplayDxe 的控制器驱动大概率同 IP（waipio 系），换地址 ae94000 即可试验（路线②）。
 
 **v0.3「触感」（输入）**
@@ -251,9 +251,9 @@ adb -s 192.168.43.29:42621 shell getprop ro.vendor.oplus.project  # 期望 22803
 ```
 交叉验证点：触摸 input 名（应为 `synaptics-tcm`/`tp_*`）、leds 里 `qti-haptics`（证明 PMIC haptics）、`/sys/bus/spi/devices` 出现 `spi0.0`（S3910）。
 
-## 7. 本调查未决项（明确移交）
+## 7. 本调查未决项
 
-- AVDD/Iris 供电轨的实际来源（UEFI 层是否需要 Iris 初始化）→ 上机试验或读 `abl-uefi-extract`。
+- AVDD/Iris 供电轨的实际来源（UEFI 层是否需要 Iris 初始化）→ 真机验证试验或读 `abl-uefi-extract`。
 - TFA9874 的 init/固件装载细节（v0.6 才需要）。
 - 相机 4 颗 sensor 型号 → 需运行时 `dumpsys` 或 sensormodule bin 解析。
 - 首次真机 logfs 回读后复核：EPSS LUT、TSENS 32 路读数、UFSHC 探测。

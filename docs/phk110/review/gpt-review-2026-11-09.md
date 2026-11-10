@@ -1,4 +1,4 @@
-# 外部 AI 审阅导读（2026-11-09）
+# 外部评审意见（2026-11-09）
 
 > 给有本地文件阅读能力的 AI（ChatGPT 等）的审阅入口。本文只做导航与提问，所有细节都在所引文件里。
 > 项目语言：中文（代码注释/日志为英文）。仓库根：`<host>\.zcode\workspace\9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7\hakios-phk110`（下称 `[REPO]`）。
@@ -6,7 +6,7 @@
 
 ## 0. 一段话项目背景
 
-把 **HakiOS**（github.com/oosexgang：Apple XNU 内核直接跑在安卓高通手机上）从唯一参考机 POCO X5 Pro 5G 移植到 **一加 Ace 2（PHK110 / SM8475 / 16GB）**。启动链 = `ABL → boot_b(Mu-Silicium UEFI + AVB graft) → BootShim → XnuLoader(loader.efi) → XNU 内核 → Darwin 用户态(20F66 IPSW)`。boot_b 刷写循环为一揽子授权的非破坏性双系统研究平台（slot a 安卓日常不动）。方法论 = 主代理分析编排 + 子代理波次执行，一切结论以真机实测为准；36 次 boot 的全记录在 `[REPO]/docs/STATUS.md`（唯一权威快照）。
+把 **HakiOS**（github.com/oosexgang：Apple XNU 内核直接跑在安卓高通手机上）从唯一参考机 POCO X5 Pro 5G 移植到 **一加 Ace 2（PHK110 / SM8475 / 16GB）**。启动链 = `ABL → boot_b(Mu-Silicium UEFI + AVB graft) → BootShim → XnuLoader(loader.efi) → XNU 内核 → Darwin 用户态(20F66 IPSW)`。boot_b 刷写循环为一揽子授权的非破坏性双系统研究平台（slot a 安卓日常不动）。方法论 = 分析编排与阶段执行分离，一切结论以真机实测为准；36 次 boot 的全记录在 `[REPO]/docs/STATUS.md`（唯一权威快照）。
 
 ## 1. 当前位置（一页纸）
 
@@ -17,21 +17,21 @@
 | v0.3 触摸/按键/常驻/8核 | ✅ Boot #21 | wave11-12c |
 | v0.4 存储（UFS S0-S8 + P0 carve + HFS+ /var） | ✅ Boot #22-24 | wave15-18, 16b/16c |
 | v0.4 用户态（launchd 28 进程 / sshd :22 / SpringBoard） | ✅ Boot #25 (v14) | wave20 |
-| **v0.4 收官 = 主机↔loader 的 USB 管道（SSH 数据面）** | **🔄 唯一剩余，本文重点** | wave19/21/21_1/21_2/21_5/22 |
-| iOS 桌面出画（无 GPU CPU 渲染路线） | 🔄 Wave 23.x 进行中 | docs/research/f13 + wave23-scripts/ |
+| **v0.4 完成 = 主机↔loader 的 USB 管道（SSH 数据面）** | **🔄 唯一剩余，本文重点** | wave19/21/21_1/21_2/21_5/22 |
+| iOS 桌面出画（无 GPU CPU 渲染路线） | 🔄 阶段 23.x 进行中 | docs/research/f13 + wave23-scripts/ |
 | v0.5 GPU（freedreno） | ⏳ | PLAN.md；呈现通道依赖上行的出画 |
 
-**核心矛盾一句话**：loader 相位的 USB gadget，主机（Windows）大多数时候枚举不出来（死 devnode `0000:0002`），少数时候枚举成功且 bulk 端点对武装成功（v15 以来首次在 Boot #36 铁证）；SSH 数据面需要一个**持续可用**的管道，所以"武装成功率"是 v0.4 的最后一道墙。
+**核心矛盾一句话**：loader 相位的 USB gadget，主机（Windows）大多数时候枚举不出来（死 devnode `0000:0002`），少数时候枚举成功且 bulk 端点对武装成功（v15 以来首次在 Boot #36 证据）；SSH 数据面需要一个**持续可用**的管道，所以"武装成功率"是 v0.4 的最后一道墙。
 
 ## 2. 阻塞问题五分钟版（编年）
 
-按时间顺序，每一步都有完整波次报告（`[REPO]/docs/waves/`）：
+按时间顺序，每一步都有完整阶段日志（`[REPO]/docs/waves/`）：
 
 1. **Boot #9 遗案**：vendor `UsbConfigDxe start_ex` 间歇失败（~9/10 boot，wave7/wave8）。
 2. **wave19-prep**：SSH 数据面方案定稿 = loader 桥接网络（共享页网环 + 内核 en0 + loader bulk 管道复用，零内核 USB 栈）。
-3. **wave21（v15.x, Boot #26-29）**：三端全上机，en0 数据面实证（内核态 10.0.0.2/30 配置成功）；阻塞 = start_ex 间歇失败 + F7 usbipd stale export。
+3. **wave21（v15.x, Boot #26-29）**：三端全真机验证，en0 数据面实证（内核态 10.0.0.2/30 配置成功）；阻塞 = start_ex 间歇失败 + F7 usbipd stale export。
 4. **wave21_1（v16, Boot #30）**：延迟首试 + 失败码打印 → `usb: started` 首试即成；新发现 **F8**（半启动 zombie：ep0 可枚举但 bulk 未武装）与 **F9**（usbipd→WSL vhci 管道生命周期）。
-5. **wave21_2（v16b/v16c, Boot #31-33）**：**F10** 构建回归破案（PAYLOAD_BASE 漏带 → 冻屏，照片+反汇编定案）；v16b' 修复后新形态 = **端点墙**（`physical endpoint[2] not configured` / `0x8000000C` 持续刷屏）；三重 DWC3 唤醒修复无效 → 定性 vendor 栈固有行为。
+5. **wave21_2（v16b/v16c, Boot #31-33）**：**F10** 构建回归定位根因（PAYLOAD_BASE 漏带 → 冻屏，照片+反汇编定案）；v16b' 修复后新形态 = **端点墙**（`physical endpoint[2] not configured` / `0x8000000C` 持续刷屏）；三重 DWC3 唤醒修复无效 → 定性 vendor 栈固有行为。
 6. **wave21_4 → docs/research/f12-ep2-not-configured.md**：端点墙**指令级归因**（vendor UsbfnDwc3Dxe 反汇编）：bulk 武装唯一路径 = host SET_CONFIG → ep0 状态机 case 9 → DEPSTARTCFG → 描述符 walk → DwcConfigureEP；三重前置 = speed 字段（仅 ConnectDone 写非 0）+ maxpkt 速度表（**bulk@speed0=0 陷阱列**）+ DEPSTARTCFG 成功。根因三候选 **H1/H2/H3**（见 §5）。
 7. **wave21_5（v17/v17b, Boot #34-35）**：探针机制（0 长度 bulk 探针 + 判别器 + 重掷）两轮完整执行；主机全程未枚举 → 阻塞**上游化**为"主机可见性"。
 8. **wave22（v18, Boot #36）**：根因定案到指令级（vendor 唯一拉高 pull-up 的 connect 只被泵送盲窗的平台回调驱动；我们自己的 start_ex 开头会断开 connect 且从不重新展示）→ 修复 = **泵送前移（usb_wait_pumped，20ms 节拍）+ 自主 present（usb_present：start_ex 成功后 DCTL|=bit31）**。真机：**两项历史首胜**（loader 相位枚举成功 6 分钟 + logdump 判别器逐字 `the bulk pair answered: armed at generation 0, beat 1`）。**剩余阻塞精确化**（§5）+ v19 施工单（§6）。
@@ -61,7 +61,7 @@
 4. 代码：`[WSL]/kernel/xnuloader/loader.c` 的 USB 段（行号地图见 §4.1）+ `[REPO]/wave22-scripts/patch-loader-v18.py`（v18 delta 全文，含设计动机注释）
 5. 真机数据：`[REPO]/logdump-v18.bin.keylines.txt`（armed 会话判别记录）+ `wave22-scripts/bus18-watch.log`（Windows 总线观测）+ `wave23-scripts/fetch23.log`（**最新反常数据**，见 §5-D）
 
-**想审全项目**：加读 `docs/PLAN.md`（版本计划）、`docs/M0-PROGRESS.md`（编年体）、`docs/README.md`（37 篇波次报告目录）、`docs/research/f13-virtual-display.md`（并行线）、`docs/research/landscape-2026-11-08.md`（生态对比）。
+**想审全项目**：加读 `docs/PLAN.md`（版本计划）、`docs/M0-PROGRESS.md`（编年体）、`docs/README.md`（37 篇阶段日志目录）、`docs/research/f13-virtual-display.md`（并行线）、`docs/research/landscape-2026-11-08.md`（生态对比）。
 
 ### 4.1 loader.c USB 段行号地图（[WSL]/kernel/xnuloader/loader.c，共 5129 行）
 
@@ -82,9 +82,9 @@
 - **H1**：DEPSTARTCFG/描述符 walk 本身翻车（与 start_ex 间歇失败同族）
 - **H2**：SET_CONFIG 到达时 speed 字段仍为 0 → maxpkt 速度表 bulk@speed0=0 陷阱 → 端点武装失败
 - **H3**：UsbDeviceDxe 层 "Unknown USB Speed" STALL（speed==0 时 SET_CONFIG 被拒）
-- 分辨手段受限：raw 失败码被 UsbDeviceSend 包装成 7 形（logdump 看不到 raw）；vendor 的**前导错误行只上屏不进 logdump**（用户屏摄是唯一活通道）。v19 Round 2 计划加 raw 码透传。
+- 分辨手段受限：raw 失败码被 UsbDeviceSend 包装成 7 形（logdump 看不到 raw）；vendor 的**前导错误行只上屏不进 logdump**（屏摄是唯一活通道）。v19 Round 2 计划加 raw 码透传。
 
-**B. 结构毒窗（主代理 2026-11-09 审码发现，未修复）**
+**B. 结构异常窗（2026-11-09 审码发现，未修复）**
 每个 boot 的最初 25s settle 窗：`usb_init_kick` 唤起的 vendor 平台回调会在该窗内拉高 pull-up（wave22 §1 指令级证实），而该窗**按设计不能泵送**（start_ex 未配置事件环，ring 不属于 loader）→ 主机第一眼看到的 attach 注定 5s 控制超时 → 死 devnode。每个 boot 都先送 Windows 一个坏枚举。缓解候选：settle 25s→5s（v16 的 5s 版有"首试即成"实证）。
 
 **C. 重掷 detach 杀枚举（wave22 首要嫌疑）**
@@ -94,7 +94,7 @@ armed 会话恰是零重掷会话（gen0 直接武装）；重掷的 start_ex �
 一个会话里设备被 Windows **稳定枚举 2.5 分钟**（open+claim 每 10s 成功、libusb_set_configuration(1) 已发），但 **bulk-OUT 全部 LIBUSB_ERROR_TIMEOUT** = bulk 始终未武装。这把"时机窗口太短"解释打薄——**设备侧 walk 失败本身（H1/H2）在稳定窗内也在发生**成为首要嫌疑。请审阅者给出：这个数据形态下 H1/H2/H3 的概率排序与判别实验设计。
 
 **E. 主机侧已知变量**
-- usbipd-win 有残留持久共享 `b67ab332→xnuloader`（管理员 `usbipd unbind` 可清，用户侧待办）；整夜 hunt 脚本的 attach 手术与设备自身枚举时序对撞（F9）。
+- usbipd-win 有残留持久共享 `b67ab332→xnuloader`（管理员 `usbipd unbind` 可清，主机侧待办）；整夜 hunt 脚本的 attach 手术与设备自身枚举时序对撞（F9）。
 - **提问**：usbipd 的 bind/Shared 状态、或 attach 到 WSL 的 vhci 重放，是否会改变 Windows 自身对该设备的枚举行为（0000:0002 的成因清单里排第几）？
 
 **F. 代码级问题（对照 §4.1 行号）**
@@ -105,19 +105,19 @@ armed 会话恰是零重掷会话（gen0 直接武装）；重掷的 start_ex �
 5. 探针在 beat 0 立即开火（present 后无等待），armed 会话是 beat 1（5s）命中——Windows 枚举+SET_CONFIG 的典型耗时与这个节拍的匹配度？
 6. 若放弃 vendor UsbDeviceDxe/UsbfnDwc 栈、loader **直接寄存器驱动 DWC3 gadget**（参考 U-Boot dwc3 gadget / Linux dwc3，AArch64 UEFI 裸机），工作量与风险评级？（现状：vendor 栈两历史首胜已证可用，只是成功率低）
 
-**G. 并行线（虚拟显示/出画，Wave 23.x）**
-- `docs/research/f13-virtual-display.md`：上游树内核内建 MiniIOSurface/MiniIOMobileFramebuffer 假驱动（b25 logdump 铁证 backboardd 已提交 1125×2436 帧）；ios-sweet（SM7150 真机 iOS 16.7 主屏）考古；23.x = cmdline-only 屏录取证。
+**G. 并行线（虚拟显示/出画，阶段 23.x）**
+- `docs/research/f13-virtual-display.md`：上游树内核内建 MiniIOSurface/MiniIOMobileFramebuffer 假驱动（b25 logdump 证据 backboardd 已提交 1125×2436 帧）；ios-sweet（SM7150 真机 iOS 16.7 主屏）考古；23.x = cmdline-only 屏录取证。
 - 请顺带审：23.x 的判定协议（`make-cmdline-v19.py` 头注释 + f13 §施工单）与 F6（vnode 表耗尽 @218s，v15 时代 300s 会话）风险的权衡是否合理。
 
 ## 6. v19 施工单（当前计划，欢迎挑战）
 
-来源 wave22 verdict §7 + 主代理审码增补（按序）：
+来源 wave22 verdict §7 + 审码增补（按序）：
 1. 软化重掷：代际内见主机事件（DeviceStateChange Connected/Configured）不重掷，gen0 窗 30s→~120s（~15 行）
 2. 服务相位提前：probe 阶段并行 `usb_poll_command`（~10 行）
 3. E2E/提取通道换 Windows libusb 直连（probe18w 骨架已证）——23.x 已在用
 4. usbipd 到达事件驱动 attach 替代轮询手术
 5. raw 失败码透传打印（分辨 H1/H2）
-6. settle 25s→5s（毒窗 B 的缓解）
+6. settle 25s→5s（异常窗 B 的缓解）
 刷写预算：每波 2 轮（boot_b 一揽子授权内）。
 
 ## 7. 关键数据/工件速查

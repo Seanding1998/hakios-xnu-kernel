@@ -1,17 +1,17 @@
-# F10 调研报告：DXE 期 Data Abort (FAR=0xF0000000) — 外部先例 + 独立本地扫描 + 修复模式库
+# DXE 阶段 Data Abort（FAR=0xF0000000）的外部先例与修复模式调研
 
-**日期**：2026-11-08 ｜ **性质**：F10 专项子代理（外部先例 + 独立本地字节扫描；驱动身份反汇编归另一代理，本报告不重复）
+**日期**：2026-11-08 ｜ **性质**：F10 专项调研（外部先例 + 独立本地字节扫描；驱动身份反汇编见另篇，本报告不重复）
 **案例**：SM8475 (PHK110/udon) Mu-Silicium 系 UEFI（DEBUG，FD sha 8924cb67），BdsDxe 调用 DXE 驱动（加载基址 0xFA58E000，EntryPoint+0x60）解引用 FAR=**0xF0000000** → Synchronous external abort (EC 0x25) → EDK2 默认处理器 `ASSERT(FALSE)` @ CpuExceptionHandlerLib.c(438) 死循环。间歇性：#31（暖）/ #32（冷）均中。
 
-> ## ⚠ 结案更正（2026-11-08，照片裁决，主代理闭环——本报告成文于裁决送达前）
-> **F10 已闭环，真因与本报告的工作假设不同**：崩点驱动 = **本项目自产 `xnuloader/loader.efi`**（BDS 经 gBS LoadImage/StartImage 启动 payload 内 loader，非 vendor DXE）；根因 = 本轮构建回归，裸 `./build.sh` 漏带 `PAYLOAD_BASE=0xF4000000` → loader.c:23 的 **redwood 上游默认基址 0xF0000000** 编进 loader，parse_payload 首读 `ph->magic` 即访问**未映射地址**（udon uefiplat.cfg 无此映射 → L0 translation fault），冷/暖无关、v16b 6 hunks 无罪。修正版 v16b'（`e33ec417…`，54/54 自检，F10 指令级钉死）已入库待批刷。教训已钉流程：编 loader 必须 `PAYLOAD_BASE=0xF4000000 ./build.sh`（详见 `docs/STATUS.md` 更新⑪、`docs/waves/wave21_2-ssh-catch.md` §7）。
+> ## ⚠ 结案更正（2026-11-08，照片定案——本报告成文于定案之前）
+> **F10 已闭环，真因与本报告的工作假设不同**：崩点驱动 = **本项目自产 `xnuloader/loader.efi`**（BDS 经 gBS LoadImage/StartImage 启动 payload 内 loader，非 vendor DXE）；根因 = 本轮构建回归，裸 `./build.sh` 漏带 `PAYLOAD_BASE=0xF4000000` → loader.c:23 的 **redwood 上游默认基址 0xF0000000** 编进 loader，parse_payload 首读 `ph->magic` 即访问**未映射地址**（udon uefiplat.cfg 无此映射 → L0 translation fault），冷/暖无关、v16b 6 hunks 无罪。修正版 v16b'（`e33ec417…`，54/54 自检，F10 指令级钉死）已入库待刷写。教训已钉流程：编 loader 必须 `PAYLOAD_BASE=0xF4000000 ./build.sh`（详见 `docs/STATUS.md` 更新⑪、`docs/waves/wave21_2-ssh-catch.md` §7）。
 > **因此本报告以下内容的地位调整为**：①§2 外部先例库、§3 本地扫描数据、§3.3 vendor 常量普查（DALSYSDxe 含 18 处 0xF0000000 记录）= **仍有效的参考档案**（将来 vendor DXE 域再出 0xF0000000 类异常时直接可用）；②§0-1 的"TZApps 触碰"机制假设、§6 修复建议 = **对本案例已被裁决取代**（0xF0000000 实为"未映射"而非"TZ secure 区访问"；但注意 §3.2 的 TZApps 边界事实仍准确——若当时 loader 落在 0xEA–0xF14 区内则会是另一种 abort 签名）。"0xF0000000 = redwood 系 loader 的历史默认 payload 基址"这一语义，比本报告检索到的任何外部语义都更贴合本案，且已由反汇编代理证实。
 
 ---
 
 ## 0. 一页结论（TL;DR）
 
-1. **0xF0000000 落在本机 TZApps carveout 内部**：udonPkg `MemoryMapLib.c:35` 定义 `TZApps Reserved = 0xEA000000, size 0x07400000`，即 0xEA000000–0xF13FFFFF。0xF0000000 位于其中段。**对 TZ/hyp 拥有的物理区做 NS 访问 = Synchronous External Abort**——这一机制在本机已有 UniXNU BRINGUP 原文铁证（SM8475 SMMU 编程 external abort，见 §2.2），并与 Mu-Silicium 上游 OnePlus 15 同型案例 #2120（TZ carveout SEA，§2.1）互证。
+1. **0xF0000000 落在本机 TZApps carveout 内部**：udonPkg `MemoryMapLib.c:35` 定义 `TZApps Reserved = 0xEA000000, size 0x07400000`，即 0xEA000000–0xF13FFFFF。0xF0000000 位于其中段。**对 TZ/hyp 拥有的物理区做 NS 访问 = Synchronous External Abort**——这一机制在本机已有 UniXNU BRINGUP 原文证据（SM8475 SMMU 编程 external abort，见 §2.2），并与 Mu-Silicium 上游 OnePlus 15 同型案例 #2120（TZ carveout SEA，§2.1）互证。
 2. **本地扫描（§3）**：全部源码构建模块 **零** movk/movz 0xF0000000 立即数；word 命中全为 ADRP 指令编码噪声。唯一物化 0xF0000000 的二进制 = **vendor `Binaries/udon/.../DALSYSDxe.efi`**（18 处 qword `0x00000000F0000000`，嵌在重复描述符表内；且 DALSYSDxe 确认在编，`DXE.inc:29` + `APRIORI.inc:17` 早期派发位次）。UsbConfigDxe 二进制本身不含该常量，但断言屏 USB 状态行字符串（`ConnectSts` / `Data Role`）**归属 `UsbConfigDxe.patched.efi`**。
 3. **生态先例**：Mu-Silicium/MU-Qcom、edk2-msm（Renegade 系）公开 issue 中**未找到**与本案同型的"BdsDxe 调驱动入口即 Data Abort @ sm8450/sm8475"直接记录（搜索词组合见 §4"未找到清单"）；但同机制先例（TZ carveout SEA → MemoryMapLib 标 Reserved）与同诱因先例（暖重启 USB 控制器带病重入）均有官方级修复记录。
 4. **修复模式库（§5）按适用度排序**：① DXE.inc 注释 DALSYSDxe 做 A/B 定性（1 行，最快）→ ② APRIORI/DEPEX 时序调整 → ③ .patched.efi 字节手术（树内成熟范式）→ ④ MemoryMap 收紧 → ⑤ 源码级 DWC3 复位（成本高）。
@@ -134,7 +134,7 @@ FD 基址：`FD_BASE=0xA7100000`（`scripts/build-udon-firmware.sh:45`）。
 | 5 | **源码级 DWC3/USB 复位 quirk** | U1（dis_u3_susphy）/U2（GDSC retention）/U3（endpoint reset） | 在 vendor UsbInit/UsbConfig 之外源码层做控制器软复位；或 loader 流程规避（现有 20s 节拍已属此类） | 高（新驱动代码） | 中：与 vendor 双栈共存未证（wave19-prep R-B 结论） |
 | 6 | **内存保护/PSC 类** | Mu v3.x "Removed Memory Protection"（上游反例：保护反而惹祸被移除） | 不建议 | — | 上游已证负收益 |
 
-## 6. 给 Wave 21.2 主攻代理的三条建议（已被结案裁决取代——F10 真因 = 构建回归，见顶部更正；以下留档仅当未来 vendor DXE 域再现 0xF0000000 类异常时参考）
+## 6. 给 阶段 21.2 主攻代理的三条建议（已被结案裁决取代——F10 真因 = 构建回归，见顶部更正；以下留档仅当未来 vendor DXE 域再现 0xF0000000 类异常时参考）
 
 1. **先跑零成本 A/B 定性轮**：反汇编定位结果出来前/后，第一刷都建议 `DXE.inc:29` 注释 DALSYSDxe（单变量）——一轮刷写分辨"F10 消失（DALSYSDxe 定罪）/ F10 仍在（转向 UsbConfigDxe 族）/ 变成其他失败（DALSys 消费者连锁，改用模式 3）"。同时按既有制度收屏幕照片 + 判据行。
 2. **修复落点优先选模式 3（.patched.efi 字节手术），慎选模式 4**：0xF0000000 是 TZApps 区内地址，MemoryMap 层收紧误伤面大（SMEM/PIL/DAL 合法路径都在 TZ 边界上）；而 Binaries 树的 .patched 范式已有四个成功先例且自检可逐字节验证。DALSYSDxe 描述符表（§3.3）是字节手术的第一坐标来源。
@@ -144,4 +144,4 @@ FD 基址：`FD_BASE=0xA7100000`（`scripts/build-udon-firmware.sh:45`）。
 
 - 扫描脚本（只读，未动 uefi-udon 树）：`wave21-scripts/f10_scan_f0000000.py`、`wave21-scripts/f10_scan2_context.py`、`wave21-scripts/f10_print_summary.py`
 - 扫描结果 JSON：`wave21-scripts/f10_scan_result.json`、`wave21-scripts/f10_scan2_result.json`
-- git 未 commit（按红线，主代理统一提交）
+- git 未 commit（统一提交）

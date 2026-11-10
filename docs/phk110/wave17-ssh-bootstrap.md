@@ -1,6 +1,6 @@
-# Wave 17 报告：v0.4 SSH 引导物料 —— Procursus bootstrap 机制解读、下载核验、密钥生成
+# 阶段 17 · 2026-11-03 · SSH 引导链机制备忘（sshd / 密钥 / libiosexec）
 
-> 2026-11-04 · 纯 WSL + 网络（零手机交互、零内核树写入）· 执行子代理产出
+> 2026-11-04 · 纯 WSL + 网络（零手机交互、零内核树写入）· 执行记录产出
 > 产物根：**`~/hakios/procursus-prep/`**（WSL 新目录）；报告仓库侧仅新增本文件
 > 上游输入：`~/hakios/kernel/tools/mk-jb.sh`、`userland/build.sh`、`userland/src/init.c`、`userland/rc.jobs.ssh`（全程只读，脚本复制到产物根执行）
 
@@ -13,8 +13,8 @@
 | **机制（使命 1）** | **不是** HFS+ 卷离线预置、**不是** init 从分区解包 tar、**不是** USB 安装。是 **构建期把 bootstrap 前缀离线预置进系统 APFS 镜像（`/jb`，只读）+ 设备侧 init 每次 boot 自动嫁接（graft）到 `/private/var/jb`**。HFS+ 数据卷只是嫁接地，唯一的"离线种子"是 ssh 密钥（经镜像内 `etc/var.skel` 通道，init 开机时种子进卷） |
 | **下载核验（使命 2）** | `mk-jb.sh` 副本运行 **EXIT=0**：bootstrap `1800` 套件快照（20,792,571 B，sha256 `a99b39bb…`）+ 7 个 .deb 全部落 `jb/debs/`，sha256 全记录；前缀 `jb/root/var/jb` = **130M / 6,926 条目 / 70 包**；openssh-server **9.7p1-1**（仓库最新，已预置解包）；sshd 抽查 = 纯 **arm64**（cputype 0x0c000001 subtype 0，零 arm64e） |
 | **预置落地（使命 3）** | 机制 = 系统镜像侧预置，HFS+ 离线写入**不需要也不可行**（WSL2 内核无 hfsplus 文件系统，实测记录见 §6）；`jb/` 与 `ssh/` 两个 build.sh 输入目录已就位，下一波拷入 kernel 树顶层跑一次 `RC_JOBS=rc.jobs.ssh userland/build.sh` 即完成全部接线 |
-| **密钥（使命 4）** | host key（ed25519）+ 用户 key 对已生成于 `procursus-prep/{ssh,keys}/`，公钥/指纹见 §5 留档；`ssh/` 目录布局严格对齐 build.sh:392-403 的 `../ssh` 读取约定 |
-| 磁盘 | 本波次净耗 **~156M**（130M 前缀 + 26M debs + 密钥/日志），WSL 916G 可用，无压力 |
+| **密钥（使命 4）** | host key（ed25519）+ 登录密钥对已生成于 `procursus-prep/{ssh,keys}/`，公钥/指纹见 §5 留档；`ssh/` 目录布局严格对齐 build.sh:392-403 的 `../ssh` 读取约定 |
+| 磁盘 | 本阶段净耗 **~156M**（130M 前缀 + 26M debs + 密钥/日志），WSL 916G 可用，无压力 |
 | 红线 | 零手机调用 ✅；kernel 树只读（脚本副本执行，ROOT 解析为 procursus-prep）✅；`var-hfs-data.img` 原件未动（仅 sparse 读复制）✅；下载全走 127.0.0.1:7897 ✅ |
 
 ---
@@ -27,7 +27,7 @@
 
 ### 1.2 主机侧：`tools/mk-jb.sh` 产出前缀树
 
-`~/hakios/kernel/tools/mk-jb.sh`（239 行，本波次复制到 `procursus-prep/tools/` 执行）：
+`~/hakios/kernel/tools/mk-jb.sh`（239 行，本阶段复制到 `procursus-prep/tools/` 执行）：
 
 - :17 `SUITE=1800`（rootless 发行套件名；:8-9 注释明确"1800 是发行名，不要求 Darwin userland 18"）
 - :19 `MIRROR=https://apt.procurs.us`
@@ -108,13 +108,13 @@
 - **sshd**：`usr/sbin/sshd`，806,512 B；Mach-O 头实测 magic `0xcffaedfe`（MH_MAGIC_64）、**cputype `0x0c000001`（arm64）**、cpusubtype 0 —— 纯 arm64，零 arm64e，与本项目内核（xnu-8796.121.2 arm64）路线一致
 - **ssh 配套**：`etc/ssh/{sshd_config,ssh_config,moduli}`；`usr/libexec/{sftp-server,ssh-keysign,ssh-sk-helper,sshd-keygen-wrapper,ssh-pkcs11-helper}`；`etc/master.passwd`（2,652 B，init pwd_mkdb 消费）
 - **strust-procursus：本 snapshot 不存在**（全树 `find -iname "*strust*"` 零命中）。该信任缓存工具属于更新的 Procursus bootstrap；v0.4 不消费 trust cache（`cs_enforcement_disable=1` + miniamfi stub，wave14 §5.1），**无影响**；若未来走 AMFI 正门需换新 bootstrap 或单取该工具
-- Sileo 全套在位（`Applications/Sileo.app` + `giveMeRoot` 4755），apt 源与 CaInfo 配置由 mk-jb.sh 写好——v0.4 SSH 场景用不上但不碍事，Sileo 生态后续波次免重做
+- Sileo 全套在位（`Applications/Sileo.app` + `giveMeRoot` 4755），apt 源与 CaInfo 配置由 mk-jb.sh 写好——v0.4 SSH 场景用不上但不碍事，Sileo 生态后续阶段免重做
 
 ## 4. 预置/安装步骤（给 P0 后的 v0.4 波，逐条执行）
 
-**本波次已完成（产物即交付物）**：`~/hakios/procursus-prep/` 下 `jb/root/var/jb`（前缀树 = build.sh 的 `../jb` 输入）、`ssh/`（build.sh 的 `../ssh` 输入）、`keys/`（用户 key 对）、`logs/`（哈希台账）。
+**本阶段已完成（产物即交付物）**：`~/hakios/procursus-prep/` 下 `jb/root/var/jb`（前缀树 = build.sh 的 `../jb` 输入）、`ssh/`（build.sh 的 `../ssh` 输入）、`keys/`（登录密钥对）、`logs/`（哈希台账）。
 
-**下一波执行（构建窗口期，与 Wave12a 协调，勿并行写 kernel 树）**：
+**下一波执行（构建窗口期，与 阶段 12a 协调，勿并行写 kernel 树）**：
 
 ```bash
 # 1. 拷入 kernel 树顶层（build.sh 以相对路径 ../jb、../ssh 消费；TREE 内只增两个新顶层目录）
@@ -161,10 +161,10 @@ user: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDj9jT2NReWL1Joq4rSfSZQLza2G4U0Qxr9s3L
 ## 6. HFS+ rw 能力调查结论（使命 3 附带，实测）
 
 - **WSL2 内核 `6.18.54.1-microsoft-standard-WSL2` 不含 hfsplus 文件系统**：`/proc/filesystems` 无 hfs/hfsplus，`modprobe hfsplus` FATAL（无模块目录）→ **Linux 内核侧挂载（ro 与 rw 均不可能）**
-- 用户态 hfsprogs 540.1 可用（wave14 装的 `hfsplus-tools`）：本波次对副本 `fsck.hfsplus -q` **EXIT=0 FILESYSTEM CLEAN**；mkfs 能建卷（wave14 已证）
+- 用户态 hfsprogs 540.1 可用（wave14 装的 `hfsplus-tools`）：本阶段对副本 `fsck.hfsplus -q` **EXIT=0 FILESYSTEM CLEAN**；mkfs 能建卷（wave14 已证）
 - 即使内核有 hfsplus，upstream Linux 也拒绝 journaled 卷 rw 挂载；已知绕法（清卷头 journal 位 @1024+16 attributes bit0x2、或 hpmount 类用户态工具）要么破坏 `-J` 语义（fork 内核 var_kept 期待日志卷，init.c:836-838 注释），要么同样拒 journaled 卷——**均不采**
 - **结论：不需要也不应做 HFS+ 离线写入。** 机制上 bootstrap 走镜像 `/jb`、密钥走 var.skel 种子通道（init.c:954-966），HFS+ 卷只是设备侧 init 的挂载/嫁接地。任务书中"卷外通道"的猜想**成立且已是现成机制**（var.skel 'f' 行 + in_image()，init.c:29、:954-966；build.sh:400-403 供货）
-- `var-hfs-data.img` 原件未动；副本 `procursus-prep/var-hfs-data-jb.img`（12G sparse，实占 52K）为 fsck 验证过的工作副本，供后续波次实验（挂载/灌 var.skel 对照）用
+- `var-hfs-data.img` 原件未动；副本 `procursus-prep/var-hfs-data-jb.img`（12G sparse，实占 52K）为 fsck 验证过的工作副本，供后续阶段实验（挂载/灌 var.skel 对照）用
 
 ## 7. 磁盘账目
 
@@ -184,7 +184,7 @@ user: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDj9jT2NReWL1Joq4rSfSZQLza2G4U0Qxr9s3L
 4. **手机侧 apt 走设备直连**（无代理）：procursus.sources 指向 https://apt.procurs.us；upstream 实机已跑通 Sileo/apt（wave14 §5.2 情报），CaInfo 直配证书绕过 trustd——本 port 无回连网络是否同样可升级，留待设备实测
 5. **var_hfs=DEV 依赖 UFS 侧**（wave16/16b 范围）：`/dev/ufs_darwin_data` 节点就位前挂载失败自动回落 ramfs；回落时密钥仍从镜像种子，host 指纹不变，SSH 链不受影响（仅持久性丢失）
 6. **bootstrap 快照较旧**（2024）：strust-procursus 不在内（§3）。若 v0.5+ 要 AMFI 正门，需换较新 bootstrap 重跑本流程（mk-jb.sh 幂等，重跑即得）
-7. `mk-jb.sh` 的 ellekit.space 源若波动会失败（EXIT≠0）——本波次一次通过；重跑时该文件已在 `jb/debs/` 缓存，get() 跳过
+7. `mk-jb.sh` 的 ellekit.space 源若波动会失败（EXIT≠0）——本阶段一次通过；重跑时该文件已在 `jb/debs/` 缓存，get() 跳过
 
 ## 9. 红线遵守
 

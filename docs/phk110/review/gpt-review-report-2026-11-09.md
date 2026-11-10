@@ -1,15 +1,15 @@
-# HakiOS / PHK110 USB 核心审阅报告
+# 外部评审报告一（2026-11-09）
 
 **我的判断是，下一轮应先修正观测与事件消费方式，再用一次诊断刷写区分设备侧失败路径。现有证据支持继续使用 vendor 栈，但尚不足以把 fetch23 的稳定可打开窗口定性为“H1/H2 导致 bulk 始终未武装”。**
 
 在限定只比较 H1、H2、H3，并且已经确认真实 SET_CONFIGURATION 到达设备、随后设备侧 OUT 提交仍返回未配置错误的条件下，我的暂定概率排序是 **H1 > H2 > H3**。当前材料不足以给出有意义的百分比。若把候选范围展开，**没有有效 OUT 接收请求、事件被错误消费、主机配置状态与设备内部状态脱节**，必须与 H1 同级优先排查。
 
-本次全程只读，报告直接交付在聊天中。审阅依据包括导读、Wave 22、F12、F13、主机脚本、日志，以及 WSL 中的实际代码。外部源码核验通过 Clash `7897` 端口访问。
+本次全程只读，报告直接交付在聊天中。审阅依据包括导读、阶段 22、F12、F13、主机脚本、日志，以及 WSL 中的实际代码。外部源码核验通过 Clash `7897` 端口访问。
 
 需要先固定版本边界。
 
 - fetch23 对应的 **v19 初版保留 v18 loader**，其构建脚本明确携带 `553289a4…`，只修改 cmdline。
-- 本次实际读取的 WSL `loader.c` 已包含 **v19b / Wave 23 Round 2** 改动，文件 SHA-256 为 `a53209dc1c2cdec5628b33b66d48b971bbd5be578e0cedb7a77e2edef0cee122`，前后读取一致。
+- 本次实际读取的 WSL `loader.c` 已包含 **v19b / 阶段 23 Round 2** 改动，文件 SHA-256 为 `a53209dc1c2cdec5628b33b66d48b971bbd5be578e0cedb7a77e2edef0cee122`，前后读取一致。
 - 以下对 v19b 的代码发现，不能直接当作早先 fetch23 会话的成因。外部 libusb、Linux、usbipd 源码用于核验语义，本次没有核验本机运行中的 DLL、驱动与这些上游版本完全一致。版本依据见构建脚本。[v19 构建脚本](<host>/.zcode/workspace/9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7/hakios-phk110/wave23-scripts/make-payload-v19.sh:2)、[v19b 构建脚本](<host>/.zcode/workspace/9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7/hakios-phk110/wave23-scripts/make-payload-v19b.sh:2)
 
 ---
@@ -55,7 +55,7 @@ H2 与 H3 还涉及**两个不同层的 speed 字段**。F12 给出的 UsbfnDwc 
 
 针对 `0000:0002` 的早期枚举失败，则应另排一张表。**未服务的展示窗口、控制器重初始化与再次展示的生命周期、固件异步回调**优先于 bulk walk。首次设备描述符阶段的失败，发生在 bulk 配置之前，不能直接由 H1–H3 解释。
 
-### 4. Wave 22 首胜应保留，但验收措辞应更精确
+### 4. 阶段 22 首胜应保留，但验收措辞应更精确
 
 `armed at generation 0, beat 1` 证明 **该次 OUT 零长度提交被接受**，结合 F12 的状态判据，这是有价值的设备侧进展。现有探针没有独立测试 IN，也没有等待真实数据完成，因此“bulk pair 已完成双向验证”超出了证据。主机成功写入也还需要与设备侧接收完成和命令应答关联。[v18 判别记录](<host>/.zcode/workspace/9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7/hakios-phk110/logdump-v18.bin.keylines.txt:1)、[当前探针接受后立即 abort](<\\wsl.localhost\FedoraLinux-44\home\<host>\hakios\kernel\xnuloader\loader.c:4303>)
 
@@ -81,9 +81,9 @@ H2 与 H3 还涉及**两个不同层的 speed 字段**。F12 给出的 UsbfnDwc 
 
 **尚不能认定漏了必需的 config 步骤，也不支持直接补调一次 vendor config。**
 
-实际调用顺序是 `start_ex(&usb_set)` 成功、分配传输缓冲、关闭 SUSPHY，然后 `usb_present()`。F12 已说明 start_ex 路径包含事件缓冲、EP0 和控制状态机配置。Wave 22 也存在成功提交的会话，说明当前拆分流程至少具有可行路径。[loader 启动顺序](<\\wsl.localhost\FedoraLinux-44\home\<host>\hakios\kernel\xnuloader\loader.c:4156>)、[F12 T1 路径](<host>/.zcode/workspace/9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7/hakios-phk110/docs/research/f12-ep2-not-configured.md:58)
+实际调用顺序是 `start_ex(&usb_set)` 成功、分配传输缓冲、关闭 SUSPHY，然后 `usb_present()`。F12 已说明 start_ex 路径包含事件缓冲、EP0 和控制状态机配置。阶段 22 也存在成功提交的会话，说明当前拆分流程至少具有可行路径。[loader 启动顺序](<\\wsl.localhost\FedoraLinux-44\home\<host>\hakios\kernel\xnuloader\loader.c:4156>)、[F12 T1 路径](<host>/.zcode/workspace/9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7/hakios-phk110/docs/research/f12-ep2-not-configured.md:58)
 
-仍未回答的是，**vendor connect 的 config 与 start_ex 实际完成的配置是否具有相同后置条件**。尤其需要比较事件缓冲、EP0 SETUP 接收、速度复位、控制器运行状态，以及异步回调是否随后再改这些对象。再次 config 也可能重置已经建立的状态。对此目前证据不足，宜先比较 present 前的寄存器和状态快照。[Wave 22 vendor connect 与 start_ex 对照](<host>/.zcode/workspace/9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7/hakios-phk110/docs/waves/wave22-host-visibility.md:14)
+仍未回答的是，**vendor connect 的 config 与 start_ex 实际完成的配置是否具有相同后置条件**。尤其需要比较事件缓冲、EP0 SETUP 接收、速度复位、控制器运行状态，以及异步回调是否随后再改这些对象。再次 config 也可能重置已经建立的状态。对此目前证据不足，宜先比较 present 前的寄存器和状态快照。[阶段 22 vendor connect 与 start_ex 对照](<host>/.zcode/workspace/9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7/hakios-phk110/docs/waves/wave22-host-visibility.md:14)
 
 ### F3. five milliseconds 注释与 stall(50000)
 
@@ -117,7 +117,7 @@ v19b 的 raw 探针只在 **beat 0** 调用，恰好最容易采到正常的“�
 
 ---
 
-## 三、结构毒窗的最优修复策略
+## 三、结构异常窗的最优修复策略
 
 **最优策略是建立“初始化期间不展示，状态准备完成后只展示一次”的生命周期。25 秒缩到 5 秒可作缓解。**
 
@@ -141,7 +141,7 @@ v19b 的 raw 探针只在 **beat 0** 调用，恰好最容易采到正常的“�
 
 现有重掷路径先 `usb_init_kick()`，随后对旧的成功启动状态泵送 25 秒，再调用 start_ex。回调若在该窗口重新配置控制器，旧事件环与当前硬件的对应关系需要补证。[重掷顺序](<\\wsl.localhost\FedoraLinux-44\home\<host>\hakios\kernel\xnuloader\loader.c:4344>)
 
-**5 秒仍可能覆盖完整的一次枚举失败期限。** 因而不能把等待缩短五倍解释为失败概率降低五倍。v16 的一次首试成功支持它值得对照，但不足以证明毒窗已被消除。
+**5 秒仍可能覆盖完整的一次枚举失败期限。** 因而不能把等待缩短五倍解释为失败概率降低五倍。v16 的一次首试成功支持它值得对照，但不足以证明异常窗已被消除。
 
 ---
 
@@ -199,7 +199,7 @@ v19b 的 raw 探针只在 **beat 0** 调用，恰好最容易采到正常的“�
 - **H2 被支持**——修复速度事件与状态复位顺序。使用真实协商速度，不能直接把未知速度强制为 SS。
 - **H3 被支持**——处理 UsbDeviceDxe 的速度传播与控制状态，验证真实配置请求完成。
 - **接收生命周期被支持**——保持持续有效 RX，验证主机写入、设备完成、命令执行、IN 应答四点闭环。
-- **初始化毒窗或复位被支持**——实施受控展示或正确复位序列，与第一轮使用相同主机环境对照。
+- **初始化异常窗或复位被支持**——实施受控展示或正确复位序列，与第一轮使用相同主机环境对照。
 
 第二轮至少应验收**带关联标识的多次双向命令应答、一个有长度与内容校验的上传，以及受控重连后的恢复**。仅再次出现 `armed` 日志，仍不足以验收 SSH 数据面。
 

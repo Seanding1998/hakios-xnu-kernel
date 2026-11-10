@@ -1,19 +1,19 @@
-# Wave 15 报告：v0.4 存储深水区预研 —— UFS 驱动实施级设计（纯调研，零刷写）
+# 阶段 15 · 2026-11-03 · 存储路线研究：UFS 驱动的实施级设计
 
-> 2026-11-03 · 执行子代理产出 · 输入 = upstream 三仓（只读克隆）+ 本机 live FDT + fork 工作树（只读）+ GPL 内核/DT（新 shallow clone）
-> 结论先行：**"深水区"在 upstream 的架构里已经填平了 90%** ——fork 里躺着一整套与 upstream 字节相同、实机验证过的存储栈（内核驱动 + loader 服务 + 工具链），差的只是 1 个 config 开关、4 个 boot-args、和一块要 carve 出来的 `darwin` 分区。预计内核/loader **零行代码改动**。
+> 2026-11-03 · 执行记录产出 · 输入 = upstream 三仓（只读克隆）+ 本机 live FDT + fork 工作树（只读）+ GPL 内核/DT（新 shallow clone）
+> 结论先行：**"难点"在 upstream 的架构里已经填平了 90%** ——fork 里躺着一整套与 upstream 字节相同、实机验证过的存储栈（内核驱动 + loader 服务 + 工具链），差的只是 1 个 config 开关、4 个 boot-args、和一块要 carve 出来的 `darwin` 分区。预计内核/loader **零行代码改动**。
 
 ---
 
 ## 0. 执行摘要
 
-| 问题（consulting 判定的深水区） | upstream/fork 的实际答案 | 状态 |
+| 问题（consulting 判定的难点） | upstream/fork 的实际答案 | 状态 |
 |---|---|---|
-| UFS 控制器 init（链路启动/UIC/PHY/时钟/电源） | **vendor UFSDxe 在 UEFI 里做，内核/loader 永不 init**。fork 的 udon Binaries 已含 UFSDxe 且已上机工作 | ✅ 已在跑（logdump 分区读写 Boot #8–#17 全成功 = UEFI UFS 写路径实证） |
+| UFS 控制器 init（链路启动/UIC/PHY/时钟/电源） | **vendor UFSDxe 在 UEFI 里做，内核/loader 永不 init**。fork 的 udon Binaries 已含 UFSDxe 且已刷入真机工作 | ✅ 已在跑（logdump 分区读写 Boot #8–#17 全成功 = UEFI UFS 写路径实证） |
 | SMMU/DMA | **不碰**。DMA 映射是 UEFI 建的、内核沿用；内核 native 路径直填物理地址；本机（udon）固件甚至把 UFS IOMMU fault 标为 non-fatal（官方 DT） | ✅ 风险大幅降级 |
 | write ordering / flush / FUA | **单请求 mailbox 串行**（一次一个、无乱序）+ loader 每写 flush+读回（慢路）或 journal flush 点（fast 路）；无 FUA 概念 | ✅ 机制现成 |
-| HFS+ /var | 内核内建 hfs-627.100.6 + `var_hfs=DEV` 挂载（init.c:825-860）+ 12G 模板（Wave14） | ✅ 全内建 |
-| 真正缺的东西 | ①`CONFIG_HAKIOS_UFS` 在 phk110.config 被关（:38）②`darwin` 分区不存在（P0 carve，需用户批准）③cmdline 未带 ufs args ④darwin-write 工具的 redwood GPT 常量需换 PHK110 | 📋 施工单 §4 |
+| HFS+ /var | 内核内建 hfs-627.100.6 + `var_hfs=DEV` 挂载（init.c:825-860）+ 12G 模板（阶段 14） | ✅ 全内建 |
+| 真正缺的东西 | ①`CONFIG_HAKIOS_UFS` 在 phk110.config 被关（:38）②`darwin` 分区不存在（P0 carve，需单独确认）③cmdline 未带 ufs args ④darwin-write 工具的 redwood GPT 常量需换 PHK110 | 📋 施工单 §4 |
 
 **S0–S8 每步 upstream 都是实机走过的**（CHANGELOG.md:35-39 + docs/devices/redwood.md:24），fork 侧文件与 upstream **逐字节相同**（diff 实测全 0，见 §3.1）。
 
@@ -70,7 +70,7 @@
 | `drivers/storage/hakios.ufshc.h` | 32 | loader 交接结构 | **A** | :11-20 `struct ufshc_loader` |
 | `drivers/storage/conf` | 24 | 驱动装配 | **A** | :14-19 `driver UFS` → `bsd/dev/hakios.ufs.c`+`ufshc.c` |
 | `userland/src/init.c` | — | var_hfs 挂载 + var.skel 骨架 | **A**（fork 与 upstream diff=0） | mount_data_volume :825-860（mount :855；失败回落 :856-857；成功 :859） |
-| `userland/src/var_store.c` | — | packed store 打包/写卷（HFS+ 未挂载时的兜底） | **A** | DEVICE="/dev/rufs_darwin" :54；var_busy/var_save 握手 :171, :1278-1307 |
+| `userland/src/var_store.c` | — | packed store 打包/写卷（HFS+ 未挂载时的回退） | **A** | DEVICE="/dev/rufs_darwin" :54；var_busy/var_save 握手 :171, :1278-1307 |
 | `xnuloader/loader.c`（存储段） | — | mailbox + native 交接 | **A** | 见 §1.3 |
 | `tools/userdata-carve.py` | — | GPT 手术：userdata 尾部切 darwin | **B**（redwood 常量） | 全文；f2fs 缩 + 双表 CRC |
 | `tools/darwin-write.py` | — | adb root 写镜像入 darwin（严格身份校验） | **B** | :29-34 常量（redwood: PARTN=34, FIRST/LBA 25374720..30617594, sda34） |
@@ -92,7 +92,7 @@
 | S7 /var | init.c empty_tree + var.skel | var_kept=1 语义 |
 | S8 重启持久 | hakios_var_save_on_return（ufs.c:1117-1139）→ var saver（var_store.c）→ VAR_SAVE_DONE → loader 收回 → logdump | 20s 上限（var_save_ms）；panic 不走此路（store 保持旧档，var_store.c 头注释 :193-206） |
 
-### 1.6 SMMU/DMA 策略（consulting 深水区的裁决落地）
+### 1.6 SMMU/DMA 策略（consulting 难点的裁决落地）
 
 **upstream 选了"第三条路：不碰"**，且有两层独立证据：
 
@@ -119,7 +119,7 @@
 | reg[2] ufs_ice_hwkm | 0x1d90000 + 0x9000 | 同上 | HW Key Manager（不用） |
 | interrupts | GIC_SPI 265 (0x109) LEVEL_HIGH | live FDT `interrupts: 0x0 0x109 0x4` | cape.dtsi:1912；**内核 mailbox/native 均轮询不用中断**（ufshc.c 头注释） |
 | lanes-per-direction | 2 | 同 | cape.dtsi:1919 |
-| dev-ref-clk-freq | 0 = 19.2 MHz | cape.dtsi:1920 | 与 Wave12a GENI 探活同款 ref 时钟源 |
+| dev-ref-clk-freq | 0 = 19.2 MHz | cape.dtsi:1920 | 与 阶段 12a GENI 探活同款 ref 时钟源 |
 | clocks ×9 | core=GCC_UFS_PHY_AXI_CLK(GCC 151/0x97)、bus_aggr=GCC_AGGRE_UFS_PHY_AXI_CLK(10)、iface=GCC_UFS_PHY_AHB_CLK(150)、unipro=GCC_UFS_PHY_UNIPRO_CORE_CLK(166)、ice=GCC_UFS_PHY_ICE_CORE_CLK(154)、ref=RPMH_CXO_CLK(rpmhclk 0)、tx_sym0=GCC 164、rx_sym0=GCC 160、rx_sym1=GCC 162 | live FDT clocks 序列 | cape.dtsi:1921-1940 |
 | freq-table-hz | 75M/850M（core、unipro、ice），余 0/0 | live FDT | cape.dtsi:1941-1950 |
 | resets | `<gcc 25>`（0x24 0x19）名 "rst" | live FDT | = GCC_UFS_PHY_BCR；GPL ufs-qcom.c:4002 `devm_reset_control_get(hba->dev, "rst")` |
@@ -133,7 +133,7 @@
 
 | 参数 | 值 | 证据 |
 |---|---|---|
-| compatible | **`qcom,ufs-phy-qmp-v4-cape`** | live FDT；GPL `drivers/phy/qualcomm/phy-qcom-ufs-qmp-v4-cape.c`（320 行）= **SM8475 代际铁证** |
+| compatible | **`qcom,ufs-phy-qmp-v4-cape`** | live FDT；GPL `drivers/phy/qualcomm/phy-qcom-ufs-qmp-v4-cape.c`（320 行）= **SM8475 代际证据** |
 | reg | 0x1d80000 + 0x2000（phy_mem） | live FDT + cape.dtsi:1884 |
 | clocks ×9 | ref_clk_src=RPMH_CXO、ref_aux=GCC 157、qref=GCC 149、rx_sym0/1_mux=GCC 161/163、tx_sym0_mux=GCC 165、rx_sym0/1_phy=UFS_PHY_RX_SYMBOL_0/1_CLK(GCC 4/5)、tx_sym0_phy=GCC 6 | live FDT + cape.dtsi:1889-1901 |
 | resets | `<&ufshc_mem 0>`（控制器做 PHY reset provider） | cape.dtsi:1902 |
@@ -177,7 +177,7 @@ SAME  userland/src/init.c
 SAME  userland/src/var_store.c
 SAME  tools/userdata-carve.py
 SAME  tools/darwin-write.py
-DIFF  xnuloader/loader.c   (201 行 = PAYLOAD_BASE 参数化 + klog flush 修复 + GICR stride + platform_phk110 —— 全是已上机验证的 PHK110 平台件，存储段 0 diff)
+DIFF  xnuloader/loader.c   (201 行 = PAYLOAD_BASE 参数化 + klog flush 修复 + GICR stride + platform_phk110 —— 全是已刷入真机验证的 PHK110 平台件，存储段 0 diff)
 DIFF  configs/common_defconfig (7 行 = S3910/buttons 条目，与本波无关)
 ```
 
@@ -214,7 +214,7 @@ DIFF  configs/common_defconfig (7 行 = S3910/buttons 条目，与本波无关)
 :52     ClockDxe :53 SPMIDxe :57 SmemDxe
 ```
 
-Binaries/udon（提取自本机原厂 FD）已就位。**上机实证**：loader 每轮把内核日志写进 `logdump` 分区（loader.c:43 `LOG_PARTITION u"logdump"`，write_logs :363-434 走 EFI_BLOCK_IO=UFSDxe），Boot #8–#17 全部成功落盘并被回读（logdump-v3…v10.bin，最大 131,072B）——**UEFI 的 UFS 读、写、flush、GPT 分区定位在本机全部工作，S0 的验收其实在 Boot #8 就过了**。
+Binaries/udon（提取自本机原厂 FD）已就位。**真机验证实证**：loader 每轮把内核日志写进 `logdump` 分区（loader.c:43 `LOG_PARTITION u"logdump"`，write_logs :363-434 走 EFI_BLOCK_IO=UFSDxe），Boot #8–#17 全部成功落盘并被回读（logdump-v3…v10.bin，最大 131,072B）——**UEFI 的 UFS 读、写、flush、GPT 分区定位在本机全部工作，S0 的验收其实在 Boot #8 就过了**。
 
 施工首日核查项（一行 diff 的事）：对照 `Binaries/udon/QcomPkg/Drivers/DALSYSDxe` 是否已含 redwood 同款 cache-coherence patch（redwood Binaries README 列此 patch 为必需；我们的是原厂原版。logdump 工作说明原厂版在其自身内存布局下正常，但 ufs mailbox 的共享 buffer 在 payload 窗口，属新布局——S1 对拍数据错时第一嫌疑）。
 
@@ -223,9 +223,9 @@ Binaries/udon（提取自本机原厂 FD）已就位。**上机实证**：loader
 ## 4. S0–S8 施工单（照单施工版）
 
 > 图例：📂=要写/改的文件（路径:行）；📐=预计行数；✅=验收证据（日志行，逐字可 grep）；⚠️=风险（编号见 §5）。
-> 顺序原则：P0（装机一次性，需用户批准）→ S0-S2（只读，boot_b 循环授权内）→ S3-S4（开写）→ S5-S7（文件系统）→ S8（持久闭环）→ N（进阶 native）。
+> 顺序原则：P0（装机一次性，需单独确认）→ S0-S2（只读，boot_b 循环授权内）→ S3-S4（开写）→ S5-S7（文件系统）→ S8（持久闭环）→ N（进阶 native）。
 
-### P0 · darwin 分区 carve（装机前置，**破坏性 = 需用户逐次批准**）
+### P0 · darwin 分区 carve（装机前置，**破坏性，需单独确认**）
 - 📂 `tools/userdata-carve.py` → 复制为 `tools/userdata-carve-phk110.py`（或加 `--phone` 参数）📐 ~40 行改动：GPT 头位置/LUN 名（本机 `/dev/block/sda` 假设需真机核）+ GIB 参数
 - 📂 `tools/darwin-write.py` :29-34 常量 → PHK110 版（PARTN/FIRST/LAST/NODE 由 P0 实测的 GPT 填）📐 ~10 行
 - 📂 `tools/mkdatavol.py` :27-29 → **不改**（DATA_FIRST=2042368 保持，见下约束）
@@ -283,7 +283,7 @@ Binaries/udon（提取自本机原厂 FD）已就位。**上机实证**：loader
 - 施工：0 行（机制全在）；测试协议：
   ①boot #N：写 marker（var_kept 卷上 `echo` 类工具或 var_store saver）②`loader_return_after` 到期干净返回 ③logdump 确认 `var_store:` 行 ④boot #N+1 读 marker 在
 - ✅ 关键日志：`var_store: the run is ending: the data volume is asked for`（ufs.c:1127）→ `var_store: the saver has finished after … ms`（:1135）或 HFS+ 直写路径下 boot #N+1 的 S6 挂载行 + marker 内容
-- ⚠️ R9（panic 路径不走 saver——journal 兜底；R5 flush 真落盘）
+- ⚠️ R9（panic 路径不走 saver——journal 回退；R5 flush 真落盘）
 
 ### N · native 直驱进阶（可选性能档，S3 稳定后）
 - 施工：0 行代码；boot-args 阶梯：`ufs_native=2`（只看）→ `=3`（dry run 换列表进出）→ `ufs_native=1`（真读）→ `ufs_native_check=1`（全盘对拍，ufs.c:1490-1596）
@@ -316,12 +316,12 @@ Binaries/udon（提取自本机原厂 FD）已就位。**上机实证**：loader
 | R3 | **UIC/doorbell 超时**（仅 native）：命令 10s 未完 | `ufs: native: slot %u (…) not done in 10 s (doorbell %08x, IS %08x, HCS %08x): this path is off from now on`（ufshc.c:674-677） | 行即检测；IS_FATAL 位探针 :105 | native 档中；mailbox 档**不可能**（无 UIC） | 结构性安全：hc_off + `ufs_native_fallbacks` 自动回 loader 读（ufs.c:582-589）；列表可逆（switch_out :1063） |
 | R4 | **GPT 枚举差异**：分区 >160 / darwin 名不符 / slot 布局意外 | loader 枚举行缺 darwin；`ufs: no node for …`（ufs.c:1751） | S0 先 ufs=1 数分区；P0 后核对 | 低 | BLOCK_MAX_PARTS 扩容（ufs.c:73 + loader 同步）——预计不需 |
 | R5 | **flush 未真落盘**：fast 路径 BLOCK_OP_FLUSH 语义与 journal 期待不符 → 掉电/重启丢尾 | S8 marker 重启消失；journal replay 日志 | S8 双轮 + 强制 reset 测试（有意不等 saver） | 低-中 | 回退慢路径（loader 不给 BLOCK_CAN_FAST 即自动全 flush+读回，ufs.c:699-703 已是行为开关） |
-| R6 | **f2fs resize 拒绝**（P0） | resize F2FS_IOC_RESIZE_FS 返回错误 | P0 步骤内失败即显式 | 中 | `--wipe` 路线（fastboot -w 抹 userdata 重来）——**升级为用户明确批准**（抹数据） |
+| R6 | **f2fs resize 拒绝**（P0） | resize F2FS_IOC_RESIZE_FS 返回错误 | P0 步骤内失败即显式 | 中 | `--wipe` 路线（fastboot -w 抹 userdata 重来）——**需单独确认**（抹数据） |
 | R7 | **GPT 手术出错**（P0） | 双表 CRC 不合 / 安卓拒启 | 工具内建读回校验（userdata-carve.py 全程校验）+ 安卓重启验证 | 低（工具保守） | 回写备份的 gpt-head/tail.bin（P0 第①步产物） |
 | R8 | **HFS+ 卷参数不合** | S6 回落行打印 errno | 行即检测 | 低 | 重建卷（mkfs.hfsplus 参数对照 run-hfs-test.sh:13） |
-| R9 | **panic 打断写** | — | — | 必然会发生 | HFS journal 重放（挂载即修）+ var_store packed 兜底（panic 不经 saver，store 保持旧档，var_store.c:193-206 设计注释） |
+| R9 | **panic 打断写** | — | — | 必然会发生 | HFS journal 重放（挂载即修）+ var_store packed 回退（panic 不经 saver，store 保持旧档，var_store.c:193-206 设计注释） |
 
-**S3 最可能死法排序**：R2（操作面，非技术）> R1 > R3（不可能发生于 mailbox 主路线）> R5。mailbox 主路线本质上把 UFS 控制器的复杂性全部留在已经实机验证的 UEFI 代码里——这就是 upstream 架构的精髓，也是"深水区削平"的机理。
+**S3 最可能死法排序**：R2（操作面，非技术）> R1 > R3（不可能发生于 mailbox 主路线）> R5。mailbox 主路线本质上把 UFS 控制器的复杂性全部留在已经实机验证的 UEFI 代码里——这就是 upstream 架构的精髓，也是"难点削平"的机理。
 
 ---
 

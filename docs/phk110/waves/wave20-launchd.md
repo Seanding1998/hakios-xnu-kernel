@@ -1,11 +1,11 @@
-# Wave 20 报告：launchd 存活 + Procursus /jb 接线（Boot #25，v14）
+# 阶段 20 · 2026-11-08 · launchd 存活：hw.target 修复与 /jb 前缀接线
 
-> 2026-11-08 · 执行子代理 · 全循环：根因 → 双修复（内核 boot-arg + loader 真身份）→ /jb 接线 → 三镜像 → 双通道刷写 → b25 取证 → **判定阶梯三级全过，v0.4 用户态全绿**
-> 核心结论：**Apple launchd 真身不再死**——`hardware target : d22ap` 被接受，launchd 域完整跑起来（SpringBoard/backboardd/sshd 等 28 个进程），**sshd 监听 0.0.0.0:22（pid 40）**，零 panic 会话 120 s 后 PSCI 干净返回。SSH 登录本身（网络三端）= Wave 21。
+> 2026-11-08 · 执行记录 · 全循环：根因 → 双修复（内核 boot-arg + loader 真身份）→ /jb 接线 → 三镜像 → 双通道刷写 → b25 取证 → **判定阶梯三级全过，v0.4 用户态全绿**
+> 核心结论：**Apple launchd 真身不再死**——`hardware target : d22ap` 被接受，launchd 域完整跑起来（SpringBoard/backboardd/sshd 等 28 个进程），**sshd 监听 0.0.0.0:22（pid 40）**，零 panic 会话 120 s 后 PSCI 干净返回。SSH 登录本身（网络三端）= 阶段 21。
 
 ## 0. 一句话
 
-b24 死亡点（`failed to query hardware target: 22`，0.6 s 退场）已破案并双修复：内核 `hw.target` sysctl 的 EINVAL（`kern_mib.c` `PEGetTargetName` false→EINVAL）由 **hw_target boot-arg fallback**（kern_mib 补丁）与 **loader 真身份**（mkidentity.sh 从 `DeviceTree.d22ap.im4p` 重生成 identity.h，替代 v6 占位身份）双层封堵；Procursus /jb（130 MB）按 Wave 18 预案落 system.apfs（flashboot 守卫 1 行），b25 会话里 **/jb → /var/jb 嫁接 439 目录 / 6,416 文件、sshd 起来并监听 ：22**。
+b24 死亡点（`failed to query hardware target: 22`，0.6 s 退场）已定位根因并双修复：内核 `hw.target` sysctl 的 EINVAL（`kern_mib.c` `PEGetTargetName` false→EINVAL）由 **hw_target boot-arg fallback**（kern_mib 补丁）与 **loader 真身份**（mkidentity.sh 从 `DeviceTree.d22ap.im4p` 重生成 identity.h，替代 v6 占位身份）双层封堵；Procursus /jb（130 MB）按 阶段 18 预案落 system.apfs（flashboot 守卫 1 行），b25 会话里 **/jb → /var/jb 嫁接 439 目录 / 6,416 文件、sshd 起来并监听 ：22**。
 
 ## 1. 根因链（文件:行号级，全部本仓库/本地取证）
 
@@ -21,7 +21,7 @@ b24 死亡点（`failed to query hardware target: 22`，0.6 s 退场）已破案
        if (!PEGetTargetName(dummy, 64)) return EINVAL;   // ← errno 22 的出处
    ```
 3. **PEGetTargetName**（`iokit/Kernel/IOPlatformExpert.cpp:944`）→ `gIOPlatform->getTargetName()`；arm64 下 `IODTPlatformExpert::getTargetName`（:1813）转调 `getModelName` = 读 **loader 交进来的设备树的根节点 `model` 属性**。
-4. **为什么 model 缺失**：在机 loader.efi = v6 时代构建，其 `xnuloader/identity.h` 是 `mkidentity.sh --placeholder` 占位版（实证：`identity_root[] = { { "hakios-placeholder", 0, 0 } }`，无任何 Apple 身份属性）→ 内核侧 `GenericARMPE: platform "device-tree"`（b24 L1147，平台专家在跑）但树里无 `model` → `getModelName` false → EINVAL。与生态审计波（`docs/research/landscape-2026-11-08.md`）独立会诊，结论一致，两案合并。
+4. **为什么 model 缺失**：机上 loader.efi = v6 时代构建，其 `xnuloader/identity.h` 是 `mkidentity.sh --placeholder` 占位版（实证：`identity_root[] = { { "hakios-placeholder", 0, 0 } }`，无任何 Apple 身份属性）→ 内核侧 `GenericARMPE: platform "device-tree"`（b24 L1147，平台专家在跑）但树里无 `model` → `getModelName` false → EINVAL。与生态审计波（`docs/research/landscape-2026-11-08.md`）独立会诊，结论一致，两案合并。
 5. b24 佐证：panic dump `Hardware Model: Not set yet`（`pe_init.c:433` 的 `gModelTypeBuffer` 同样读不到树属性）。
 
 ## 2. 修复（双层，均最小改动）
@@ -47,13 +47,13 @@ if (!PEGetTargetName(dummy, 64)) {
 
 - `xnuloader/mkidentity.sh ~/hakios/sysimage-20F66/work/DeviceTree.d22ap.im4p` → `identity.h` 8,274 B：根节点 6 属性（**target-type "D22"、manufacturer "Apple Inc."、target-sub-type "D22AP"、compatible "D22AP/iPhone10,3/AppleARM"、model "iPhone10,3"、device_type "bootrom"**）+ /product 61 属性等。
 - lzfse 解码器缺失 → 自建（github.com/lzfse/lzfse BSD → `xnu-deps/host/bin/lzfse`）。
-- loader.efi 重编（`PAYLOAD_BASE=0xF4000000`，与在机件同参；loader.c 自 2026-11-03 16:48 未变）：`66c6b342…`（67,584 B）→ **`7ba818d2…`（72,192 B）**，D22AP/iPhone10,3/target-type 字符串入体，RAMDisk1/双 ramdisk 支持串保留。
+- loader.efi 重编（`PAYLOAD_BASE=0xF4000000`，与机上在用件同参；loader.c 自 2026-11-03 16:48 未变）：`66c6b342…`（67,584 B）→ **`7ba818d2…`（72,192 B）**，D22AP/iPhone10,3/target-type 字符串入体，RAMDisk1/双 ramdisk 支持串保留。
 - `xnu/export.sh` 重产 `xnu/hakios.patch`（diff 验证 = 仅 kern_mib 新 hunk + s3910 config 行补登[树内既有态]）。
 
-### 2.3 /jb 接线（Wave 17 物料执行 + Wave 18 预案守卫）
+### 2.3 /jb 接线（阶段 17 物料执行 + 阶段 18 预案守卫）
 
 - `~/hakios/procursus-prep/jb`（130 MB rootless，openssh 9.7p1）→ `~/hakios/kernel/jb`（build.sh 期望布局 `../jb/root/var/jb`）。
-- **flashboot 侧守卫 1 行**（Wave 18 预案）：`userland/build.sh:559` 的 jb 嵌入从 `[ -d ../jb/root/var/jb ]` 改为 `[ -d ../jb/root/var/jb ] && [ -n "$FLASHBOOT_JB" ]`——前缀只进 system.apfs，resident ramdisk 保持 4 MB，payload 64 MB 窗无虞（实际 23.4 MB）。
+- **flashboot 侧守卫 1 行**（阶段 18 预案）：`userland/build.sh:559` 的 jb 嵌入从 `[ -d ../jb/root/var/jb ]` 改为 `[ -d ../jb/root/var/jb ] && [ -n "$FLASHBOOT_JB" ]`——前缀只进 system.apfs，resident ramdisk 保持 4 MB，payload 64 MB 窗无虞（实际 23.4 MB）。
 - 构建：`RC_JOBS=rc.jobs.ssh FLASHBOOT=1 CRYPTEXES=flash SYSTEM=1 userland/build.sh` →
   - `system.apfs` **616,835 块**（2,526,556,160 B；v13 = 604,420）＝ /jb 130 MB 经 zlib 收进 +48,415 块；`/jb/.procursus_strapped`、`/jb/usr/sbin/sshd`（806,512 B）入卷实证（apfs verify.py clines）。
   - `flashboot.apfs`/`root.apfs` 各 1,024 块（root 含 `/etc/rc`=rc.launchd、`/etc/rc.jobs`=rc.jobs.ssh、`/etc/var.skel`、`/LaunchDaemons/com.hakios.demo.plist`）。
@@ -84,20 +84,20 @@ if (!PEGetTargetName(dummy, 64)) {
 
 ## 4. Boot #25 判定（`intel/m3-boot1/b25-kernel-log.txt`，539,872 B，END OF LOG 完整）
 
-| 判定阶梯 | 结果 | 铁证 |
+| 判定阶梯 | 结果 | 证据 |
 |---|---|---|
 | 1. hardware-target 行消失 + launchd 越过死亡点 | ✅ | libignition 配置 dump **`hardware target : d22ap`**（boot-arg 值，dyld_tolower 小写化）；`exit reason` 行 **0 条**；`failed to query` 0 条；launchd syslog 2,000+ 行全时域流动（08:00:40→08:02:36） |
 | 2. sshd 进程起来 | ✅ | `$ /var/jb/usr/sbin/sshd -D -e -h /var/root/.ssh/ssh_host_ed25519_key …`（rc.jobs.ssh 原句）→ **`tcp listen: [0.0.0.0:22<->0.0.0.0:0] process: sshd:40`** |
 | 3. 零 panic 稳定会话 + S6-S8 回归 | ✅ | `panic(cpu…)` 0 条；会话跑满 120 s 窗（syslog 至 08:02:36 > 08:00:40+116 s）→ `--- loader_return_after expired ---` → **`psci: cpu 3 ends the system`** 干净返回 → END OF LOG；S6 `kept between boots` 逐字、S7 `112 directories, 22 files`、**`/var/jb from /jb, in /private/var/jb: 439 directories, 6416 files and links, users resolvable`**（Procursus 嫁接行）、数据卷继续被内核写（全卷 sha `6e40eaef…`→`ad2fcc0f…`、卷头 `1e4cd367…`→`d5910060…` = 存储栈跨会话存活，b24 同型先例） |
 | 超预期 | ✅ | launchd 域内 **28 个进程**（pid 11-42）：**SpringBoard[12]**、backboardd[16]、notifyd/logd/syslogd/containermanagerd/mobilegestalt.xpc 等；com.hakios.demo [18] `service state: running`；MiniIOMobileFramebuffer 10 fps 稳定出帧至 153 s+；3 容器步进新布局命中（System 50,585 files @0 MB / cryptex **@2409 MB** / AppCryptex **@5009 MB**） |
 
-- **hw.target 值 = d22ap（boot-arg 层生效）**：真身份 loader 已在机（D22AP/iPhone10,3 入树），但 `PEGetTargetName` 仍 false（IOKit registry 侧 `model` 属性路径未通，见 §5 F5）——双层防御按设计兜底，boot-arg 为当前实际生效层。
+- **hw.target 值 = d22ap（boot-arg 层生效）**：真身份 loader 已已刷入（D22AP/iPhone10,3 入树），但 `PEGetTargetName` 仍 false（IOKit registry 侧 `model` 属性路径未通，见 §5 F5）——双层防御按设计回退，boot-arg 为当前实际生效层。
 - S8 注记：第二周期 init 报 `HFS Plus …: Resource busy`（devfs 哨兵 EEXIST 族，b24 已有同型语义）→ 该周期 /private/var 走内存盘，`/var/jb` 嫁接两周期都成功（439 目录/6,416 文件行两见）。
-- 回安卓：ABL 兜底自发（~20 min，多轮 120 s 会话），slot a 安卓在线、/data 无损、logdump 拉回（`logdump-v14.bin` 512 MB 分区全量，`ffc3e66d…`）。
+- 回安卓：ABL 回退自发（~20 min，多轮 120 s 会话），slot a 安卓在线、/data 无损、logdump 拉回（`logdump-v14.bin` 512 MB 分区全量，`ffc3e66d…`）。
 
 ## 5. 新发现/注记
 
-- **F5（新）**：真身份 loader 在机后 `PEGetTargetName` 仍走 boot-arg 层——IODTPlatformExpert::getModelName 读的是 IOKit registry provider 的 `model`，与 pe_init 的 SecureDT 根读法不同源；Wave 21+ 若要"树侧真值"需在 GenericARMPE 侧补齐（非阻塞，boot-arg 层已满足 launchd）。
+- **F5（新）**：真身份 loader 刷入后 `PEGetTargetName` 仍走 boot-arg 层——IODTPlatformExpert::getModelName 读的是 IOKit registry provider 的 `model`，与 pe_init 的 SecureDT 根读法不同源；阶段 21+ 若要"树侧真值"需在 GenericARMPE 侧补齐（非阻塞，boot-arg 层已满足 launchd）。
 - F3（沿登）：b25 console 环含双周期残页（L43 首周期 + L557 次周期 init 输出并存），周期归属法证仍挂账。
 - usbipd fastboot 通道首次 getvar 挂死、kill 重试即愈（wave16c 卡死的"数据端点打死"仅在半途中断后出现；完整重启 bootloader 后通道健康）。
 - WSL /tmp 在调用间可能被清（本波实测两次）——执行脚本一律落 /mnt/c 持久路径，`/tmp` 只作缓冲。
@@ -108,12 +108,12 @@ if (!PEGetTargetName(dummy, 64)) {
 - `intel/m3-boot1/b25-kernel-log.txt`（539,872 B，`logdump-v14.bin` 分区全量留根目录）
 - `wave20-scripts/`：make-cmdline-v14.py、make-payload-v14.sh、verify-udon-hakios-v14.py（47 检）、graft、front-preflight-v14.sh、darwin-front-write-v14.sh、fastboot-flash-b25.sh、pull-b25-forensics.sh、extract-b25-log.py、wait-android-b25.sh、build-v14-userland.sh（tmp/ 工具件）
 - 内核树（WSL，叠加未提交）：`kern_mib.c` HW_TARGET 补丁、`configs/boot-args.lst`/`docs/boot-args.md` hw_target 登记、`xnu/hakios.patch` 重产、`xnuloader/identity.h` 真身份、`userland/build.sh` flashboot jb 守卫、`jb/` 130 MB 物料、userland 三镜像产物
-- 手机现状：**安卓在线（slot a，ABL 自发兜底）**，boot_b = v14，darwin 前段 = v14 三段（读回全 same），数据卷 = 内核续写健康态
+- 手机现状：**安卓在线（slot a，ABL 自发回退）**，boot_b = v14，darwin 前段 = v14 三段（读回全 same），数据卷 = 内核续写健康态
 
-## 7. Wave 21 移交清单
+## 7. 交给阶段 21 的清单
 
-1. **SSH 登录三端**（Wave19-prep 方案 A）：loader 桥接网络（共享页 net 环 + en0 link 驱动 + loader `oem netrx/nettx`）+ Wave13 loader_talk.py 扩 ProxyCommand —— sshd 已监听 :22，只差数据面。
-2. hw.target 树侧真值（F5）：GenericARMPE registry 侧补 `model` 属性，让 `PEGetTargetName` 主路径生效（boot-arg 层保留为兜底）。
+1. **SSH 登录三端**（阶段 19-prep 方案 A）：loader 桥接网络（共享页 net 环 + en0 link 驱动 + loader `oem netrx/nettx`）+ 阶段 13 loader_talk.py 扩 ProxyCommand —— sshd 已监听 :22，只差数据面。
+2. hw.target 树侧真值（F5）：GenericARMPE registry 侧补 `model` 属性，让 `PEGetTargetName` 主路径生效（boot-arg 层保留为回退）。
 3. S8 二周期 `Resource busy`（F1 族语义）专查：init 二次挂 var 的哨兵清理。
 4. F3 console 环跨周期残页归属法证。
-5. `loader_return_after` 语义观察：b25 会话实际运行 >150 s（syslog 08:00:40→08:02:36，fb 帧到 153 s），expiry 行后才进 return 序列——若 Wave 21 需要长驻 SSH 会话，直接调该 boot-arg 即可，机制已被验证会兜住。
+5. `loader_return_after` 语义观察：b25 会话实际运行 >150 s（syslog 08:00:40→08:02:36，fb 帧到 153 s），expiry 行后才进 return 序列——若 阶段 21 需要长驻 SSH 会话，直接调该 boot-arg 即可，机制已被验证会兜住。

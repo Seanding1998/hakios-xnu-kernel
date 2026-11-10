@@ -1,8 +1,8 @@
-# Wave 13 — Windows 主机直连 loader USB gadget 工具链（免刷写迭代铺路）
+# 阶段 13 · 2026-11-03 · Windows 主机直连 loader USB 的工具链
 
 Date: 2026-11-03. Scope: 纯 Windows 侧。修通「主机 → libusb → loader USB gadget
 (18d1:d00d, product/serial `xnuloader`, bulk, 纯 ASCII 命令协议)」工具链并验证到
-协议层自洽（selftest 24/24），真机联调留给后续刷 usbmode 镜像的波次。
+协议层自洽（selftest 24/24），真机联调留给后续刷 usbmode 镜像的阶段。
 红线遵守：未碰手机（无 adb/fastboot/usbipd attach）、未碰 WSL、未改 ~/hakios 与
 仓库既有文件（只新增 `wave13-scripts/` 与本文档）、未安装任何全局软件。
 
@@ -128,7 +128,7 @@ python -I wave13-scripts/loader_talk.py log --out log.out   # oem log → DATA �
 3. 唯一实测到的 open 失败模式：string descriptor 读 `LIBUSB_ERROR_ACCESS`
    （adb.exe 持有接口时）——属占用冲突，不是 WinUSB 不兼容。
 
-待真机闭环的一点（下一步波次）：loader gadget 枚举出现后跑
+待真机闭环的一点（下一步阶段）：loader gadget 枚举出现后跑
 `python -I wave13-scripts/loader_talk.py probe`，预期输出
 `OPEN+CLAIM OK (interface 0, class=vendor)` + bulk IN/OUT 端点表；此步是
 "WinUSB 绑定下 libusb open+claim"的最终直接证明（机制上已无悬念：同后端、
@@ -174,14 +174,14 @@ python -I wave13-scripts/loader_talk.py log --out log.out   # oem log → DATA �
 filter 冲突**——与"force 过仍 attach 失败"的实测吻合。
 
 **处置选项（均未执行，按需择一）**：
-1. 退出/卸载火绒（最彻底，用户决策）；
+1. 退出/卸载火绒（最彻底）；
 2. 把 `hrdevmon` 从上述 USB 类 `UpperFilters` 移除并重启（只解除 USB 类挂钩）；
 3. usbipd 侧无需动作——**loader 通道走 WinUSB/libusb，完全绕开 usbipd/VBoxUSB，
    不受此冲突影响**（这正是本波选 ctypes-libusb 直连路线的额外好处）。
 
 ## 5. 真机联调清单（后续刷 usbmode 镜像后执行）
 
-镜像：`device-layer/udon-hakios-usbmode-grafted.img`（Wave 7 产物，loader v2 +
+镜像：`device-layer/udon-hakios-usbmode-grafted.img`（阶段 7 产物，loader v2 +
 `usb=1` → USB 命令服务器常驻；刷写方式同 §6 wave7：fastboot flash boot_b +
 set_active b，走 `SERIAL_REDACTED` 实例的 usbipd/VBoxUSB fastboot 通道）。
 

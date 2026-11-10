@@ -1,6 +1,6 @@
-# F12 专项：bulk 端点 "physical endpoint[2] not configured" 深挖（Wave 21.4）
+# USB bulk 端点 "endpoint[2] not configured" 的专项排查
 
-> 2026-11-08 · F12 执行子代理 · 本地反汇编（radare2 5.9.8 / WSL Fedora 44）+ 外部调研 · 零手机交互 · 零刷写
+> 2026-11-08 · F12 执行记录 · 本地反汇编（radare2 5.9.8 / WSL Fedora 44）+ 外部调研 · 零手机交互 · 零刷写
 > 证据基准：`~/hakios/uefi-udon/Binaries/udon/QcomPkg/Drivers/`（udon = PHK110 平台，只读，反汇编副本在 WSL `~/f12`）
 > 地址约定：UsbfnDwc3Dxe.efi / UsbDeviceDxe.efi 均为 PE32+ AArch64，`.text` paddr 0x1000 → vaddr = 文件偏移 + 0x10000。下文全部用 **vaddr**；引用字符串时同时给文件偏移。
 
@@ -8,7 +8,7 @@
 
 ## 0. 一句话结论
 
-**照片签名四行循环的每一行都已定位到指令级。判据 = `DwcPrepareURB` 读 `EP 表[phys_idx].state@+0x18`，为 0 即打 "physical endpoint[%d] not configured" 并返回 0x8000000C。该 state 只被 `DwcConfigureEP` 置 1；而 bulk（phys[2] = 端点地址 0x01）的武装只发生在 vendor UsbfnDwc 的 ep0 状态机收到 host SET_CONFIG 之后（且前置 DEPSTARTCFG 成功 + speed 字段非 0）。我们 loader 的描述符与 vendor 期望完全一致 —— **修复不在描述符侧**，在"SET_CONFIG 武装链路从未成功执行"这一 vendor 行为侧；loader 侧最优解 = **post-start_ex bulk 探针 + 失败即 stop/start 重掷**（loader.c 小改，建议并入 Wave 21.5）。**
+**照片签名四行循环的每一行都已定位到指令级。判据 = `DwcPrepareURB` 读 `EP 表[phys_idx].state@+0x18`，为 0 即打 "physical endpoint[%d] not configured" 并返回 0x8000000C。该 state 只被 `DwcConfigureEP` 置 1；而 bulk（phys[2] = 端点地址 0x01）的武装只发生在 vendor UsbfnDwc 的 ep0 状态机收到 host SET_CONFIG 之后（且前置 DEPSTARTCFG 成功 + speed 字段非 0）。我们 loader 的描述符与 vendor 期望完全一致 —— **修复不在描述符侧**，在"SET_CONFIG 武装链路从未成功执行"这一 vendor 行为侧；loader 侧最优解 = **post-start_ex bulk 探针 + 失败即 stop/start 重掷**（loader.c 小改，建议并入 阶段 21.5）。**
 
 ---
 
@@ -112,7 +112,7 @@ host attach ─────► 总线复位 → ConnectDone(T3): dev.speed = 真
 host SET_CONFIG(1) ──► T2: SetConfigIfc(DEPSTARTCFG) → walk → bulk phys[2]/phys[3] state=1  ✅
 loader send(0x01/0x81) ──► DwcPrepareURB state!=0 ──► 正常传输
 ```
-失败 boot（Boot #31-33 签名）：T1 完成（枚举活、描述符全读通）→ **T2 从未成功落槌**（speed 未知 / DEPSTARTCFG 翻车 / walk 中断三选一，见 §5）→ bulk state 恒 0 → 每次提交撞 §2 判据 → 0x8000000C 刷屏。
+失败 boot（Boot #31-33 签名）：T1 完成（枚举活、描述符全读通）→ **T2 从未成功确定**（speed 未知 / DEPSTARTCFG 翻车 / walk 中断三选一，见 §5）→ bulk state 恒 0 → 每次提交撞 §2 判据 → 0x8000000C 刷屏。
 
 ---
 
@@ -131,16 +131,16 @@ loader send(0x01/0x81) ──► DwcPrepareURB state!=0 ──► 正常传输
 | 接口 | 1 个（ff/42/03 fastboot），2 EP | walk 按 `bInterfaceNumber`+`bAlternateSetting` 匹配（fcn.00016960 @0x169c0-0x169d4） | ✅ |
 | 设备描述符 | FS 0x0200/64 + SS 0x0300/2^9 + qualifier + BOS(3 caps) + 5 strings | UsbDevDescInitDescriptors/UpdateDeviceInfo 已接受（枚举为证） | ✅ |
 | 协议结构体 | `usb_device_descriptor_set`（efi.h:260）= ABL EFIUsbDevice.h 原样 | UsbDeviceStartEx fcn.00011d1c 按同布局读 | ✅ |
-| 物理↔逻辑映射 | 我们声明 ep1 对（0x01/0x81） | vendor 无固定映射表，全由描述符 bEndpointAddress 经 `epnum*2+dir` 决定 | ✅ 一致（**改描述符换端点号不解决任何事**：无论 0x01 还是 0x02，T2 没落槌就没有 state） |
+| 物理↔逻辑映射 | 我们声明 ep1 对（0x01/0x81） | vendor 无固定映射表，全由描述符 bEndpointAddress 经 `epnum*2+dir` 决定 | ✅ 一致（**改描述符换端点号不解决任何事**：无论 0x01 还是 0x02，T2 没确定就没有 state） |
 
 ---
 
-## 5. 根因判定：T2 为什么没落槌（三候选 + 证据与排除）
+## 5. 根因判定：T2 为什么没确定（三候选 + 证据与排除）
 
 **已排除**：
 - ❌ 描述符/映射侧（§4 全表 ✅）——任务书原假设"修复在 loader 描述符"不成立。
 - ❌ host 时序（host 侧 set_configuration 被收下、描述符全读通；且 0xB/0xC 为设备侧打印）。
-- ❌ 暖态 SUSPHY/CSFTRST（Wave 21.2 v16c 三变体 53f5e077 已证墙恒在）。
+- ❌ 暖态 SUSPHY/CSFTRST（阶段 21.2 v16c 三变体 53f5e077 已证墙恒在）。
 - ❌ start_ex 失败残留（F8 zombie 是"USB 服务器不启动"形态；本轮 loader 在跑 UsbDeviceSend = start_ex 已返回 OK = T1 全绿）。
 
 **候选（按可能性排序）**：
@@ -154,7 +154,7 @@ loader send(0x01/0x81) ──► DwcPrepareURB state!=0 ──► 正常传输
 
 ## 6. 修复方案排序
 
-### 首选（loader.c 小改，零 vendor 风险，建议并入 Wave 21.5）："bulk 探针 + stop/start 重掷"
+### 首选（loader.c 小改，零 vendor 风险，建议并入 阶段 21.5）："bulk 探针 + stop/start 重掷"
 T1 之后 loader 自己验墙，发现即重掷（把 v16b 的"start_ex 失败重试"推广为"bulk 死也重试"）：
 ```c
 /* usb_start() 成功路径末尾（loader.c:3691 "usb: started" 前）插入：*/
@@ -173,7 +173,7 @@ for (tries = 0; tries < 3; tries++) {
 ### 次选：时序整形（弱时序 → 强时序）
 - loader 不在启动期 start_ex，等 host attach（UsbDeviceEventDeviceStateChange Connected）后再 start_ex——对齐 ABL 的"先插线后起栈"强时序，让 T2 到来时 ConnectDone/speed 必然就绪。缺点：无人插线时 USB 服务器永不就绪，与"免手链路"目标冲突；可与首选叠加（先掷，attach 后再掷一轮）。
 
-### 末选（vendor 行为绕过，高风险兜底）
+### 末选（vendor 行为绕过，高风险回退）
 - UsbfnDwc3Dxe.efi 字节手术：把 T2 的 speed==0 分支 fallback 到 speed=4（maxpkt 表列强改 SS），或 SetConfigIfc 失败重试。判据均已定位到指令级（§3.1/§3.2），可做但违反"零 vendor 风险"原则——仅当首选+次选双败且照片证据锁定 H2 时考虑。
 
 ---
@@ -214,7 +214,7 @@ for (tries = 0; tries < 3; tries++) {
 
 ---
 
-## 9. 移交 Wave 21.5 的三行清单
+## 9. 交给阶段 21-5 的三行清单
 
 1. loader.c 加 "bulk 探针 + stop/start 重掷"（§6 首选，~20 行）：探针失败码即 H1/H2/H3 在线判别器（0xC 恒在=武装链全死；0xC→成功=重掷治愈；失败码在 0xB/其它间漂移=另一层问题，回填本档 §1 表）。
 2. 下一轮 boot 照片检索 vendor 前导错误行：`DEPSTARTCFG Fails` / `Failed to set config for ep %d, dir %d` / `DwcConfigureEP failed` / `USB_REQ_SET_CONFIG: Unknown USB Speed` —— 任一出现即根因定案（§5）。

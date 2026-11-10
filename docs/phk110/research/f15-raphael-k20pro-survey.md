@@ -1,6 +1,6 @@
-# F15 调研报告：红米 K20 Pro（raphael / SM8150 / Adreno 640）"WiFi、4G、GPU 已修好"传闻核实 + 对 PHK110 的迁移评估
+# 红米 K20 Pro（SM8150）移植传闻核实与迁移评估
 
-日期：2026-11-10 ｜ 执行：F15 调研子代理（Wave 29）｜ 纯调研：零手机、零刷写、零构建
+日期：2026-11-10 ｜ 执行：F15 调研（阶段 29）｜ 纯调研：零手机、零刷写、零构建
 方法：GitHub REST/raw + git shallow clone（raphael-bringup 分支，depth 60）+ web 页面取证，代理 127.0.0.1:7897；WebSearch 一次
 基线：`docs/research/f14-sd778g-zendot-survey.md`（2026-11-09）+ `upstream-manifest.txt`（hakios-xnu-kernel @96ffbc5、hakios-sm7325 @04fbfff）
 产出：本报告（git commit，message 前缀 "F15 research:"）
@@ -12,17 +12,17 @@
 ## 0. 摘要（判定先行，六条）
 
 1. **"raphael 支持存在" = 证实，但不在上游官方 org，而在社区 fork**。上游 oosexgang org（7 个仓）无任何 raphael/sm8150 仓；上游 main 的 `devices/manifest.conf` 只登记 redwood+qemu，`docs/devices/` 只有 redwood.md/qemu.md，main README 不提 raphael。raphael 移植的真身在 **HeliumStudio-Dev/hackios-xnu-kernel**（`raphael-bringup` 分支 + 已发布的 `raphael-uefi` Release）与后续接力的 fork **adelholzener69/hakios-xnu-kernel-raphael**（`raphael` 分支）。
-2. **"GPU 驱动已修好" = 证实（有边界）**：Adreno 640 经 freedreno FD640 出 OpenGL ES 3.2，1080×2340 三角形绘制+读回无 GL 错误、桌面用户确认可用 [实测转述]；但 **Metal 明确不可用**（作者自述 "Metal is not available on either"），而上游 redwood 已是"Metal 窗口服务器出画、滑动 100–104 fps"。就 GPU 而言 raphael 反而落后 redwood 半步。
+2. **"GPU 驱动已修好" = 证实（有边界）**：Adreno 640 经 freedreno FD640 出 OpenGL ES 3.2，1080×2340 三角形绘制+读回无 GL 错误、桌面确认可用 [实测转述]；但 **Metal 明确不可用**（作者自述 "Metal is not available on either"），而上游 redwood 已是"Metal 窗口服务器出画、滑动 100–104 fps"。就 GPU 而言 raphael 反而落后 redwood 半步。
 3. **"WiFi 已修好" = 部分证实**：WCN3990/ath10k SNOC 栈，5 GHz WPA3-SAE（H2E/PMF/IGTK）与 2.4 GHz WPA2 的关联、取地址、**真实网页加载**均经真机验证 [实测转述]；但作者原文"连接仍不稳定……此次提交保存已有实现，**不声称已经修复该问题**"，且关闭再开启 WiFi 后无法重连（日志 `failed to power on device: -19`）是文档明写的已知 bug。合拢上游 redwood 的 "wifi works" 口径，raphael WiFi 还差一口气。
 4. **"4G 已修好" = 证伪**。作者自己的设备状态表（`devices/raphael/device.conf`，rapheal 分支 tip）：**`cellular missing`**；启动参数 `modem=0`（蜂窝链路不跑）；状态文档工作顺序里蜂窝排第 4 步（在存储持久化之后）；RAPHAEL-WIFI.md："保留这些上游改动，**但不启用 raphael 蜂窝功能**"。SM8150 上 modem 固件（wlanmdsp.mbn 经 MPSS PAS 4）确实被加载——但那是为了 **WiFi 固件跑在 modem DSP 里**，与蜂窝数据/注册无关。
-5. **"几乎完全正常" = 夸大**。对照上游 redwood 的验收口径：raphael 缺 **存储持久化**（旧树验证过 userdata 接管，迁移到新基线后丢失，`storage missing`/RAM-only）、蜂窝、蓝牙、相机、Metal、充电、麦克风（扬声器单声道有）；CPU 只有 7/8 核（core 0 留给 loader）。综合完成度 **≤ redwood**，不存在"远超 redwood"。
+5. **"几乎完全正常" = 夸大**。对照上游 redwood 的验收尾径：raphael 缺 **存储持久化**（旧树验证过 userdata 接管，迁移到新基线后丢失，`storage missing`/RAM-only）、蜂窝、蓝牙、相机、Metal、充电、麦克风（扬声器单声道有）；CPU 只有 7/8 核（core 0 留给 loader）。综合完成度 **≤ redwood**，不存在"远超 redwood"。
 6. **时间线判定 = F14（11-09）之前的进展，但 F14 情报口径有盲区**：Helium-Studio 的 7 条 raphael-bringup 提交全部落盘于 **2026-10-25**（UEFI/loader、GT9886 触控+按键、OSM 调频、A640+TE 扫描、userdata 存储、ath10k+WPA3、文档），10-27 发布 raphael-uefi 镜像并完成"迁移到上游重写后的 main"；11-03 起中文圈病毒传播（smzdm 文章）；11-08 adelholzener69 把历史 squash 进 fork 并追加 16 条提交（扬声器音频、触感、手电）。**F14 错过的原因 = 只查官方 org**，没有扫 fork 网络、unixnu.com 设备目录与中文社区；这不是"过去几天的新进展"，而是"过去两周在 fork 生态里持续发生、且已出圈到大众媒体的进展"。
 
 ---
 
 ## ① 三条主张逐条核实（证据表）
 
-| # | 用户主张 | 判定 | 一手证据 | 备注 |
+| # | 传闻主张 | 判定 | 一手证据 | 备注 |
 |---|---|---|---|---|
 | 1 | raphael 支持存在 | **证实（社区 fork，非上游）** | ① 官方侧证据（均为负面）：org 仓列表（仅 7 仓，push 至 2026-11-10）https://github.com/orgs/oosexgang/repositories ；main `devices/manifest.conf`（redwood+qemu+uefi，无 raphael）https://raw.githubusercontent.com/oosexgang/hakios-xnu-kernel/main/devices/manifest.conf ；`docs/devices/`（index/qemu/redwood）https://github.com/oosexgang/hakios-xnu-kernel/tree/main/docs/devices 。② fork 侧证据（正面）：https://github.com/HeliumStudio-Dev/hackios-xnu-kernel （标题自述 "HackiOS XNU kernel for Redmi K20 Pro aka Mi 9T Pro (raphael)"，`raphael-bringup` 分支 @57722468a3）；https://github.com/adelholzener69/hakios-xnu-kernel-raphael/tree/raphael （squash 基座 = 上游 main tip 63fc2b4633，fork 独有 `raphael` 分支 @3233e83714） | Helium-Studio 主账号 https://github.com/Helium-Studio 的 /hackios-xnu-kernel 301 → HeliumStudio-Dev（重定向验证）。上游 PR 列表页 JS 渲染无法匿名确认"有无 raphael PR"，但 manifest/设备页/README/org 四处皆无 → 未被上游收编 [实证] |
 | 2 | GPU 已修好 | **证实（GLES 层）** | `devices/raphael/kit/extract-gpu-firmware.sh`：固件 = `a640_gmu.bin`、**`a630_sqe.fw`**、`a640_zap.mdt/.b00/.b01/.b02`（"the a660_* files of other phones must not be used"）https://github.com/adelholzener69/hakios-xnu-kernel-raphael/blob/raphael/devices/raphael/kit/extract-gpu-firmware.sh ；`device.conf`：`gpu works Adreno 640 through GLES (gpu=1); needs fw-gpu/` ；`docs/RAPHAEL.md`：A640 全部初始化步骤、TZ zap shader 认证、`freedreno / FD640 / OpenGL ES 3.2`、三角形绘制 42 ms/回读 25 ms、CoreAnimation accelerated renderer（2026-10-23 真机日志 `logs/011423-run.log`）[实测转述] | 边界：Metal 不可用（zh README："图形路径 Mesa/Freedreno，OpenGL ES；**当前不提供 Metal 驱动**"）；默认 GPU 时钟 257/427 MHz；"不保证所有场景稳定 60 FPS" |
@@ -30,7 +30,7 @@
 | 4 | 4G 已修好 | **证伪** | `device.conf`：`status cellular missing` ；`docs/RAPHAEL-K20PRO.md` L23："Bluetooth, cellular, cameras……\*\*no\*\*" ；实测 XL_CMDLINE 含 **`modem=0`**（L125）；`docs/RAPHAEL-K20PRO-STATUS.md` 工作顺序："3. Storage persistence. 4. Cellular, then cameras"，且"NV partitions pulled in step 3 are **already the first ingredient**"（= NV 只是备料，未开工） | SM8150 的 WiFi 依赖 MPSS（PAS 4）签名装载 `wlanmdsp.mbn` + TFTP/PD mapper——modem PIL 链路因此真机通过 [实测转述]，但这是 **WiFi 的载体**，不是蜂窝；蜂窝的 NAS/QMI WDS/IPA 链路在 raphael 上明确"不启用" |
 | 5 | "几乎完全正常" | **夸大** | 见 §③ 完成度总表：缺 storage 持久化/cellular/BT/相机/Metal/充电/麦克风/第 8 核；wifi 重连 bug | 与 redwood 对比：redwood 有 storage 持久化、相机、Metal 出画、麦克风、8/8 核 |
 
-**用户消息源推测**：中文圈 2026-11-03 起的病毒传播（smzdm 文章 https://post.smzdm.com/p/aomqr29m ，"2019 年的红米 K20 Pro 启动 iOS 16.5、弹出式前摄收起"——全文被腾讯验证码墙挡住未能直读，仅搜索摘要可见 [待核]）；以及 HeliumStudio-Dev 仓的中文测试指南（README.raphael.zh.md，561 行，本身就是面向中文读者写的）。UniXNU 生态的 unixnu.com 设备目录另有 raphael 条目（见 §②-3），口径为"compile-only"，与"几乎完全正常"不符。
+**消息源推测**：中文圈 2026-11-03 起的病毒传播（smzdm 文章 https://post.smzdm.com/p/aomqr29m ，"2019 年的红米 K20 Pro 启动 iOS 16.5、弹出式前摄收起"——全文被腾讯验证码墙挡住未能直读，仅搜索摘要可见 [待核]）；以及 HeliumStudio-Dev 仓的中文测试指南（README.raphael.zh.md，561 行，本身就是面向中文读者写的）。UniXNU 生态的 unixnu.com 设备目录另有 raphael 条目（见 §②-3），口径为"compile-only"，与"几乎完全正常"不符。
 
 ---
 
@@ -65,7 +65,7 @@
 
 ---
 
-## ③ 完成度总表（对照上游 redwood 设备页验收口径）
+## ③ 完成度总表（对照上游 redwood 设备页验收尾径）
 
 判定口径 = 上游 `docs/devices/redwood.md` 的 works/partly/missing 三档 + fork 自身 `devices/raphael/device.conf`（raphael 分支 tip，由 tools/docs-gen.py 生成的权威表）。
 
@@ -99,7 +99,7 @@
 
 - **控制链**：MPSS 签名装载（wlanmdsp.mbn）→ SMEM/SMP2P/GLINK/QRTR → RMTFS（只读 NV 快照 modemst1/2+fsg/fsc，写只改 RAM 副本）→ TFTP（只导出 wlanmdsp.mbn + server_check.txt）→ PD mapper → PDR → DMS（WLAN MAC 校验后经 WLFW 0x33 提交）→ **BDF**（按 `ro.boot.hwc` 选 `bd_f11cn.bin`/`bd_f11gl.bin`，拒绝缺省 0xff→通用 bdwlan.bin 的路径）→ MSA/SMMU（SID 0x640，MSA 区 `0x8bc00000+0x180000` 恒等映射）→ 五路 PMIC 供电（含 **PM8150L L10C 3312 mV/HPM**，外设 0x549）→ AOSS QMP QDSS 时钟投票。
 - **主机路径**：12 路 level-high CE 中断、NAPI、HTC/WMI、数据收发。
-- **调试战役**（docs/RAPHAEL.md 10-24 节，对我们 WiFi 战的参考价值最高的部分）：固件 early crash（SMP2P wlan bit1 → WLAN PD DOWN/UP）→ 对照本机 6.12 分支 4 条 commit（`4c37abf82a78` ICNSS/MSA/SID/CE、`f48d0a8dfc4e` L10C 供电、`ad7584e9454f` 6.12 用 ICNSS+qcacld 的配置辨伪、`0ad06c1c3f64` QDSS 时钟投票）→ 修好后两轮真机 `0x21 FW_READY`（step 14）；再修 BDF 选择（cnss-daemon 机型逻辑核对）→ 扫描 dwell ≥120 ms → WPA3 SAE H2E 真机联网。
+- **调试工作**（docs/RAPHAEL.md 10-24 节，对我们 WiFi 战的参考价值最高的部分）：固件 early crash（SMP2P wlan bit1 → WLAN PD DOWN/UP）→ 对照本机 6.12 分支 4 条 commit（`4c37abf82a78` ICNSS/MSA/SID/CE、`f48d0a8dfc4e` L10C 供电、`ad7584e9454f` 6.12 用 ICNSS+qcacld 的配置辨伪、`0ad06c1c3f64` QDSS 时钟投票）→ 修好后两轮真机 `0x21 FW_READY`（step 14）；再修 BDF 选择（cnss-daemon 机型逻辑核对）→ 扫描 dwell ≥120 ms → WPA3 SAE H2E 真机联网。
 - **代码与构建**：`drivers/wifi/hakios.wifi.c` +1406/−82（ICNSS 步法）；`wifi/lx/ath10k/{host.c 14.7 KB, include/, patches/icnss-bootstrap.patch 1.5 KB}`；`tools/mk-ath10k.py`（**固定源码管线**：linux **7.0.14** tar.xz + freebsd 15.1 src + wpa_supplicant 2.11 + mbedtls 3.6.7，全部 SHA256 锁定 → 编出 `ath10k.o` → `WIFI_OBJECT=... make kernel` 链入 XNU）；`device.conf` 选 `WIFI_ATH10K=1`。启动参数 `wifi_step=15 wifi_lx=2 wifi_bdf=... wifi_smmu=2 wifi_keep=1 ...`。
 - **验收工具范式**：`tools/check-wifi-{mdt,smem,doorbell,proxy,memory,rmtfs,tftp,pd,pdr,qrtr,icnss,dms,diag,dump,microdump,smmu}.py` 十六项主机回归 + `tools/wpa-test/run.sh` + `mk-ath10k.py --sae-test`（195 项 WPA2 检查、WPA3 SAE/PMF 检查）——"ASan/UBSan 通过不能替代实机扫描、重新关联及网络稳定性验证"。
 
@@ -108,7 +108,7 @@
 - `device.conf`：`cellular missing`；`CONFIG_HAKIOS_QMI=y / CONFIG_HAKIOS_MODEM=y` 在 config 里（**为 WiFi 的 MPSS 链服务**），但运行参数 `modem=0`（蜂窝步法不跑）。
 - `docs/RAPHAEL-K20PRO-STATUS.md`：Cellular 行 = "**no**｜modem bring-up（第 3 步拉到的 NV 分区已是第一份原料）"；工作顺序：扬声器→触感/手电→**存储持久化→蜂窝→相机**。即蜂窝排在存储之后，连第二步都没到。
 - UPSTREAM-BASELINE-20261027.md："最新提交主要涉及蜂窝 MPSS/IPA……**保留这些上游改动，但不启用 raphael 蜂窝功能**"——上游 redwood 的 IPA/QMI 蜂窝代码被原样带着，但 raphael 没开。
-- "Shows 4G" 到什么程度：**没有任何注册/数据/VoLTE 证据**。搜索与文档均未见 raphael 蜂窝实测记录。→ 用户的"4G"信息为误传或与上游 redwood 的状态条（modem 见网、SIM 绑定）混淆。
+- "Shows 4G" 到什么程度：**没有任何注册/数据/VoLTE 证据**。搜索与文档均未见 raphael 蜂窝实测记录。→ 该"4G"信息为误传或与上游 redwood 的状态条（modem 见网、SIM 绑定）混淆。
 
 ### 4.3 GPU
 
@@ -121,7 +121,7 @@
 
 - **OSM 调频**（SM8150 用 OSM 非 EPSS）：三个 OSM 域 0x18323000/0x18325800/0x18327800，硬件 LUT 读法（+0x110，32 B/行；性能请求 +0x920），50 ms 负载采样双档调速，真机上限 1785/2419/2841 MHz。
 - **DCS 亮度链**：backboardd 滑条值 → `kern.hakios.brightness` sysctl → 内核 → DSI 控制器 DCS 0x51 → 面板。**上游 redwood 没有亮度控制**，这是全生态第一个面板亮度实现。
-- **UEFI 逐机化**：UEFI 从用户手机自己的 XBL 提取构建（`tools/extract-raphael-uefi.py`→`kit/build-uefi-image.sh`），三个 vendor DXE（DALSYSDxe/UsbConfigDxe/ButtonsDxe）**先验字节同一性再打单字节 patch**（`check-xbl.py` + `raphael-firmware-patches.json`）；"官方发布的 UEFI 内嵌作者的 XBL，XBL 不同的手机黑屏"——这就是他们 fork 存在的主要理由。
+- **UEFI 逐机化**：UEFI 从目标手机自己的 XBL 提取构建（`tools/extract-raphael-uefi.py`→`kit/build-uefi-image.sh`），三个 vendor DXE（DALSYSDxe/UsbConfigDxe/ButtonsDxe）**先验字节同一性再打单字节 patch**（`check-xbl.py` + `raphael-firmware-patches.json`）；"官方发布的 UEFI 内嵌作者的 XBL，XBL 不同的手机黑屏"——这就是他们 fork 存在的主要理由。
 - **固件拉取变体**：`kit/pull-firmware.sh` 走 **TWRP + adb root**（非 redwood 的 adb/Magisk 法）：只读挂载 modem 分区拉 `modem.mdt+wlanmdsp.mbn+BDF+modem.bNN`（→ fw-raphael/，WiFi 用）、adsp.mdt 全段（→ fw-audio/）、XBL 两镜像（→ UEFI 构建）；umask 077、git-ignore、逐目录报文件数。
 - **var_store 保守化**：恢复时跳过快照、列出库存、`var_skip=` 参数（11-08 的上游 PR #54 同主题）。
 
@@ -159,7 +159,7 @@ Mu-Silicium 上游 `Platforms/Xiaomi` 有 **nuwaPkg = Redmi K60（SM8475，与 P
 ### 5.4 "如果我们抄它，下一个波该干什么"——Top 3
 
 1. **把"固定源码驱动对象管线"立起来（v0.5/v0.6 共用前置）**：以 `tools/mk-ath10k.py` 为模板写 `tools/mk-ath11k.py`（拉 ath11k/mac80211 源 + SHA256 锁 + 补丁集进 `wifi/lx/ath11k/patches/`，主机编 .o），同时把 raphael 的 `check-wifi-*.py` 范式改造成我们的 `tools/check-phk110-wifi-*.py`（CNSS 供电序列/MHI/QRTR/WDI 各一）。产出物与手机无关，本周即可开工。
-2. **UEFI patch 管理收编成"清单+校验"（v0.x 工程质量项，半天）**：把我们 Wave 18–24 的 udon UEFI 手术（UsbConfigDxe start_ex/DALSYSDxe 等）写成 `devices/phk110/uefi/firmware-patches.json` + `check-xbl.py` 式的模块哈希校验脚本；顺带登记 Mu-Silicium nuwaPkg @commit 为 UEFI 备胎锚点（一行 BASE 文件）。
+2. **UEFI patch 管理收编成"清单+校验"（v0.x 工程质量项，半天）**：把我们 阶段 18–24 的 udon UEFI 手术（UsbConfigDxe start_ex/DALSYSDxe 等）写成 `devices/phk110/uefi/firmware-patches.json` + `check-xbl.py` 式的模块哈希校验脚本；顺带登记 Mu-Silicium nuwaPkg @commit 为 UEFI 备胎锚点（一行 BASE 文件）。
 3. **修正情报面 + 亮度/sysctl 注入侦察（本波完成）**：① 在 STATUS/landscape 里补记"raphael fork 生态（两仓+release+smzdm 出圈）"与"上游 mtk 蓝牙打通"，把跟进范围从官方 org 扩到 fork 网络 + unixnu.com；② 亮度链虽排在 v1.0 后，但读一遍 `hakios.brightness.c` 的 sysctl 挂点与 backboardd 注入法成本极低，先入档（PHK110 亮度是 redwood 也没有的能力，将来是加分项）。
 
 ---
@@ -187,8 +187,8 @@ Mu-Silicium 上游 `Platforms/Xiaomi` 有 **nuwaPkg = Redmi K60（SM8475，与 P
 
 ### 6.3 附带情报（本轮顺带证实，修正 F14/landscape 旧结论）
 
-1. **上游 redwood 蜂窝比 F14 记录的更活跃**：重写前 main（10-24/10-25，raphael-bringup 克隆的历史层可见）有 IPA "2.0 数据路径 + en1"、QMI DPM Open Port 次序修正、WDS Start Network Interface 注册后重试、NAS 信号缓存、运营商名进 SpringBoard、状态栏信号条注入等 commit——但当前官方 `docs/devices/redwood.md`（main@63fc2b46）仍写 "cellular partly… **no registration yet**"。解读：注册/数据会话代码在树上且测试周期里见过注册，官方验收口径仍保守 [推断]。对我们 v0.7：**DPM Open Port → WDA → WDS bind/IP-family/start 的时序顺序是现成参考**（`docs/cellular.md` 亦在该时代已存在）。
-2. **上游 mtk 分支蓝牙打通**（11-10 push："bluetoothd of iOS 16.5 on the MT6631: HCI over …"）——上游把蓝牙从"侦察"推到了"协议栈上机"，MTK 优先；QC 侧（我们）尚未见同级别动作。蓝牙对 PHK110 仍不排期，但"上游能跑 bluetoothd"改变了 F14"蓝牙只有第一步侦察"的判断。
+1. **上游 redwood 蜂窝比 F14 记录的更活跃**：重写前 main（10-24/10-25，raphael-bringup 克隆的历史层可见）有 IPA "2.0 数据路径 + en1"、QMI DPM Open Port 次序修正、WDS Start Network Interface 注册后重试、NAS 信号缓存、运营商名进 SpringBoard、状态栏信号条注入等 commit——但当前官方 `docs/devices/redwood.md`（main@63fc2b46）仍写 "cellular partly… **no registration yet**"。解读：注册/数据会话代码在树上且测试周期里见过注册，官方验收尾径仍保守 [推断]。对我们 v0.7：**DPM Open Port → WDA → WDS bind/IP-family/start 的时序顺序是现成参考**（`docs/cellular.md` 亦在该时代已存在）。
+2. **上游 mtk 分支蓝牙打通**（11-10 push："bluetoothd of iOS 16.5 on the MT6631: HCI over …"）——上游把蓝牙从"侦察"推到了"协议栈真机验证"，MTK 优先；QC 侧（我们）尚未见同级别动作。蓝牙对 PHK110 仍不排期，但"上游能跑 bluetoothd"改变了 F14"蓝牙只有第一步侦察"的判断。
 3. 社区 fork 动能：上游主仓 fork 列表里出现 bramble（Pixel 6a）/a52sxq（Galaxy A52s）/garnet 等设备名 fork——"设备代号命名的 fork"可作为新设备支持的先行指标（raphael 即如此被发现）。
 
 ---
@@ -223,16 +223,16 @@ Mu-Silicium 上游 `Platforms/Xiaomi` 有 **nuwaPkg = Redmi K60（SM8475，与 P
 - `upstream-manifest.txt`（基线锚：kernel@96ffbc5、sm7325@04fbfff、UniXNU-udon@ad550a9、uefi-udon@475f9de）
 - `docs/research/f14-sd778g-zendot-survey.md`（格式模板与对照基线）
 
-## 补记（2026-11-10 晚，用户信源修正）
+## 补记（2026-11-10 晚，信源修正）
 
-用户澄清其原始信源 = **抖音视频**（非 GitHub）。这改写判定的适用范围而不推翻它：
+经澄清，原始信源 = **抖音视频**（非 GitHub）。这改写判定的适用范围而不推翻它：
 
 - **公网代码层判定不变**：GitHub 全网（官方 org + 30 forks + unixnu.com）确实没有蜂窝栈——fork 自家 device.conf 写 `cellular missing`、`modem=0`。
-- **新假设：私人构建先于开源**。用户在抖音看到 4G 工作的 K20 Pro，最合理的解释 = 某porter（Helium-Studio 本人或另一人）**已私下跑通蜂窝但未 push**。这在此生态有先例（redwood 的蜂窝也是"文档宣称在案、代码迟到"模式）。含义：**SM8150 蜂窝栈"有人做成过"的先例可能真实存在**，v0.7 IPA 参考价值上调，但参考物暂不可得。
+- **新假设：私人构建先于开源**。抖音上有 4G 工作的 K20 Pro，最合理的解释 = 某porter（Helium-Studio 本人或另一人）**已私下跑通蜂窝但未 push**。这在此生态有先例（redwood 的蜂窝也是"文档宣称在案、代码迟到"模式）。含义：**SM8150 蜂窝栈"有人做成过"的先例可能真实存在**，v0.7 IPA 参考价值上调，但参考物暂不可得。
 - **情报面扩容**：监控源在"官方 org + 主仓 forks + unixnu.com"之外，增加**中文短视频平台（抖音/B站/小红书）**为事件驱动源——此生态的发发布链 = 小圈子先发视频、代码后到（smzdm 11-03 出圈先于多数代码可见度，同构）。
 - 待办：拿到抖音链接/作者账号后做 porter 定位（是 Helium-Studio 还是新面孔）+ 视频内容逐项核对（4G 注册状态栏？数据？通话？）。
 
 
-## 勘误（2026-11-10 晚，Wave 30 实证纠正）
+## 勘误（2026-11-10 晚，阶段 30 实证纠正）
 
 - §5.4 迁移 Top3 第 2 条的 nuwaPkg 表述**失实**：nuwaPkg = **小米 13 Pro / SM8550（kailua）**，**不是** Redmi K60 / SM8475（四处互证：DSC 注释 SOC_TYPE=SM8550-AB、KailuaPkg.dsc.inc、sm8550-xiaomi-nuwa.dtb、SMBIOS "13 Pro"）。价值从"同 SoC UEFI 备胎锚点"降级为"同生态工程模板"（DXE 全集含 UFS/显示/按钮/USB + 46 个 panel XML）。

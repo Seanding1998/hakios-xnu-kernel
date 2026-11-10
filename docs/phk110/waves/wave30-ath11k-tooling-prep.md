@@ -1,6 +1,6 @@
-# Wave 30 — ath11k 工具链前置（零手机案头波）
+# 阶段 30 · 2026-11-10 · WiFi（ath11k）工具链准备
 
-> 2026-11-10 · Wave 30 工具链前置子代理
+> 2026-11-10 · 阶段 30 工具链前置
 > 任务书：把 F15 确认的"固定源码管线范式"（fork 的 `tools/mk-ath10k.py` + 16 个 `check-wifi-*.py`）提前做成 PHK110 v0.6 WiFi 前置工具链；另做 Mu-Silicium nuwaPkg 快查
 > 红线执行：零手机零刷写零 fastboot/adb ✓（全程只碰主机侧 + 上游克隆）；上游浅 clone 全部放 `wave30-scripts/upstream-scratch/`（不入库，已加 .gitignore）✓；未改动 WSL 构建树任何产物 ✓（本波无 WSL 写操作）
 
@@ -10,7 +10,7 @@
 2. **本波把管线真跑到了"源码就绪"**：`mk-ath11k.py --verify` 真实拉取 linux-7.0.14.tar.xz（157,262,664 B）+ freebsd-15.1-src.txz（253,039,000 B），SHA256 与 fork 锁定值逐字节一致；抽出 22 个 ath11k 文件（20 core + mhi + pci），**逐文件许可证门 22/22 通过**（fork 规则：每文件必须自带 `SPDX-License-Identifier: BSD-3-Clause-Clear` 或 ISC 全文）；`compile-plan.json` 已产出。编译/链接步按任务书**故意拒绝**（`--build` 返回解释性错误），等内核侧 `hakios.lx.h` 出现。
 3. **决定性新发现（修正 F14 的两个隐含假设）**：上游 linux 7.0.14 的 ath11k **根本没有 `ATH11K_HW_QCA6490` 这个 hw_rev**——PHK110 DTB 里的 `qcom,cnss-qca6490` 在 ath11k 世界里的身份是 **WCN6750 hw1.0**（`core.h` 枚举 + `core.c` hw_params 表在证）；固件目录因此是 **`WCN6750/hw1.0/`**（`core.c:582`，F14 写的 "QCA6490/hw1.0" 不存在）。且 **ath11k_pci 模块对 WCN6750 是"core 就绪、胶水缺失"**：`pci.c` 设备 ID 表只有 QCA6390/WCN6855/QCN9074，`mhi.c` 的 hw_rev switch 没有 WCN6750 case（default 直接报 `failed assign mhi_config`）。→ **管线必须携带 2 个一行级补丁**（见 §2.3，已写成 check 脚本的 GAP 清单）。
 4. **GPL 边界是 ath11k-PCI 路线与 ath10k-SNOC 路线的结构性差异**：ath11k 全树 BSD-3-Clause-Clear（许可门可过），但它依赖的 **drivers/bus/mhi（MHI 主机栈）是 GPL-2.0-only**——不能像 ath11k 一样链入。fork 自己的答案是把总线协议在手写垫层里重实现（`wifi/lx/src/lx_bus.c` 为 WCN6750 手写了 ahb.c 探测序 + 1ms CE 轮询线程，270ms 到 "unified ready" 真机实证）；我们的 MHI 协议实现同样应住在 wifi/lx 层（MHI 环形通道协议本身有公开规范形态，ath11k/mhi.c 的调用面就是需求文档）。
-5. **check-wifi-*.py 的判定模式 = "宿主编译内核真实函数 + mock 环境 + ASan/UBSan + assert"**：脚本用 regex 从 `hakios.wifi.c` 里抽出真实交付到手机的函数（MDT 解析器、QRTR 状态机、SMMU 页表……）连同其常量，镶进生成的 C harness，mock 掉硬件边界（image_file/rd/kmem_alloc 等），`cc -fsanitize=address,undefined` 原生跑 assert，`puts("PASS: ...")` 收尾。**测的是上机的那份代码，不是测试替身**。本波 5 个 `check-phk110-wifi-*.py` 已按此范式立起（内核代码未写前先测 DTB/固件清单/环算术/上游契约；e2e 脚本挂 wave27 通道）。
+5. **check-wifi-*.py 的判定模式 = "宿主编译内核真实函数 + mock 环境 + ASan/UBSan + assert"**：脚本用 regex 从 `hakios.wifi.c` 里抽出真实交付到手机的函数（MDT 解析器、QRTR 状态机、SMMU 页表……）连同其常量，镶进生成的 C harness，mock 掉硬件边界（image_file/rd/kmem_alloc 等），`cc -fsanitize=address,undefined` 原生跑 assert，`puts("PASS: ...")` 收尾。**测的是真机验证的那份代码，不是测试替身**。本波 5 个 `check-phk110-wifi-*.py` 已按此范式立起（内核代码未写前先测 DTB/固件清单/环算术/上游契约；e2e 脚本挂 wave27 通道）。
 6. **nuwaPkg 情报修正（F15 §5.3 两处失实）**：Mu-Silicium `Platforms/Xiaomi/nuwaPkg`（仅 13 文件）**不是 Redmi K60/SM8475，而是小米 13 Pro/SM8550**——`nuwa.dsc` 注释 `0 = SM8550-AB / 1 = SM8550-AC`、`!include KailuaPkg/KailuaPkg.dsc.inc`、FDT `sm8550-xiaomi-nuwa.dtb`、SMBIOS `PcdSmbiosSystemModel|"13 Pro"` 四处互证。"同 SoC 备胎"降级为"**同生态模板备胎**"（kalama vs cape 隔一代，但它是一套完整能出 UEFI 的 Qualcomm 设备包模板，vendor DXE 全集见 §4）。
 
 ---
@@ -175,7 +175,7 @@ compile-plan.json emitted ✓
 
 ---
 
-## 5. 施工单（移交下一波）
+## 5. 任务单（留给下一阶段）
 
 | # | 事项 | 前置 | 产物 |
 |---|---|---|---|

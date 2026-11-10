@@ -1,10 +1,11 @@
 # 一加 Ace 2（`PHK110`）
 
-HakiOS 的 SM8475（"cape"）移植，从上游 `redwood`（SM7325）参考机出发。
-下表只写这台真机上实际看到过的状态（Boot #1–#39）；完整日志线索在
+HakiOS 的 SM8475（"cape"）移植，从上游 `redwood`（SM7325）参考设备出发。
+下表只写这台真机上实际验证过的状态；完整记录在
 [`docs/phk110/STATUS.md`](../../docs/phk110/STATUS.md) 与
-[`docs/phk110/waves/`](../../docs/phk110/waves/)。英文版见 [README.md](README.md)，
-移植差异汇总见 [PORT-NOTES.md](PORT-NOTES.md)。
+[`docs/phk110/waves/`](../../docs/phk110/waves/)（"Boot #N" 指那份时间线）。
+英文版见 [README.md](README.md)，与上游参考设备的差异逐项说明见
+[PORT-NOTES.md](PORT-NOTES.md)。
 
 | | |
 |---|---|
@@ -12,30 +13,30 @@ HakiOS 的 SM8475（"cape"）移植，从上游 `redwood`（SM7325）参考机�
 | SoC | `SM8475`（骁龙 8+ Gen 1，"cape"），16 GB 内存 |
 | 配置 | loader cmdline = `soc.args` + `device.conf` 里的 boot-args |
 | 维护者 | PHK110 移植团队（本分支） |
-| 基座 | [hakios-xnu-kernel](https://github.com/oosexgang/hakios-xnu-kernel)（redwood 参考机） |
+| 基座 | [hakios-xnu-kernel](https://github.com/oosexgang/hakios-xnu-kernel)（redwood 参考设备） |
 | UEFI | takasugl udonPkg 本板重建（`FD_BASE=0xA7100000`、`PAYLOAD_BASE=0xF4000000`） |
-| 启动路径 | 只用 `boot_b` 槽位、RAM 级；日常安卓 `boot_a` 从不触碰 |
+| 启动路径 | 只用 `boot_b` 槽位；日常安卓的 `boot_a` 从不触碰 |
 
 ## 实测状态
 
 | 部件 | 状态 | 说明 |
 |---|---|---|
-| 显示 | ✅ 工作 | UEFI framebuffer 1240×2772；内核 fb 控制台滚动；屏录 boot-arg 通路存在（rec_secs/rec_ring） |
-| 按键 | ✅ 工作 | 电源 + 双音量键，PMIC SPMI **v7** 仲裁器（上游驱动只认 v5）；真机按键事件带毫秒时戳（Boot #16） |
-| CPU | ✅ 工作 | 8 核全上（`small_cores_after=0` 时 7 个 AP 核 8 ms 窗内齐上；大核 1–3、慢核 4–6） |
-| 触摸 | ◑ probe 通过 | Synaptics S3910 TouchComm **v1**（GENI SPI，SE 固件禁了 FIFO 接口 → bitbang 读方向）：`part number "S3910PA0B0-15.2"`、1240×2772 面板、report config 读取、`touch screen ready`（probe ~1.0 s，Boot #21）；9 字节块按 ~20 ms 节拍重新武装 |
-| 存储 | ✅ 工作 | UFS：129 分区只读（`ufs=2`）+ `ufs_darwin_data` 写路径（`ufs_write=1 var_hfs=…`），`/private/var` 跨 boot 保持、journal replay 跨会话复验（Boot #22–#24） |
-| 用户态 | ✅ 工作 | 真 Apple launchd 接管 pid 1：`hardware target : d22ap` 被接受、28 进程（SpringBoard/backboardd）、Procursus `/var/jb` 前缀嫁接（Boot #25） |
-| SSH | ✅ 工作 | `WAVE21-SSH-OK` 判定：经 loader USB 网络（`en0`，10.0.0.2/30）3 条独立 SSH 会话、root shell、256 KiB 校验传输、干净 FIN/ACK 退出且 loader 存活（2026-11-10） |
-| USB serving | ✅ 工作 | loader USB 命令服务器（getvar / oem log / oem upload，216 KB 长度+内容双校验）——前提是修复 vendor 复位流程缺陷（CORESOFTRESET 超时后半复位 core 常驻，"H4" 根因，Wave 24） |
-| 会话上限 | ◑ 部分 | 1800 s 帽端到端实证；更长会话撞预存 `panic: vnode table is full`（F6） |
-| GPU | ❌ 未通 | WindowServer/CoreAnimation 未起——计划内 v0.5 边界 |
-| WiFi | 工具先行 | WCN6750/ath11k 工具链已备（Wave 30），未上机 |
+| 显示 | ✅ 工作 | UEFI framebuffer 1240×2772；内核帧缓冲控制台滚动输出；屏幕录制参数通路存在（rec_secs/rec_ring） |
+| 按键 | ✅ 工作 | 电源 + 双音量键，经 PMIC 的 SPMI 总线读取（仲裁器协议 v7，上游驱动原本只认 v5）；真机事件带毫秒时戳（Boot #16） |
+| CPU | ✅ 工作 | 8 核全部上线；`small_cores_after=0` 时 7 个应用核心 8 ms 内齐起（大核 1–3，小核 4–6） |
+| 触摸 | ◑ 驱动探针通过 | Synaptics S3910，GENI SPI 口上的 TouchComm v1 协议（端口固件禁用了 FIFO 接口，读方向用 bitbang）：读到部件号 "S3910PA0B0-15.2"、面板 1240×2772、报告配置读取完成、`touch screen ready`（探针约 1.0 s，Boot #21）；芯片每个片选帧只给一个 9 字节块、约 20 ms 重新武装 |
+| 存储 | ✅ 工作 | UFS：129 个分区只读枚举（`ufs=2`）+ `ufs_darwin_data` 可写（`ufs_write=1 var_hfs=…`）；`/private/var` 跨启动保留，文件系统日志重放双向验证（Boot #22–#24） |
+| 用户态 | ✅ 工作 | 真 Apple launchd 以 pid 1 运行：`hardware target : d22ap` 被接受、28 个进程（SpringBoard/backboardd）、Procursus 前缀嫁接到 `/var/jb`（Boot #25） |
+| SSH | ✅ 工作 | 经 loader 的 USB 网络通道（`en0`，10.0.0.2/30）建立 3 条独立 SSH 会话、root shell、256 KiB 校验传输、干净断开后 loader 仍存活（2026-11-10） |
+| USB 服务通道 | ✅ 工作 | loader 的 USB 命令服务（getvar / oem log / oem upload，216 KB 上传做了长度+内容双重校验）；此前阻塞在 vendor USB 驱动的复位流程缺陷——CORESOFTRESET 超时后核心处于半复位状态并带进后续每次启动（2026-11-09 在阶段 24 定位并修复） |
+| 会话上限 | ◑ 部分 | 1800 s 会话上限端到端验证过；更长会话会撞上一个早就存在的 `panic: vnode table is full` |
+| GPU | ❌ 未实现 | WindowServer / CoreAnimation 未启动（按路线排在 v0.5） |
+| WiFi | 工具先行 | WCN6750 / ath11k 的检查器与打包工具已备（`wave30-scripts/`），尚未上机 |
 | 蜂窝 / 音频 / 电池 / 振动 / 相机 | ❌ 未尝试 | — |
 
 ## 安全边界
 
 移植只走 `boot_b` 槽位：刷写与引导它**从不写入**日常安卓的 `boot_a` 槽位。
-会话失败或内核崩溃时由 bootloader 自身的 A/B fallback 兜底回安卓；手动回安卓
-= `fastboot set_active a` + reboot。200 GB userdata 卷仅在尾部挖出 20 GB
-`darwin` 卷（P0 操作前后数据卷头/签名双重校验，Wave 16b/16c）。
+会话失败或内核崩溃时，由 bootloader 自带的 A/B 回退自动退回安卓；手动回安卓
+= `fastboot set_active a` + reboot。200 GB 的 userdata 卷只在尾部挖出 20 GB
+`darwin` 卷，操作前后对数据卷头与签名做过双重校验（阶段 16b/16c）。

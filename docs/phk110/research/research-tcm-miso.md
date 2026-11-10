@@ -1,4 +1,4 @@
-# S3910 TouchComm over SPI — 外部先例与已知坑调研（电气层卡死专项）
+# TouchComm over SPI 的外部先例与已知问题调研
 
 Date: 2026-11-03. 纯调研（WebFetch/WebSearch + 本地源码 + OnePlusOSS 官方仓库），未触碰手机/WSL/构建树。
 设备：OnePlus Ace 2（PHK110，OPPO 项目号 22803，内部代号 **udon**，SM8475/"taro-cape"），触摸 IC = Synaptics S3910，TouchComm v1 over SPI（QUPv3 SE4）。
@@ -46,7 +46,7 @@ vendor 权威定义（OnePlusOSS udon-22803 devicetree + Syna TCM 绑定文档�
 ### 0.4 "STATUS_PACKET_CORRUPTED(0xfe) = 线路损坏" → **部分误诊**：0xfe 是 host 自造状态；且本机根本不说 v2
 
 - `0xfe` **不是设备返回码**。Syna core（synaptics_touchcom_core_dev.h，即本仓 intel/wave1b-scripts 那份）枚举注释原文："0xfe: **self-defined** status for a corrupted packet."——它是 host 在 CRC-6/CRC-16 校验失败时自己填的状态。
-- b20 的 v2 兜底读到的 4 字节头是 `a5 0f 00 00` = **v1 帧** `[A5][STATUS_ERROR=0x0f][len=0]`——STATUS_ERROR 在 v1 里是"generic communication error, probably incorrect payload"。即芯片（v1 固件）收到了我们 v2 框架的 CMD_IDENTIFY 字节、按 v1 语义解析后**回了 STATUS_ERROR**，我们的 v2 CRC-6 检查对 v1 帧必然失败 → 6/6 次 0xfe。**这是"拿 v2 协议问 v1 芯片"的必然结果，不是电气故障。** v2 fallback 在本机上应视为死路（或改为收到 `a5` 首字节时立即转 v1 解析）。
+- b20 的 v2 回退读到的 4 字节头是 `a5 0f 00 00` = **v1 帧** `[A5][STATUS_ERROR=0x0f][len=0]`——STATUS_ERROR 在 v1 里是"generic communication error, probably incorrect payload"。即芯片（v1 固件）收到了我们 v2 框架的 CMD_IDENTIFY 字节、按 v1 语义解析后**回了 STATUS_ERROR**，我们的 v2 CRC-6 检查对 v1 帧必然失败 → 6/6 次 0xfe。**这是"拿 v2 协议问 v1 芯片"的必然结果，不是电气故障。** v2 fallback 在本机上应视为死路（或改为收到 `a5` 首字节时立即转 v1 解析）。
 
 ---
 
@@ -81,7 +81,7 @@ vendor 权威定义（OnePlusOSS udon-22803 devicetree + Syna TCM 绑定文档�
 | power-on 后等待 | **200 ms** | `synaptics,power-delay-ms = <200>`；core 默认 `.power_on_delay_ms = 200` |
 | RESET 声明时长 | **10 ms** | `synaptics,reset-active-ms = <10>`；OPPO v1 驱动 `POWEWRUP_TO_RESET_TIME 10` |
 | RESET 释放后等待 | **80 ms** | `synaptics,reset-delay-ms = <80>`；OPPO v1 驱动 `RESET_TO_NORMAL_TIME 80`；core 默认 `.reset_delay_ms = 80` |
-| 兜底长等待 | 200 ms | core_dev.h `RESET_DELAY_MS (200)`（"default time after reset in case it's not set properly"） |
+| 回退长等待 | 200 ms | core_dev.h `RESET_DELAY_MS (200)`（"default time after reset in case it's not set properly"） |
 | fw mode switch | 200 ms | `FW_MODE_SWITCH_DELAY_MS` |
 | 复位后使能 IRQ 前再等 | 15 ms | core_dev.h `RST_ENABLE_IRQ_DELAY_MS`；fw update 后同样 `msleep(RST_ENABLE_IRQ_DELAY_MS)` 再 hw_reset |
 | 命令响应超时 / 轮询间隔 | 3000 ms / 20 ms | `CMD_RESPONSE_TIMEOUT_MS` / `CMD_RESPONSE_POLLING_DELAY_MS` |
@@ -156,7 +156,7 @@ HBP 驱动 probe 顺序（syna_tcm2.c `syna_tcm2_probe` → connect）：`ops_po
 | 7 | INT/ATTN | GPIO21，**声明=低**（irq-on-state=0；0x2008=level-low），idle=高 | GPIO21 输入 no-pull，只读极性 | 语义已对齐（0.3）；**尚未在探测里用 ATTN 做事件对齐（候选 #3）** |
 | 8 | 供电 | vdd=L3C 3008 mV（pm8350c l3）+ vcc=L4H 1800 mV（pm8450 l4）+ GPIO97 负载开关（wave12-touch-buttons.md §64 已核 cmd-db `ldoc3`/`ldoh4`） | ldoc3 3008 / ldoh4 1800 + GPIO97 | 一致（b20 真机两轨写成功；exp5 显示开关不门控，留复核项不阻塞） |
 | 9 | v1 读序列 | 头 9 B（MIN_READ_LENGTH=9）→ 续读 `[A5][03]+24+2` 单事务；读后校验 padding 0x5A；ATTN 事件驱动 | 9 B → `[A5][03]` 检查 + 26 B 单事务；窗口丢弃 0x03 帧 | **形状一致；差异 = 读时序对齐 + 续读失败后无跨事务重组（候选 #3 附带）** |
-| 10 | 探测入口 | 先写 0x07 再读 4 B；v1 判 A5、v2 判 CRC6 残差 | 被动裸读 9 B 判 A5；v2 兜底发 CMD_IDENTIFY | 探测差异（v1 窗已被 b20 证明可行；v2 兜底在本机死路，见 0.4） |
+| 10 | 探测入口 | 先写 0x07 再读 4 B；v1 判 A5、v2 判 CRC6 残差 | 被动裸读 9 B 判 A5；v2 回退发 CMD_IDENTIFY | 探测差异（v1 窗已被 b20 证明可行；v2 回退在本机死路，见 0.4） |
 | 11 | v2 帧实现 | TX byte3=`1<<7\|seq<<6\|crc6(26b)`；RX `crc6(32b)==0`+seq+CRC16 | 逐位一致 | 一致（v2 在本机无用武之地） |
 | 12 | 复位/超时常数 | power 200/active 10/delay 80/RESET_DELAY 200/mode-switch 200/IRQ-before 15 ms | 200/100（窗口另加 ~1 s） | 一致偏保守 |
 
@@ -186,7 +186,7 @@ HBP 驱动 probe 顺序（syna_tcm2.c `syna_tcm2_probe` → connect）：`ops_po
 
 ### 根因 2：v1 窗口/续读状态机不识别"分帧服务"（纯软件，保险丝）
 
-芯片已证明会把 identify 拆成多个 `[A5][03]` 帧服务（b20 read 2/3）。若根因 1 的修复后仍有残余失配，正确姿势是 vendor 的兜底逻辑：**任何窗口读到 `[A5][03]` 就继续 clock 到 0x5A padding，跨事务重组整包**（OPPO v1 驱动的 continued_read 循环即如此）。当前我们把它当"无载荷状态行"丢弃。改动小，可与根因 1 同刷。
+芯片已证明会把 identify 拆成多个 `[A5][03]` 帧服务（b20 read 2/3）。若根因 1 的修复后仍有残余失配，正确姿势是 vendor 的回退逻辑：**任何窗口读到 `[A5][03]` 就继续 clock 到 0x5A padding，跨事务重组整包**（OPPO v1 驱动的 continued_read 循环即如此）。当前我们把它当"无载荷状态行"丢弃。改动小，可与根因 1 同刷。
 
 ### 根因 3：ATTN 事件对齐缺失（兼"固件未就绪"的独立观测）
 

@@ -1,4 +1,4 @@
-# Wave 7 — USB-mode grafted boot image (XnuLoaderMain graft + usb-mode payload)
+# 阶段 7 · 2026-11-03 · USB 模式启动镜像：免手操作引导链走通
 
 Date: 2026-11-03. Scope: rebuild udon FD with the Wave-7 `BootManager.c` patch
 (`XnuLoaderMain()` inserted at the tail of `PlatformBootManagerAfterConsole`,
@@ -35,9 +35,9 @@ JOBS=$(nproc) ./scripts/build-udon-firmware.sh
 ## 2. Build output
 
 - Build total time **00:00:34** (2026-11-03 14:11:14 → 14:11:48), no errors;
-  only the pre-existing warnings from Wave 4 (SiliciumPkg.dsc.inc(211) library
+  only the pre-existing warnings from 阶段 4 (SiliciumPkg.dsc.inc(211) library
   class, BaseTools VFR grammar).
-- FV geometry: `FVMAIN 99% full 0x7b0000 total, 0x7af0a0 used` (Wave 4 was
+- FV geometry: `FVMAIN 99% full 0x7b0000 total, 0x7af0a0 used` (阶段 4 was
   0x7AF008 — +0x98 from the graft call), `FVMAIN_COMPACT 31% full 0x400000`.
 - Product: `~/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd`
   (4,194,304 B, `_FVH` @ 0x28).
@@ -118,7 +118,7 @@ Total: 14 script + 10 manual = 24 checks, 0 unexpected failures.
 | `device-layer/udon-hakios-usbmode-grafted.img` | 201,326,592 | `0fdd243724c4566390fc7bc3a35f6f67429a36d57f80f82fd909e3ab8d5123f6` |
 | FD `SILICIUM_UEFI.fd` (build tree, not copied to device-layer) | 4,194,304 | `8924cb67e349f7c188c258bde08fe90155d81a9d27ef5d0a965399ffb7a7180f` |
 | payload `/tmp/wave7-payload-usb.bin` | 66,216 | `859be7211a446a9654ff9a5f1416f4ef64f213f11f70ad30fc500dda39e2bfde` |
-| shim `udon-hakios-BootShim.bin` (reused, Wave 5) | 240 | `108ce972adb82cc9c23967a1d380a27a67ef73a7c131f117561e38e261fa58ba` |
+| shim `udon-hakios-BootShim.bin` (reused, 阶段 5) | 240 | `108ce972adb82cc9c23967a1d380a27a67ef73a7c131f117561e38e261fa58ba` |
 | loader `udon-hakios-loader-v2.efi` (embedded in payload) | 66,048 | `63e51e0770286711c3d56e0d9bf79f2f50dbbd07c084b6c74a7fd6cc960e5b51` |
 
 New files on Windows device-layer: only `udon-hakios-usbmode-grafted.img`.
@@ -136,7 +136,7 @@ fastboot reboot
 
 Expected boot chain:
 
-1. ABL splash (stock vbmeta grafted, AVB green/red as in Wave 5).
+1. ABL splash (stock vbmeta grafted, AVB green/red as in 阶段 5).
 2. UEFI starts, console up, `PlatformBootManagerAfterConsole` runs →
    **no Boot Manager menu**: the graft calls `XnuLoaderMain()` directly and
    never reaches `DeviceBootManagerAfterConsole ()`.

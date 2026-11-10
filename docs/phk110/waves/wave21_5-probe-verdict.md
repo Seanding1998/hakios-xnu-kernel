@@ -1,13 +1,13 @@
-# Wave 21.5：post-start_ex bulk 探针 + 重掷修复（v17 → v17b）——两轮施工/刷写/判定报告
+# 阶段 21-5 · 2026-11-08 · bulk 探针与重掷机制：阻塞点移到主机侧
 
-> 2026-11-08 · Wave 21.5 执行子代理全循环：v17 施工（§1）→ 构建/自检/自刷（§2-§3）→ **Boot #34 现场判决：判别器字面量被现场纠正**（§4-§5）→ **v17b 第 2 轮（现场修正版）**（§6）→ 教训（§7）→ 红线执行（§8）
-> 判据基线：`docs/research/f12-ep2-not-configured.md`（Wave 21.4 指令级归因）
+> 2026-11-08 · 阶段 21.5 执行记录全循环：v17 施工（§1）→ 构建/自检/自刷（§2-§3）→ **Boot #34 现场判决：判别器字面量被现场纠正**（§4-§5）→ **v17b 第 2 轮（现场修正版）**（§6）→ 教训（§7）→ 红线执行（§8）
+> 判据基线：`docs/research/f12-ep2-not-configured.md`（阶段 21.4 指令级归因）
 
 ## 0. 一句话结论
 
-**v0.4「达尔文」未宣告；两轮刷写预算全部用完；但探针机制按设计完整执行并留下了完整判别记录**：v17b（Boot #35）的 logdump 显示 **3 代际 × 6 拍 = 18 次探针全部应答 `0x8000000000000007`（未武装）**，两次重掷精确触发（"the pair is un-armed after generation 1/2" → 25s 安静 → start_ex 内部 StopController 重启 → 新代际），终判行 "the pair never armed across 3 generations … the session goes on over ep0 alone" 逐字到手，会话照跑（en0 @123.6s 上线、10.0.0.2/30、1 帧发出 0 收到、`loader_return_after expired` 干净返回）→ 手机循环兜底回安卓（22:04，logdump 自动拉取）。**然而判别记录同时暴露了判别器的结构盲区**：主机在整个两轮里从未枚举成功（`0000:0002` 恒现 = UEFI/loader 相位 gadget ep0 不应答主机描述符请求；同口 ABL gadget 与安卓 USB 枚举正常 = 口/线无罪）——**无主机就没有 SET_CONFIG，未武装是"无主机"的预期正常态**；因此 18×"未武装"不能分辨"墙恒在（H1/H2）"与"主机从未到场"，**真正的阻塞已上游化为"主机可见性"（ep0 枚举路径），bulk 武装路径（Wave 21.4 的 T2/H1/H2/H3）在主机可见性恢复之前无法被行使**。下一波攻击面由此改写。
+**v0.4「达尔文」未宣告；两轮刷写预算全部用完；但探针机制按设计完整执行并留下了完整判别记录**：v17b（Boot #35）的 logdump 显示 **3 代际 × 6 拍 = 18 次探针全部应答 `0x8000000000000007`（未武装）**，两次重掷精确触发（"the pair is un-armed after generation 1/2" → 25s 安静 → start_ex 内部 StopController 重启 → 新代际），终判行 "the pair never armed across 3 generations … the session goes on over ep0 alone" 逐字到手，会话照跑（en0 @123.6s 上线、10.0.0.2/30、1 帧发出 0 收到、`loader_return_after expired` 干净返回）→ 手机循环自动回退到安卓（22:04，logdump 自动拉取）。**然而判别记录同时暴露了判别器的结构盲区**：主机在整个两轮里从未枚举成功（`0000:0002` 恒现 = UEFI/loader 相位 gadget ep0 不应答主机描述符请求；同口 ABL gadget 与安卓 USB 枚举正常 = 口/线无罪）——**无主机就没有 SET_CONFIG，未武装是"无主机"的预期正常态**；因此 18×"未武装"不能分辨"墙恒在（H1/H2）"与"主机从未到场"，**真正的阻塞已上游化为"主机可见性"（ep0 枚举路径），bulk 武装路径（阶段 21.4 的 T2/H1/H2/H3）在主机可见性恢复之前无法被行使**。下一波攻击面由此改写。
 
-## 1. 施工内容（v17 = Wave 21.4 首选修复的落地）
+## 1. 施工内容（v17 = 阶段 21.4 首选修复的落地）
 
 `patch-loader-v17.py`（`a89a627e…`）对 WSL 构建树 `~/hakios/kernel/xnuloader/loader.c`（v16b+v16c 态）施加 3 hunks（每 hunk 唯一性断言）：
 
@@ -30,7 +30,7 @@
 
 ## 3. 第 1 轮自刷（Boot #34，19:48）
 
-协调者转述"用户已开进 fastboot"时实机在安卓态（22d9:2769）→ 按标准通道从安卓发起：`adb reboot bootloader` → d00d 上总线（"Shared (forced)" 持久共享自动生效）→ `usbipd attach` → `getvar product` = **taro** ✓ → sha 复核 `505ac2b0…` ✓ → `flash boot_b`（4.8s/0.6s 全 OKAY）→ `set_active b` ✓ → `reboot` @19:48:00。
+"已进入 fastboot"的转述当时与实机状态不符（实机在安卓态（22d9:2769）→ 按标准通道从安卓发起：`adb reboot bootloader` → d00d 上总线（"Shared (forced)" 持久共享自动生效）→ `usbipd attach` → `getvar product` = **taro** ✓ → sha 复核 `505ac2b0…` ✓ → `flash boot_b`（4.8s/0.6s 全 OKAY）→ `set_active b` ✓ → `reboot` @19:48:00。
 
 ## 4. Boot #34 现场判决（logdump-v17.bin，20:45 安卓回落自动拉取）
 
@@ -38,13 +38,13 @@
 
 1. **v17 探针开火记录**（新会话头，offset 455-753）：`usb: dwc3 soft reset did not settle in one second`（v16c wake 的 1s 界退出——**v16c 时代同款打印**，logdump-v16c.bin 头部同在，非 v17 新病）→ `usb: dwc3 woken` → `twenty-five quiet seconds` → **`usb: bulk probe gen 0 beat 0: 8000000000000007`** → `a non-wall probe answer stopped the stage` → `usb: started` → 零 `try failed: start_ex`（**首试即成**）。
 2. **判别器字面量被现场纠正**：探针在未武装对上的 loader 可见应答 = **0x8000000000000007（EFI_DEVICE_ERROR）**——UsbDeviceSend 在 UsbFn 失败后把 raw 墙码（0x8000000C）包装成 7 才返回（F12 §1 的 `%r=Device Error` 行正是这一层）。v17 的 `!= 0x8000000C` 判"非墙停阶段"因此把**每一拍都会答 7 的未武装对**误判成"另一层问题"→ 阶段 beat 0 即停 → **重掷（修复本体）从未执行**。
-3. **会话完整跑通 + 手机自愈**：en0 @63.9s 上线、`en0 has 10.0.0.2/30` @64.4s、`en0 so far 1 frames sent (42 bytes), 0 received` @151.4s（内核侧网环工作；0 received = 主机从未说话）、干净 `== END OF LOG ==` @64380（**不在旧段列表** = 本次新会话）→ recycle → slot b 循环数代 → **~20:45 ABL 兜底回安卓**。**F11"冻结"假说撤销**（此前 ~1 小时的总线恒 `0000:0002` 是循环态，不是死机态）。
-4. **主机侧真相**：整个循环期 Windows 恒 `0000:0002 未知USB设备(设备描述符请求失败)`、零 d00d 窗口——**UEFI/loader 相位的 gadget ep0 不应答主机描述符请求**（同口上 ABL fastboot gadget 19:48 刷写全程可用、安卓 20:45 枚举即成 = 口/线/驱动无罪）；两轮 catch 零 serving 的直接根因即此。**主机从未到达 SET_CONFIG → T2 落槌与否在两轮里均未被行使**（en0 的 "1 frame sent" 只是内核侧入环计数，不证 USB 腿）。
+3. **会话完整跑通 + 手机自愈**：en0 @63.9s 上线、`en0 has 10.0.0.2/30` @64.4s、`en0 so far 1 frames sent (42 bytes), 0 received` @151.4s（内核侧网环工作；0 received = 主机从未说话）、干净 `== END OF LOG ==` @64380（**不在旧段列表** = 本次新会话）→ recycle → slot b 循环数代 → **~20:45 ABL 自动回退到安卓**。**F11"冻结"假说撤销**（此前 ~1 小时的总线恒 `0000:0002` 是循环态，不是死机态）。
+4. **主机侧真相**：整个循环期 Windows 恒 `0000:0002 未知USB设备(设备描述符请求失败)`、零 d00d 窗口——**UEFI/loader 相位的 gadget ep0 不应答主机描述符请求**（同口上 ABL fastboot gadget 19:48 刷写全程可用、安卓 20:45 枚举即成 = 口/线/驱动无罪）；两轮 catch 零 serving 的直接根因即此。**主机从未到达 SET_CONFIG → T2 确定与否在两轮里均未被行使**（en0 的 "1 frame sent" 只是内核侧入环计数，不证 USB 腿）。
 
-## 5. H1/H2/H3 判别器现状（移交下一轮归因）
+## 5. 判别器现状（归因留给下一轮）
 
 - 探针判别式已现场修正：**任何非零应答 = 未武装**（7 形/0xC 形/64 位/32 位一网打尽，逐拍上记录）；armed（=0）只在真武装时出现。
-- 但 ep0 不应答主机的层（= 主机连枚举都完不成）**在探针上游**——探针码只能证"bulk 未武装"，不能分辨 H1（DEPSTARTCFG/walk 翻车）/H2（speed==0）/H3（STALL），因为**三者的共同上游 = 主机 SET_CONFIG 从未到达**。下一轮归因的输入 = v17b logdump 的**逐拍探针码序列**（gen0-2 × beat0-5，若主机在某代际的 re-enumeration 后终于枚举成功，armed 出现的代际/拍位直接指示 T2 是否能落槌）。
+- 但 ep0 不应答主机的层（= 主机连枚举都完不成）**在探针上游**——探针码只能证"bulk 未武装"，不能分辨 H1（DEPSTARTCFG/walk 翻车）/H2（speed==0）/H3（STALL），因为**三者的共同上游 = 主机 SET_CONFIG 从未到达**。下一轮归因的输入 = v17b logdump 的**逐拍探针码序列**（gen0-2 × beat0-5，若主机在某代际的 re-enumeration 后终于枚举成功，armed 出现的代际/拍位直接指示 T2 是否能确定）。
 - 屏幕照片仍是 vendor 前导错误行（`DEPSTARTCFG Fails` / `Failed to set config for ep` / `Unknown USB Speed`）的唯一活通道——若未来轮次有人盯屏，任一行即一票定案。
 
 ## 6. 第 2 轮：v17b（现场修正版，Boot #35）——判别记录完整落地
@@ -71,7 +71,7 @@ usb: bulk probe gen 2 beat 0..5: 8000000000000007        ← gen 2（重掷 2）
 usb: the pair never armed across 3 generations (last …): the session goes on over ep0 alone (v16c's proven state)
 usb: started                                             ← start_ex 三代际全部首试即成（零 try failed 行）
 payload entries → kernel 会话：en0 @123.6s 上线 / 10.0.0.2/30 @124.1s / 1 帧发出 0 收到 @211.3s
---- loader_return_after expired --- → 干净 END OF LOG → 循环兜底 → 22:04 回安卓（logdump 自动拉取）
+--- loader_return_after expired --- → 干净 END OF LOG → 循环回退 → 22:04 回安卓（logdump 自动拉取）
 ```
 
 **判读（探针证据 + 结构盲区）**：
@@ -81,7 +81,7 @@ payload entries → kernel 会话：en0 @123.6s 上线 / 10.0.0.2/30 @124.1s / 1
 
 **下一波施工单（主机可见性优先）**：
 1. **泵送前移**：gadget 一上电就持续泵 handle_event（settle 窗与 kernel boot 间隙全部覆盖）——消除"主机 attach 时无人值守"的死窗；~10 行。
-2. **强制重枚举联动**：主机侧 watcher 见 `0000:0002` 恒现即请求用户拔插线（或 pnputil restart-device，管理员）——Windows 死 devnode 只在重附时刷新；
+2. **强制重枚举联动**：主机侧 watcher 见 `0000:0002` 恒现即拔插一次数据线（或 pnputil restart-device，管理员）——Windows 死 devnode 只在重附时刷新；
 3. 若 1+2 后主机仍不可见 → ep0 应答路径的 vendor 侧行为深挖（对照 v15/v16 可用世代的 boot 时序差异）；
 4. 主机可见后，探针判别器（已在 v17b 就位）直接行使 H1/H2/H3 分辨——bulk 路径的归因条件届时自动成立。
 
@@ -90,9 +90,9 @@ payload entries → kernel 会话：en0 @123.6s 上线 / 10.0.0.2/30 @124.1s / 1
 1. **🔴 探针/判别设计必须先校准"错误码穿过包装层的形态"**：F12 §1 早已记录 UsbDeviceSend 打 `%r=Device Error`（= 包装层证据），但修复设计仍按 raw 0x8000000C 写判别式——**判别器上线前应先拿一次真实失败码校准**（哪怕 1 次 boot）。
 2. **🟡 "唯一新增 vendor 调用"红线级审查保留**：v17b 已移除显式 stop()（回到全已证路径）；该原则继续有效。
 3. **🟢 总线形态学**：`0000:0002 描述符请求失败` 恒现 ≠ 死机——Boot #34 证明它可以只是"该相位 gadget ep0 不应答 + 手机在循环"。判读先看会话证据（logdump END OF LOG 是否新增），再下冻结结论。
-4. WSL /tmp 跨调用清除：常驻任务一律 agent 侧 background 承载、日志落 /mnt/c（本轮执行，早期 nohup 损失 ~18 分钟覆盖的教训沿用 Wave 20 记账）。
+4. WSL /tmp 跨调用清除：常驻任务一律 agent 侧 background 承载、日志落 /mnt/c（本轮执行，早期 nohup 损失 ~18 分钟覆盖的教训沿用 阶段 20 记账）。
 
 ## 8. 红线执行与预算
 
 - 只碰 boot_b ✓（两轮 flash 目标均仅 boot_b；userdata/darwin 未触碰；darwin 卷条目逐字节断言钉死）；禁 git reset/checkout/stash/clean ✓；Windows device-layer 只新增 ✓；git add 不 commit ✓。
-- **刷写预算 2/2 轮已用**（v17 Boot #34 + v17b Boot #35）→ 按红线本轮停止刷写，移交：①v17b 循环的 logdump 判读（拉取器常驻自动落盘 `logdump-v17b.bin` + keylines）；②若 armed 从未出现且 ep0 不应答形态持续，下一攻击面 = 主机可见性（ep0 枚举路径）而非 bulk 武装路径——Wave 21.4 的 H1/H2/H3 分辨计划改由"先让主机看到设备"子课题领路；③判定后交还：手机将随循环兜底回安卓（`set_active a` 可在下次 fastboot 窗口顺手执行）。
+- **刷写预算 2/2 轮已用**（v17 Boot #34 + v17b Boot #35）→ 按红线本轮停止刷写，后续工作：①v17b 循环的 logdump 判读（拉取器常驻自动落盘 `logdump-v17b.bin` + keylines）；②若 armed 从未出现且 ep0 不应答形态持续，下一攻击面 = 主机可见性（ep0 枚举路径）而非 bulk 武装路径——阶段 21.4 的 H1/H2/H3 分辨计划改由"先让主机看到设备"子课题领路；③判定后交还：手机将随循环自动回退到安卓（`set_active a` 可在下次 fastboot 窗口顺手执行）。

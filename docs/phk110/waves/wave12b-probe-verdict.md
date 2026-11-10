@@ -1,6 +1,6 @@
-# Wave 12b — S3910 TCM probe 判定战（Boot #18，v10b 一行修复首刷）：软件链全通，断点移到芯片电气层
+# 阶段 12b · 2026-11-03 · 触摸探针第二轮：软件链走通，问题收到芯片应答层
 
-Date: 2026-11-03. Agent: Wave 12b 执行子代理（全循环：先验 → 一行修复 → 重编 → 重打 → 自检 →
+Date: 2026-11-03. Agent: 阶段 12b 执行记录（全循环：先验 → 一行修复 → 重编 → 重打 → 自检 →
 自刷 ×2 → 自取证 → 判定）。
 任务书判定标准落位：**FAIL（TCM probe 未达）**——`s3910: TouchComm vN firmware…` 硬验收行没有打出。
 但本轮拿到的不是又一次"被阻"，而是**三层闭环证据**：
@@ -42,7 +42,7 @@ Date: 2026-11-03. Agent: Wave 12b 执行子代理（全循环：先验 → 一�
 - **历史病灶确认**：v10 自己的 `fix5-v10.py` 第 3 步曾试图替换
   `'return geni_transfer(NULL, buf, V1_MIN_READ);'`，但源码实际是
   `'if (!geni_transfer(...)) {'` 形态——`str.replace` 不匹配**静默跳过**（无断言），
-  其余 6 处替换全部命中。这解释了为什么 v10 上机后 bitbang 读方向从未被走到。
+  其余 6 处替换全部命中。这解释了为什么 v10 真机验证后 bitbang 读方向从未被走到。
 
 **判决：以"bitbang 路径端到端可达 v1_read"为前提的刷写条件成立**。调用链（修复后）：
 
@@ -80,7 +80,7 @@ hakios_s3910_init (touchscreen=1)
 
 ## 2. 刷写与取证全记录（Boot #18，两段式）
 
-**第一段（20:59–21:08）——首刷成功，循环被外部打断**：
+**第一段（20:59–21:08）——第一次刷写成功，循环被外部打断**：
 
 ```
 20:5x  adb devices → SERIAL_REDACTED device, sys.boot_completed=1（安卓在线）
@@ -90,26 +90,26 @@ hakios_s3910_init (touchscreen=1)
        sha256sum（WSL 侧）= d08e5481… ✓
        fastboot flash boot_b → Sending OKAY 4.812s / Writing OKAY 0.522s
        fastboot set_active b → OKAY；fastboot reboot → OKAY（Boot #18 启动）
-21:0x  【主代理介入】用户嫌兜底循环慢，主代理 set_active a + reboot 切回安卓（打断于 ~t=24 s，
+21:0x  【人工介入】等自动回退太慢，直接 set_active a + reboot 切回安卓（打断于 ~t=24 s，
        当轮会话未到 60 s 收尾写）；adb 21:08:43 恢复
        拉 logdump 考古：内容 = 被打断轮的流式缓冲（loader 心跳 12 条至 t=24 s，kernel size
-       e2be50 = v10b 字节已上机）+ 上一轮完整收尾写残尾（双 == END OF LOG ==）——无完整内核日志段
+       e2be50 = v10b 字节已刷入真机）+ 上一轮完整收尾写残尾（双 == END OF LOG ==）——无完整内核日志段
 ```
 
-**第二段（21:14–21:25）——干净完整循环**（主代理更正消息确认使命不变、权限完整后执行）：
+**第二段（21:14–21:25）——干净完整循环**（更正确认目标不变、权限完整后执行）：
 
 ```
 21:14  adb reboot bootloader → usbipd attach（重枚举必重 attach，busid 2-2）
        getvar product → taro ✓（boot_b 字节已验证 = v10b，同字节无重刷信息增量，故不重刷）
        fastboot set_active b → OKAY；fastboot reboot → OKAY
-       8 轮 × 60 s 兜底自然走完（无人工干预）
+       8 轮 × 60 s 回退自然走完（无人工干预）
 21:25:05 adb 恢复, sys.boot_completed=1（引导链自发回 slot a；boot_b 保留 v10b 字节）
        su dd logdump（bs=4096 count=32 = 128 KB）→ MSYS_NO_PATHCONV adb pull
        → extract-logdump.py → intel/m3-boot1/b18-kernel-log.txt（== KERNEL LOG == 6383,
          == END OF LOG == 30712, 24,345 B 完整）
 ```
 
-上机身份三重确认（loader 日志）：`payload entry 'kernel' size e2be50`（hex = 14,859,856 =
+真机验证身份三重确认（loader 日志）：`payload entry 'kernel' size e2be50`（hex = 14,859,856 =
 **v10b 构建件**）、`cmdline: 450 of 607` 全参数串逐字 = 设计值（`loader_return_after=60
 small_cores_after=0 touchscreen=1 buttons=1 …`）、ramdisk/kernel.ver 尺寸 = v6 原件。
 
@@ -179,7 +179,7 @@ votes `0x443e87c0` = as-found `0x400287c0` + QUP1_SE4(0x04000000) + CORE_2X/CORE
 
 - **v1 窗 50/50 轮无一 `0xA5`**：每轮 9 字节读的首字节都 ≠ V1_MARKER → `v1_read` 全 false
   （bitbang 正常返回 true——它只管拍线；是读回的数据无帧）；
-- **v2 兜底 CMD_IDENTIFY(0x2) 6/6 次 `STATUS_PACKET_CORRUPTED`**：`tcm_crc6` 对 4 字节头
+- **v2 回退 CMD_IDENTIFY(0x2) 6/6 次 `STATUS_PACKET_CORRUPTED`**：`tcm_crc6` 对 4 字节头
   首查即败（若 MISO 返回有效 TCM2 帧，CRC-6 应通过）→ status 0xfe 六连 → 放弃；
 - 两窗自洽 ⇒ **MISO 返回的字节流没有任何 TouchComm 结构**。0x00（钳低）、0xFF（钳高）、
   悬空噪声、极性反接、位错位（sample shift）五种情形都产生同一日志形态——**当前日志无原始
@@ -203,14 +203,14 @@ v0.3 状态：常驻 ✅ / 8 核 ✅ / 按键 ✅ / 触摸 probe ❌（阻塞点
 | --- | --- | --- | --- |
 | 1 | **bitbang 原始字节取证**：v1 窗首 3 轮 + 每第 10 轮打印读回的 9 字节 hex | `v1_read`/`chip_identify` | 一眼区分 0x00/0xFF/噪声/伪帧；这是下一步一切判断的前提 |
 | 2 | **MISO 上拉重试**：boot-arg `touch_miso_pull=1`（PULL_UP）或直接改 `bitbang_init` 配 PULL_UP 探一轮 | `bitbang_init` | as-found 的"上拉读低"暗示该板 I/O 域基线偏；no-pull 悬空采样是第一嫌疑 |
-| 3 | **RESET 极性实验**：boot-arg `touch_reset_active_high=1` 时反转 | `power_on` | 防极性反接（树里说低有效，但 cape FDT 复核 + 实验兜底） |
+| 3 | **RESET 极性实验**：boot-arg `touch_reset_active_high=1` 时反转 | `power_on` | 防极性反接（树里说低有效，但 cape FDT 复核 + 实验回退） |
 | 4 | **位拍节奏**：boot-arg `touch_bitbang_us=N`（默认 0），CLK 半周期插 N µs | `bitbang_transfer` | 当前半周期 ≈ 1 次 MMIO 写（几十 ns）；芯片若按 100 kHz 级慢速启动应答会跟不上 |
 | 5 | （若 1–4 显示恒 0x00/0xFF）**GPIO16 mux 复核**：live FDT qup4 四线 func=1 vs GPIO func=0 的 pad 环路（芯片侧 MISO 是否真连此 pad） | 文档/实验 | 引脚映射最终确认 |
 | 6 | （远期备选，不阻 v10c）GENI DMA/GSI 描述符路径 | 新增 | 引擎固件活着（0x102）且 FIFO 被禁——量产机 DMA-only 常态下 DMA 路径可能可写；工作量大，bitbang 证据优先 |
 
 ## 5. 红线自查
 
-只刷 boot_b（两次循环均 `flash boot_b`/`set_active b`，其余分区零接触；第一段后引导链与主代理
+只刷 boot_b（两次循环均 `flash boot_b`/`set_active b`，其余分区零接触；第一段后引导链与预期
 `set_active a` 均未触碰 boot_b 字节——第二段 loader 日志 kernel size e2be50 复证）；FD/BootShim
 禁重建遵守（FD 从 WSL 构建输出原样取字节 `8924cb67…`，shim `108ce972…` 原件）；loader.c 零改动
 （loader.efi `66c6b342…` 原样）；Windows device-layer 只新增（hakios-kernel-v10b.bin、
@@ -224,7 +224,7 @@ sync-drivers 入树），无 git reset/checkout/stash/clean，无 commit；失�
 | --- | --- | --- | --- |
 | **本波镜像（现刷在 boot_b，Boot #18）** | `device-layer/udon-hakios-grafted-v10b.img` | 201,326,592 B (192 MiB) | `d08e54819d60596bdfad3426f31282a2a8e36305f4d92b0121c2e376bd8ba3eb` |
 | payload v10b（仅 kernel 换 v10b，cmdline = v10 字节） | `device-layer/udon-hakios-payload-v10b.bin` | 14,944,552 B | `4cf40c41e60dd8c9818af82d1ba012f4d0ff6f09bfe4b846a803faa8ad68d846` |
-| 内核交接件 v10b（= 上机件） | `device-layer/hakios-kernel-v10b.bin` | 14,859,856 B | `e56f989ba7546822bd78ef6aed369af1775cfa130fa35ca14ad3d1b5649427da` |
+| 内核交接件 v10b（= 真机验证件） | `device-layer/hakios-kernel-v10b.bin` | 14,859,856 B | `e56f989ba7546822bd78ef6aed369af1775cfa130fa35ca14ad3d1b5649427da` |
 | 打包报告 | `device-layer/udon-hakios-grafted-v10b.report.json` | — | `d3a91f3261863ccbb13f7230b059dbe9c4fdf2eec9b126893afabec48d5938bd` |
 | 本波脚本（fix/repack/verify + 修复后源码快照） | `wave12b-scripts/{fix1-spi-xfer.py, repack-payload-v10b.py, verify-udon-hakios-v10b.py, hakios.s3910.v10b.c}` | — | 源码快照 `6fef5d80…`；只新增，未动 v7/v10/v12a 任何文件 |
 | Boot #18 logdump | `logdump-v10b.bin`（仓库根） | 131,072 B | `6ea82f1ead1f9eb71eec4de01ebbb06dfc0e080e36eae3671788ae390f93e2bd` |

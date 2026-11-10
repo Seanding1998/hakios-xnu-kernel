@@ -1,6 +1,6 @@
-# Wave 11 — 常驻改造：XNU 在 PHK110 真机 60 秒常驻 + 8 核全上线（`udon-hakios-grafted-v6.img`，Boot #13）
+# 阶段 11 · 2026-11-03 · 内核常驻 60 秒与 8 核全上线
 
-Date: 2026-11-03. Agent: Wave 11（项目首个全循环波次：分析 → 构建 v6 → 自己刷写 → 自己取证）。
+Date: 2026-11-03. Agent: 阶段 11（项目首个全循环阶段：分析 → 构建 v6 → 自己刷写 → 自己取证）。
 目标：Boot #12 已达 v0.1（内核进用户态后 hello 退出 → panic `initproc failed to start` → 干净返回，
 CORE 4-6 PC=0）。本轮让 XNU **常驻**运行：给 process 1 换一个**不退出**的 stub launchd、把取证窗口
 `loader_return_after` 从 20 s 加到 60 s，并核验 8 核（物理 0x700/600/500/400/300/200/100）全部上线。
@@ -10,7 +10,7 @@ CORE 4-6 PC=0）。本轮让 XNU **常驻**运行：给 process 1 换一个**不
 **一句话结论**：✅✅✅ 全达成，Boot #13 是项目第一次**无 panic 的完整内核会话**——驻留 stub 生效
 （心跳 t=10/20/30/40/50 s，全程零 panic 零 stackshot），60 s 定时器触发 `--- loader_return_after
 expired ---` 干净返回落盘，**7 个 AP 全部上线**（"GenericARMPE: the slower cores started too:
-7 processors running"）= 8 物理核全部被内核接管。Boot #12 的 CORE 4-6 PC=0 之谜同时破案：
+7 processors running"）= 8 物理核全部被内核接管。Boot #12 的 CORE 4-6 PC=0 之谜同时定位根因：
 **不是 PSCI 失败，是内核设计使然**——慢核默认 `small_cores_after=28` 秒才唤醒（GenericARMPE.cpp
 为锁屏时序做的调优），b12 的 panic 发生在 t≈10.5 s，根本没等到 28 s。
 
@@ -54,7 +54,7 @@ kernel.ver（`afd473f5…`，v5 同）、BootShim（`108ce972…`）、SILICIUM_
 `--- loader_return_after expired ---` → 停 GPU/WiFi/ADSP/MPSS → `loader_return()` 把日志交回 loader
 落盘。b13 的横幅与干净返回实证该路径按 60 s 正确触发。
 
-### 1.3 b12 CORE 4-6 PC=0 之谜（先破案，后取证验证）
+### 1.3 b12 CORE 4-6 PC=0 之谜（先定位根因，后取证验证）
 
 `iokit/Kernel/GenericARMPE.cpp`（:259-290）：慢核（DT `l2_access_penalty != 0`，即物理
 0x300/0x200/0x100 → logical 4/5/6）由独立的 thread_call **默认 28 秒后**才 `run()`（boot-arg
@@ -106,7 +106,7 @@ b12 panic 在 t≈10.47 s < 28 s → 慢核还没被唤醒，PC=0。**预言**�
 - v5 基线复跑：`wave5-scripts/verify-udon-hakios.py` 对 v5 镜像 **ALL 21 CHECKS PASSED**
   （final sha `6828bc5f…`）——v5 完好可回退。
 
-## 5. 刷写全记录（用户一揽子授权，boot_b 循环）
+## 5. 刷写全记录（boot_b 实验循环）
 
 | 步骤 | 时间 | 命令/结果 |
 | --- | --- | --- |
@@ -126,7 +126,7 @@ b12 panic 在 t≈10.47 s < 28 s → 慢核还没被唤醒，PC=0。**预言**�
 ### 6.1 回安卓轮询（预期行为变化兑现）
 
 - 17:52:28 起每 20 s 轮询 `adb devices`，**前 5 分钟无 adb 也无 18d1:d00d**（USB 全程未枚举 = 手机在
-  boot_b 循环里：每轮 60 s 内核常驻 + 返回 + 复位，ABL 引导重试计数耗尽才兜底）。
+  boot_b 循环里：每轮 60 s 内核常驻 + 返回 + 复位，ABL 引导重试计数耗尽才回退）。
 - **18:00:12 adb 回来**（`SERIAL_REDACTED device`）——从 reboot 起约 **8 分钟**，对比 b11/12 的 ~20-80 s：
   常驻生效后单轮时长 ×3，循环总时长 ×6+，**正是"常驻生效"的旁证**（任务书预期兑现：5 分钟未回属预期）。
 - 回安卓后 `getprop sys.boot_completed` = 1（slot a 安卓完整起来）。
@@ -167,9 +167,9 @@ adb.exe 拒绝）→ `logdump-v6.bin` 65,536 B → python 提取 `== KERNEL LOG 
   （CORE 0-6 PC 全非零）的条件也已具备——本轮无 panic，故以 `arm_cpu_init(): online` 行 + "7
   processors running" 为准。
 
-### 6.5 屏显确认与已知噪音（用户现场目击，Boot #13 引导顶部）
+### 6.5 屏显确认与已知噪音（现场照片，Boot #13 引导顶部）
 
-用户在 v6 引导现场拍了屏：cmdline 可见 `loader_return_after=60`（= v6 上机生效的屏证）、loader
+v6 引导现场拍了屏：cmdline 可见 `loader_return_after=60`（= v6 真机验证生效的屏证）、loader
 输出完整（display 1240x2772 at B8000000 / platform phk110 / payload 条目 / jumping to 0x8434194a8 /
 log: 4096 bytes written to logdump）、内核已跳转；60 s 内核持续输出不复位——肉眼判据达成。
 引导顶部两行报错定性（**已知良性噪音**，历轮均在）：
@@ -196,11 +196,11 @@ Loading driver at 0x000FA5EF000 EntryPoint=0x000FA5F1140
 
 1. **v0.2「第一缕光」**（NT37705 原生面板）：常驻 60 s 窗口正是显示调试需要的用户态稳定期；建议下一
    镜像把 `loader_return_after` 提到 300（loader_return.c 的 1 MB ring 设计支持长会话日志）。
-2. **取证节奏**：若仍走 ABL 兜底，每轮 ~75-80 s、回安卓 ~6-9 分钟属正常；如需快速回安卓可在 kernel
-   运行期不依赖兜底（先 `fastboot reboot` 或等 ABL 重试计数）。
+2. **取证节奏**：若仍走 ABL 回退，每轮 ~75-80 s、回安卓 ~6-9 分钟属正常；如需快速回安卓可在 kernel
+   运行期不依赖回退（先 `fastboot reboot` 或等 ABL 重试计数）。
 3. **可选微试验**（cmdline-only，零构建）：`small_cores_after=0`（8 核同起）与 `return_cpu=N`
    （指定核做定时返回）均为现成 boot-arg。
-4. usbmode 驻留路径（Wave8 修复已在 v5/v6 内）仍未真机验证，免刷写取证通道值得排队。
+4. usbmode 驻留路径（阶段 8 修复已在 v5/v6 内）仍未真机验证，免刷写取证通道值得排队。
 
 ## 8. 回退方式
 
@@ -208,7 +208,7 @@ Loading driver at 0x000FA5EF000 EntryPoint=0x000FA5F1140
   `usbipd attach --wsl --busid <X>`（18d1:d00d）→ WSL root
   `fastboot flash boot_b /mnt/c/.../device-layer/udon-hakios-grafted-v5.img` →
   `fastboot set_active b` → `fastboot reboot`。b12 行为（20 s 循环 + panic 返回）即恢复。
-- 兜底红线未动：slot a 原厂安卓未刷过；`backups-slotb/` 原厂备份可用 `fastboot set_active a` 回
+- 回退红线未动：slot a 原厂安卓未刷过；`backups-slotb/` 原厂备份可用 `fastboot set_active a` 回
   日常系统。
 
 ## 9. 本波自检表

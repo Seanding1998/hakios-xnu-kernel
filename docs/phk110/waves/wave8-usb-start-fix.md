@@ -1,6 +1,6 @@
-# Wave 8 — loader `usb_start()` PHK110 失败根因 + usbmode 驻留镜像 v3
+# 阶段 8 · 2026-11-03 · loader usb_start() 在 PHK110 上的失败原因
 
-Date: 2026-11-03. Agent: Wave 8 (全程未碰手机; WSL 静态分析 + 构建)。目标：修掉 Boot #9 的根因
+Date: 2026-11-03. Agent: 阶段 8 (全程未碰手机; WSL 静态分析 + 构建)。目标：修掉 Boot #9 的根因
 —— usbmode 镜像里 loader 的 `usb_start()` 在 PHK110 上失败 → 无内核可跑 → 立即复位 → slot b 引导
 循环 → ABL fallback fastboot。交付 `udon-hakios-usbmode-grafted-v3.img`。
 
@@ -12,11 +12,11 @@ Date: 2026-11-03. Agent: Wave 8 (全程未碰手机; WSL 静态分析 + 构建)�
 | loader.efi (usb_start 重试修复) | `udon-hakios-loader-usbmode-v3.efi` | 66,560 B | `9a37b99af31d15f265dd36457fa50e99c6c2ebd43d1df2cc85e1d4a799b7af13` |
 | XNUP payload (usb-mode) | `udon-hakios-payload-usbmode-v3.bin` | 66,728 B | `7f7fe8b763ec64b61553396bfa89a06514821b3cb4d71789a3ad0d72978d04da` |
 | 打包报告 | `udon-hakios-usbmode-grafted-v3.report.json` | 1,656 B | `53fa99ab0b3990531eeabc2b92dd363848dd89c1bb60dbb9e2853fe686d053f2` |
-| udon FD（**未重建**，Wave7 产品原样） | `~/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd` | 4,194,304 B | `8924cb67e349f7c188c258bde08fe90155d81a9d27ef5d0a965399ffb7a7180f` |
-| BootShim（未动，Wave5） | `udon-hakios-BootShim.bin` | 240 B | `108ce972adb82cc9c23967a1d380a27a67ef73a7c131f117561e38e261fa58ba` |
+| udon FD（**未重建**，阶段 7 产品原样） | `~/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd` | 4,194,304 B | `8924cb67e349f7c188c258bde08fe90155d81a9d27ef5d0a965399ffb7a7180f` |
+| BootShim（未动，阶段 5） | `udon-hakios-BootShim.bin` | 240 B | `108ce972adb82cc9c23967a1d380a27a67ef73a7c131f117561e38e261fa58ba` |
 
 `~/hakios/kernel` 改动：**仅 `xnuloader/loader.c` +76/−8**（`usb_start()` 一个函数；qemu/redwood/phk110
-平台条目零触碰）。与 Wave7b 的 write_logs 区（~3609-3638 行）无重叠；本 wave 构建时其改动尚未落盘
+平台条目零触碰）。与 阶段 7b 的 write_logs 区（~3609-3638 行）无重叠；本 wave 构建时其改动尚未落盘
 （`git diff --stat` = +76/−8 全部为 usb_start），两者叠加后重跑 §4 命令即可合并产出。
 
 ---
@@ -38,7 +38,7 @@ Date: 2026-11-03. Agent: Wave 8 (全程未碰手机; WSL 静态分析 + 构建)�
 | 传输缓冲 2×1 MiB | `allocate_transfer_buffer`（固件分配） | — | ✅（Boot #9 未报此错） |
 
 **任务书问题 1 的答案**：usb_start 依赖的全部"平台数据"都在固件侧（udon FD 的 vendor USB 驱动栈），
-loader 侧唯一平台相关的是选台用的 FB 基址（0xB8000000，Wave6 已核）。**问题 2**：无需逐地址核对
+loader 侧唯一平台相关的是选台用的 FB 基址（0xB8000000，阶段 6 已核）。**问题 2**：无需逐地址核对
 FDT/iomem——loader 从不直接摸 DWC3/PHY 寄存器。
 
 ## 2. Boot #9 失败时序重构（实证部分）
@@ -51,7 +51,7 @@ FDT/iomem——loader 从不直接摸 DWC3/PHY 寄存器。
    修 xBL 上由 XBL BDS 触发的 `gUsbControllerInitGuid` 事件负责这一步）。
 2. `BdsEntry`：`PlatformBootManagerBeforeConsole` → 驱动项 → **connect consoles** →
    `PlatformBootManagerAfterConsole`（`SiliciumPkg/Library/BootManagerLib/BootManager.c:129`，
-   Wave7 graft）→ **`XnuLoaderMain()` 在这里直接进 loader**。
+   阶段 7 graft）→ **`XnuLoaderMain()` 在这里直接进 loader**。
 3. 关键时序事实：stock 固件里给 USB 供电开钟的事件 `gUsbControllerInitGuid` 是由
    `DeviceBootManagerOnDemandConInConnect`（ConIn 懒连接回调，`Mu_Basecore BdsEntry.c:72`）触发的——
    **graft 抢在它之前**，所以 loader 是本次引导里**第一个**信号该事件的（loader.c 的
@@ -133,9 +133,9 @@ binding 未连接，FD 侧查 ConnectController 路径）。
 a. loader.efi   cd ~/hakios/kernel/xnuloader && PAYLOAD_BASE=0xF4000000 ./build.sh
                 （-Wall -Wextra 零警告；strings 有 "usb: try"/"retrying"/"phk110"；
                  66,560 B —— v2 的 66,048 +512）
-b. udon FD      不重建：Build/udonPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd 与 Wave7 产品
+b. udon FD      不重建：Build/udonPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd 与 阶段 7 产品
                 sha 同为 8924cb67…（融合重放 apply-wave5-fusion.py 因此整步跳过——FD 无改动，
-                Wave7 的 graft 已在该 FD 里）
+                阶段 7 的 graft 已在该 FD 里）
 c. XNUP         cd ~/hakios/kernel/xnuloader && python3 mkpayload.py \
                   -o /tmp/wave8/wave8-payload-usb.bin --usb loader.efi=$PWD/loader.efi
                 （66,728 B；entries {loader.efi 66,560 / usb "1" / kernel.ver}，无 cmdline）
@@ -150,24 +150,24 @@ d. 打包         cd /mnt/c/…/hakios-phk110 && python3 -I wave4-scripts/packag
                 kernel_gzip 1,302,741 B；container 1,310,720 B；vbmeta 2,432 B graft；192 MiB
 ```
 
-注：device-layer 里另有 Wave7b 的 `udon-hakios-{grafted-v3.img,loader-v3.efi,payload-v3.bin}`（非
+注：device-layer 里另有 阶段 7b 的 `udon-hakios-{grafted-v3.img,loader-v3.efi,payload-v3.bin}`（非
 usb、write_logs 变体，14:56 产出）——与本 wave 的 `*-usbmode-v3.*` 命名不冲突，互未覆盖。
 
 ## 6. 独立自检
 
-`wave5-scripts/verify-udon-hakios.py`：**12 PASS 后在容器条目断言处按预期停**（断言的是 Wave5 内核
-容器条目集；usb-mode 容器按设计是 `{loader.efi, usb, kernel.ver}`——与 Wave7 相同的已知偏差，按
-Wave7 方式以手动等效检查替代）。
+`wave5-scripts/verify-udon-hakios.py`：**12 PASS 后在容器条目断言处按预期停**（断言的是 阶段 5 内核
+容器条目集；usb-mode 容器按设计是 `{loader.efi, usb, kernel.ver}`——与 阶段 7 相同的已知偏差，按
+阶段 7 方式以手动等效检查替代）。
 
 手动等效 18 项（`wave8-scripts/verify-manual.sh`，全部 PASS）：report sha==img sha；header 仅
 kernel_size/ramdisk_size 改写；gzip round-trip == shim+FD+XNUP（4,261,280 B）且三件逐字节等于源；
-shim 头 0xA7100000/0x4000F0/ARMd；`_FVH` @ shim+0x28；FD 与 Wave7 构建产物逐字节同；XNUP
+shim 头 0xA7100000/0x4000F0/ARMd；`_FVH` @ shim+0x28；FD 与 阶段 7 构建产物逐字节同；XNUP
 magic/Size/条目集 {loader.efi, usb, kernel.ver}；usb=="1"；loader.efi 条目逐字节等于
 `udon-hakios-loader-usbmode-v3.efi`；cmdline 缺席；container sha == unsigned img；stock OEM vbmeta
 2,432 B graft 逐字节一致；AVBf v1.0 footer（大端，orig==voff==1,310,720，vsz==2,432）；vbmeta→
 footer 零填充；192 MiB。
 
-## 7. 刷写说明（给主代理）
+## 7. 刷写说明
 
 ```sh
 fastboot flash boot_b device-layer/udon-hakios-usbmode-grafted-v3.img
@@ -177,7 +177,7 @@ fastboot reboot
 
 **预期屏幕时间线**：
 
-1. ABL splash → udon/Silicium UEFI 画面，**无菜单**（Wave7 graft）。
+1. ABL splash → udon/Silicium UEFI 画面，**无菜单**（阶段 7 graft）。
 2. `== XNULOADER v3 ==` banner、payload 条目表、`platform phk110`、`display 1240 x 2772 at b8000000`。
 3. usb-mode 分支：
    - 顺利：`usb: started`（第一次就成）；
@@ -200,4 +200,4 @@ fastboot reboot
 1. v3 是否稳定枚举（核心验证项）：预期 `usb: started`（可能带 "(retried)"）且不复位。
 2. 若仍失败：屏上最后一次 `<code>` 的值（§3.5 判读表）+ logdump 日志。
 3. 重试上限 10 s 是否合适（若观察到 "retried" 花了 >5 s，可考虑加长；纯 loader 参数）。
-4. Wave7b write_logs 改动落盘后与本改动合并重建（§5 命令原样重跑）。
+4. 阶段 7b write_logs 改动落盘后与本改动合并重建（§5 命令原样重跑）。

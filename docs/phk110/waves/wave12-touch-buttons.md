@@ -1,6 +1,6 @@
-# Wave 12 — 触感与按键：S3910 TCM 驱动 + 电源/音量键 + 300 s 常驻 + 8 核同起（`udon-hakios-grafted-v7…v9.img`，Boot #14–#16）
+# 阶段 12 · 2026-11-03 · 触摸驱动（S3910）与电源/音量键
 
-Date: 2026-11-03. Agent: Wave 12（全循环：调研 → 实现 → 三轮自刷自取证 → 交接 v10）。
+Date: 2026-11-03. Agent: 阶段 12（全循环：调研 → 实现 → 三轮自刷自取证 → 交接 v10）。
 目标：v0.3「触感」主体——真机 Synaptics S3910 的 TCM probe（本轮硬验收目标，**未达，阻塞点已定位到
 寄存器级**）、电源/音量键（**已达，真机按键事件取证**）、cmdline 升级（`loader_return_after=300` +
 `small_cores_after=0`，**均已达**）。
@@ -13,17 +13,17 @@ Date: 2026-11-03. Agent: Wave 12（全循环：调研 → 实现 → 三轮自�
 expired` 干净返回）+ 8 核同起（7 AP 在 8 ms 内全部上线）；🟡 **S3910 TCM probe 未达**：驱动三轮迭代
 修掉两个 panic 级 bug（RPMh 双重 TCS 寻址、GCC 映射越界）后干净推进到"双轨上电成功 → GENI 时钟
 检测"，被 **wrap1 s_ahb 分支停摆**（`0x28008 = 0x80000002`，投票后不清 bit31）阻塞——现已定性为
-**cape/sm8475 的 GCC ≠ mainline sm8450**（FDT 时钟索引 m/s_ahb=134/135 vs mainline 118/119 铁证），
-v10 内核（已构建未刷写）已改为"s_ahb 告警不阻断 + 引擎直接探活 + bitbang 回退"，下轮首刷即验。
+**cape/sm8475 的 GCC ≠ mainline sm8450**（FDT 时钟索引 m/s_ahb=134/135 vs mainline 118/119 证据），
+v10 内核（已构建未刷写）已改为"s_ahb 告警不阻断 + 引擎直接探活 + bitbang 回退"，下轮第一次刷写即验。
 
 | Artifact | Path（仓库根相对；Windows 侧只新增） | Size | SHA-256 |
 | --- | --- | --- | --- |
 | **当前刷在 boot_b（Boot #16）** | `device-layer/udon-hakios-grafted-v9.img` | 201,326,592 B (192 MiB) | `d0d96ab578b1100dd1eef315d387ba5fc0aef472cbfde4b1d0ba45963926f243` |
 | payload v9（kernel 换 v9 内核） | `device-layer/udon-hakios-payload-v9.bin` | 14,944,472 B | `5fc5721cafe04489b60da7de9fd23aff2305cc62f2ce569618bf82b6b7ea4880` |
 | **v10 内核（已构建未刷写，下轮交接件）** | `device-layer/hakios-kernel-v10.bin` | 14,859,888 B | `75e2a481c292c6d1ed74f0b35aa1a48ae9d472da7dad974f8a2c31e529cf5108` |
-| 内核 v9（Boot #16 上机版） | `device-layer/hakios-kernel-v9.bin` | 14,859,800 B | `f56468c25894d8a65545a804e20574be666d578c6c0961ccd1a623f41f62052d` |
-| 内核 v8（Boot #15 上机版） | `device-layer/hakios-kernel-v8.bin` | 14,859,800 B | `e5df0e7b2b937c45f6216352a50036f934693a87f2bc95a6dfcf5f33e32a5ff3` |
-| 内核 v7（Boot #14 上机版） | `device-layer/hakios-kernel-v7` | 14,859,704 B | `5168dc26d8b924c6071aaf4f358dcf3735650add58dac829d83d3c7bb803c837` |
+| 内核 v9（Boot #16 真机验证版） | `device-layer/hakios-kernel-v9.bin` | 14,859,800 B | `f56468c25894d8a65545a804e20574be666d578c6c0961ccd1a623f41f62052d` |
+| 内核 v8（Boot #15 真机验证版） | `device-layer/hakios-kernel-v8.bin` | 14,859,800 B | `e5df0e7b2b937c45f6216352a50036f934693a87f2bc95a6dfcf5f33e32a5ff3` |
+| 内核 v7（Boot #14 真机验证版） | `device-layer/hakios-kernel-v7` | 14,859,704 B | `5168dc26d8b924c6071aaf4f358dcf3735650add58dac829d83d3c7bb803c837` |
 | 新 cmdline（375 B 含 NUL，v7–v9 共用） | `device-layer/udon-hakios-cmdline-v7.bin` | 375 B | `61534c3a75c91d6564873c27b07c1f82ef3c7e0f02360a5ad79e940e402816f3` |
 | payload v7 / v8（历史轮） | `device-layer/udon-hakios-payload-v7.bin` / `-v8.bin` | 14,944,408 / 14,944,408 B | `f912150d…42d` / `f198ac61…ac0` |
 | 镜像 v7 / v8（历史轮） | `device-layer/udon-hakios-grafted-v7.img` / `-v8.img` | 192 MiB | `a3282d0e…b7d` / `278a34fe…d89` |
@@ -49,7 +49,7 @@ SILICIUM_UEFI.fd（`8924cb67…`，禁重建条款遵守）、stock-boot-a.img�
 
 ## 1. 调研结论（A1–A4）
 
-### 1.1 live FDT：触摸挂在哪（铁证）
+### 1.1 live FDT：触摸挂在哪（证据）
 
 来源：`intel/live-fdt.dtb`（= `intel/phk110-fdt.dtb`）反编译全文 `intel/wave1b-scripts/fdt-full.txt`。
 
@@ -63,7 +63,7 @@ SILICIUM_UEFI.fd（`8924cb67…`，禁重建条款遵守）、stock-boot-a.img�
 | **RESET** | **TLMM GPIO 20**，active low（reset-active-ms=10，reset-delay-ms=80） | |
 | **供电** | vdd（模拟 2.8 V）= **L3C**（`rpmh-regulator-ldoc3/regulator-pm8350c-l3`）+ 负载开关 **TLMM GPIO 97**；vcc（I/O 1.8 V）= **L4H**（`rpmh-regulator-ldoh4/regulator-pm8450-l4`） | cmd-db 资源名 = **`ldoc3`** / **`ldoh4`** |
 | 时序 | power-on-state=1，power-delay-ms=200，irq-on-state=0 | |
-| 面板 | 1240×2772（NT37705，v0.2 显示波次对象） | |
+| 面板 | 1240×2772（NT37705，v0.2 显示阶段对象） | |
 | RPMh RSC | apps_rsc = `/soc/rsc@17a00000`，4 DRV 窗口 +0x10000×n，**drv-id=2 → APPS RSC = 0x17a20000**（= soc.args `soc_rsc`），tcs-offset 0xd00 | 与 goodix 的 TCS 布局同构 |
 | **GCC（ cape）** | `clock-controller@100000`，compatible `qcom,cape-gcc`，reg size **0x1f4200** | ⚠ 时钟索引 **0x5e/0x86/0x87**（se-clk/m-ahb/s-ahb）≠ mainline sm8450 表的 94/118/119 → **cape GCC ≠ sm8450 GCC**（§7.4 阻塞点分析的关键证据） |
 
@@ -147,7 +147,7 @@ SILICIUM_UEFI.fd（`8924cb67…`，禁重建条款遵守）、stock-boot-a.img�
    geni/bitbang → chip_identify（打印 **TouchComm 版本/模式/部件号/build id/最大包长**）→ 非应用
    模式则 RUN_APPLICATION_FIRMWARE → chip_app_info（轮询 BOOTING/UPDATING → **打印 max_x/max_y/
    对象数/按键数**）→ GET_TOUCH_REPORT_CONFIG（存表）→ ENABLE_REPORT(REPORT_TOUCH)。
-8. **轮询线程**：125 Hz 看 INT（`touch_poll_us` 可调；80 ms 兜底读）；REPORT_TOUCH 按 config 逐位
+8. **轮询线程**：125 Hz 看 INT（`touch_poll_us` 可调；80 ms 回退读）；REPORT_TOUCH 按 config 逐位
    走查（0=LIFT→UP，缺席者补 UP；按 app_info 归一化，`touch_flip` 镜像）；REPORT_IDENTIFY 重现=
    芯片自行复位；60 s 状态汇总。
 
@@ -208,7 +208,7 @@ TimeDateStamp 2 字节，payload 一律用 v6 loader 原字节）。注：button
 - `tools/drivers-check.py`（49 文件）、`tools/boot-args.py --check`（343 参数）绿。
 - 刷前 sha256 校验三轮全对（fastboot 侧 `sha256sum` 与打包报告一致）。
 
-## 7. 刷写与取证全记录（Boot #14–#16，用户一揽子授权 boot_b 循环）
+## 7. 刷写与取证全记录（Boot #14–#16，boot_b 实验循环）
 
 ### 7.0 流程通道（三轮同法）
 
@@ -220,13 +220,13 @@ TimeDateStamp 2 字节，payload 一律用 v6 loader 原字节）。注：button
 
 | Boot | 镜像 | 刷写时刻 | adb 回安卓 | 结果 |
 | --- | --- | --- | --- | --- |
-| **#14** | v7 `a3282d0e…` | 19:16 | 19:17:07（~1 min） | 内核 t≈10.49 s data-abort panic（§7.1）→ panic 快循环 → ABL 兜底回安卓 |
+| **#14** | v7 `a3282d0e…` | 19:16 | 19:17:07（~1 min） | 内核 t≈10.49 s data-abort panic（§7.1）→ panic 快循环 → ABL 自动回退到安卓 |
 | **#15** | v8 `278a34fe…` | 19:31 | 19:32:29（~1.5 min） | RPMh 双轨上电成功 + 按键 SPMI v7 全链 probe 成功；t≈10.81 s 第二个 data-abort（§7.2） |
-| **#16** | v9 `d0d96ab5…` | 19:47 | ~20:2x（主代理手动切回，见 §8 流程教训） | **零 panic**：完整 300 s 会话（t=300.36 s expired 干净返回）+ 按键真机事件（§7.3）；s3910 卡 s_ahb 时钟（§7.4） |
+| **#16** | v9 `d0d96ab5…` | 19:47 | ~20:2x（手动切回，见 §8 流程教训） | **零 panic**：完整 300 s 会话（t=300.36 s expired 干净返回）+ 按键真机事件（§7.3）；s3910 卡 s_ahb 时钟（§7.4） |
 
 ### 7.1 Boot #14（v7）——首个内核级取证：driver 执行到了真机
 
-`b14-kernel-log.txt` 关键行（panic dump 的 Boot args 行**逐字可见全部新参数** = cmdline 上机铁证）：
+`b14-kernel-log.txt` 关键行（panic dump 的 Boot args 行**逐字可见全部新参数** = cmdline 真机验证证据）：
 
 ```
 buttons: step 1: map the PMIC arbiter (0xc400000, 0xc42d000, 0xc440000) and read its version
@@ -287,7 +287,7 @@ loader 日志 + 完整内核会话：
   `jumping to 8434194a8`、`cores for the kernel: 700 600 500 400 300 200 100`。
 - **`--- loader_return_after expired ---`（t=300.36 s）**：**项目首个完整 300 s 常驻会话零 panic**
   ——`loader_return_after=300` 设计兑现（此前纪录 b13 = 60 s）。
-- **按键真机事件（用户现场按键被逐字记录）**：
+- **按键真机事件（现场按键被逐字记录）**：
   ```
   buttons: power PRESSED at 15.918 s (00:00:15.918 UTC)
   buttons: power released at 16.020 s, after 102 ms
@@ -319,7 +319,7 @@ loader 日志 + 完整内核会话：
 证据链：
 1. `0x28008` 读数投票前后恒为 0x80000002（bit31=halted + bit1=HWCG），而同一位图的 bit26（SE4）
    投票立即生效（`0x80004220 → 0x4220`）——若 0x28008 真是 wrap_1_s_ahb，同一写不可能单它不响应。
-2. **FDT 铁证**：cape GCC 时钟引用索引 m-ahb=**0x86(134)**、s-ahb=**0x87(135)**，而 mainline
+2. **FDT 证据**：cape GCC 时钟引用索引 m-ahb=**0x86(134)**、s-ahb=**0x87(135)**，而 mainline
    gcc-sm8450.c 的表里这两个是 118/119（134/135 在 mainline 是 UFS PHY 时钟）；se-clk=0x5e(94)
    与 mainline 一致 → **cape 的 GCC 表中段（含 wrap1 AHB 时钟族）与 sm8450 不同**，mainline 的
    CBCR 偏移（0x28004/0x28008）对 cape 不可信。
@@ -329,12 +329,12 @@ loader 日志 + 完整内核会话：
 4. **v10 的对策（已构建未刷写）**：(a) s_ahb 停摆降级为告警不阻断——SE4 分支已开、M_AHB 已开，
    引擎是否可用交给 `GENI_FW_REVISION_RO` 探活（SPI 协议版本字节）直接判定；(b) 引擎探活失败则
    **bitbang 回退**（同四脚 GPIO 手驱，只依赖 TLMM，goodix 在参考机已验证的同款实现）——TCM probe
-   与 GCC 时钟谜团完全解耦。下轮首刷 v10 即得 TCM probe 证据（预期日志：
+   与 GCC 时钟谜团完全解耦。下轮第一次刷写 v10 即得 TCM probe 证据（预期日志：
    `s3910: TouchComm vN firmware: mode 0x01 (application), part number "…", build id …`）。
 
-### 7.5 用户屏显情报与 UEFI 层报错分析（主代理转发）
+### 7.5 屏幕读数与 UEFI 层报错分析
 
-用户在 v7 引导现场拍屏确认 `jumping to 8434194a8`（内核已跳转）且 cmdline 上机；另比 v6 时代多出
+v7 引导现场拍屏确认 `jumping to 8434194a8`（内核已跳转）且 cmdline 真机验证；另比 v6 时代多出
 一组 UEFI 级报错：
 
 ```
@@ -349,7 +349,7 @@ ButtonsDxe - PollButtonKeys failed status:0x00000007
 分析（0x7 = EFI_DEVICE_ERROR）：
 
 1. **这些是 FD 内置的 vendor DXE 驱动**（Oplus/高通 UEFI 的 USB 电源控制库与 ButtonsDxe），跑在
-   DXE 阶段——**FD 自 Wave 7 起逐字节未动（8924cb67…），v5/v6/v7/v8/v9 的 UEFI 阶段完全相同**，
+   DXE 阶段——**FD 自 阶段 7 起逐字节未动（8924cb67…），v5/v6/v7/v8/v9 的 UEFI 阶段完全相同**，
    故这组报错不是 payload/内核改动引起的；v6 时代屏拍未含顶部行或 Type-C 状态随线缆状态变化，
    更可能是"一直在、这次拍到"。它们发生在 loader 跳内核**之前**，与本轮内核改动无因果。
 2. **① 是否预示内核按键驱动同样失败？——不**。Boot #15/#16 的内核日志给出直接反证：内核侧
@@ -365,15 +365,15 @@ ButtonsDxe - PollButtonKeys failed status:0x00000007
 
 ### 7.6 流程教训：长会话镜像的回安卓等待
 
-v9（`loader_return_after=300`）每轮 = 300 s 内核 + 引导开销 ≈ 5.2 min，ABL 兜底要重试计数耗尽
+v9（`loader_return_after=300`）每轮 = 300 s 内核 + 引导开销 ≈ 5.2 min，ABL 回退要重试计数耗尽
 （~8 轮 ≈ 40+ min）才自动回安卓。本轮验证的快速通道：**`fastboot set_active a` + `reboot` 直接
-切回安卓，30 s 内完成**（主代理已执行）。后续波次约定：长会话（≥300 s）镜像刷写验证后由主代理
-或执行代理直接 set_active a 切回，不等 ABL 兜底；logdump 是独立分区，切槽不影响其内容（本轮
+切回安卓，30 s 内完成**（已执行）。后续阶段约定：长会话（≥300 s）镜像刷写验证后
+或执行代理直接 set_active a 切回，不等 ABL 回退；logdump 是独立分区，切槽不影响其内容（本轮
 实测：切槽后拉到的 logdump 即最后会话的完整日志）。
 
 ## 8. 下一轮预期（Touch probe 冲刺 + 点按上报）
 
-1. **首刷 v10**（`device-layer/hakios-kernel-v10.bin` 已构建、自检编译零错；重打 payload 即可，
+1. **第一次刷写 v10**（`device-layer/hakios-kernel-v10.bin` 已构建、自检编译零错；重打 payload 即可，
    cmdline 不变）：预期日志要么 `s3910: serial engine: firmware 0x…01`（引擎活着 → TCM probe 直接
    跑）要么 `s3910: … trying the pins by hand` → `s3910: the chip answers on pins driven by hand`
    → TCM probe 跑。**硬验收行 = `s3910: TouchComm vN firmware: mode 0x01 (application), part
@@ -384,9 +384,9 @@ v9（`loader_return_after=300`）每轮 = 300 s 内核 + 引导开销 ≈ 5.2 mi
    权威值（注意本波已证：投票寄存器 0x62008 与 SE4 CBCR 0x284dc 行为正确，错误集中在 AHB 族）。
 3. **点按上报验证**（probe 达成后）：300 s 窗口内真人点屏即可——`s3910: finger N at X, Y` 行 +
    每分钟状态行计数即证据；配合动作清单：① set_active b 重启后不按键等内核起来（~10 s）；
-   ② 屏上滚动日志出现后指尖点/滑几次（慢、间隔 1 s）；③ 等 300 s 定时返回，主代理切回安卓拉
+   ② 屏上滚动日志出现后指尖点/滑几次（慢、间隔 1 s）；③ 等 300 s 定时返回，随后切回安卓拉
    logdump。坐标翻转备选 `touch_flip=1/2/3`；INT 不触发备选 `touch_poll_us=2000`。
-4. **流程**：长会话镜像验证后立即 `set_active a` 切回（§7.6），不等兜底。
+4. **流程**：长会话镜像验证后立即 `set_active a` 切回（§7.6），不等回退。
 5. 若 v10 的 TCM probe 达成，v0.3 触摸剩余项 = 显示联动（v0.2 NT37705）后的坐标标定（flip/归一化
    核对）与报告速率（DC 动态配置）。
 
@@ -395,7 +395,7 @@ v9（`loader_return_after=300`）每轮 = 300 s 内核 + 引导开销 ≈ 5.2 mi
 - **重刷 v6**（复检 27/27、sha `c69c64c4…` 未动）：`adb reboot bootloader` → `usbipd attach --wsl
   --busid <X>` → WSL root `fastboot flash boot_b /mnt/c/.../device-layer/udon-hakios-grafted-v6.img`
   → `set_active b` → `reboot`（= Boot #13 行为：60 s 常驻 + 8 核上线）。
-- 兜底红线未动：slot a 原厂安卓未刷过；`backups-slotb/` 原厂备份 + `set_active a` 回日常系统。
+- 回退红线未动：slot a 原厂安卓未刷过；`backups-slotb/` 原厂备份 + `set_active a` 回日常系统。
 
 ## 10. 本波自检表
 

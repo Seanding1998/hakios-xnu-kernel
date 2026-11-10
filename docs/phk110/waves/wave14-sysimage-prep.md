@@ -1,6 +1,6 @@
-# Wave 14 报告：v0.4 用户空间前置 —— 20F66 IPSW 解包、盘点、就绪化
+# 阶段 14 · 2026-11-03 · 用户空间准备：iOS 16.5（20F66）镜像解包与盘点
 
-> 2026-11-03 · 纯 WSL 工作（零手机交互、零刷写）· 执行子代理产出
+> 2026-11-03 · 纯 WSL 工作（零手机交互、零刷写）· 执行记录产出
 > 输入：`~/hakios/ipsw/iPhone10,3,iPhone10,6_16.5_20F66_Restore.ipsw`（6,165,698,198 B，sha256 `c1091c40…` 已验证，只读未动）
 > 产物根：**`~/hakios/sysimage-20F66/`**（WSL，kernel 树外新目录，`~/hakios/kernel` 全程只读未写）
 
@@ -10,12 +10,12 @@
 
 | 项 | 结论 |
 |---|---|
-| 磁盘 | 解包前 930G 可用 → 解包后 917G 可用（本波次净耗 ~13G），**充足** |
+| 磁盘 | 解包前 930G 可用 → 解包后 917G 可用（本阶段净耗 ~13G），**充足** |
 | 解包 | upstream `sysimage/unpack.sh` 链 **EXIT=0 跑通**，产物齐全且通过脚本内建校验（43 文件 dyld cache 完整、零残留 decmpfs 压缩、App cryptex 完整性哨兵 `webbookmarksd` 在位）|
 | 切片 | **抽查全部 arm64（cputype 0x0100000C / subtype 0），零 arm64e** ✅ |
 | sshd | iOS 系统镜像**确认无** sshd/dropbear/launchctl/sh/ls/reboot —— upstream 解法 = **Procursus rootless bootstrap（openssh-server）+ `rc.jobs.ssh`**，明确记录 |
 | HFS+ | v0.4 data volume 命令链已实测跑通（12GB 模板已建好），且 **fork 的 `userland/src/init.c` 已内建 `var_hfs=DEV` 挂载支持** |
-| QEMU 对照 | 按红线跳过（全链会写 kernel 树产物，Wave12a 并行中）；以 unpack 内建校验 + HFS+ 实物模板替代自洽验证 |
+| QEMU 对照 | 按红线跳过（全链会写 kernel 树产物，阶段 12a 并行中）；以 unpack 内建校验 + HFS+ 实物模板替代自洽验证 |
 
 ---
 
@@ -37,8 +37,8 @@ WSL /（/dev/sdd，ext4 虚拟盘）: 1007G 总量
 | 7-Zip 25.01 | ✅ 现成 | 读 APFS 卷并解出 rootfs/cryptex（需 ≥23，已满足）|
 | gcc (cc) 16.0.1 | ✅ 现成 | 未用到（unzbm 已有预编译产物）|
 | **unzbm** | ✅ 复用 `kernel/xnu-deps/host/bin/unzbm`（只读引用） | 解 7z 留下的 LZBITMAP（com.apple.decmpfs）文件 |
-| **hfsplus-tools 540.1** | ✅ **本波次新装**（`dnf install hfsplus-tools`，走 127.0.0.1:7897 代理）| `mkfs.hfsplus` 建 HFS+ data volume |
-| lz4 1.10.0 | ✅ 本波次新装 | upstream qemu 文档列的依赖（后续波次用）|
+| **hfsplus-tools 540.1** | ✅ **本阶段新装**（`dnf install hfsplus-tools`，走 127.0.0.1:7897 代理）| `mkfs.hfsplus` 建 HFS+ data volume |
+| lz4 1.10.0 | ✅ 本阶段新装 | upstream qemu 文档列的依赖（后续阶段用）|
 | qemu-system-aarch64 | ✅ 现成 | 对照实验备用（未跑，见 §8）|
 
 ## 3. 解包命令链（含踩坑记录）
@@ -58,7 +58,7 @@ WSL /（/dev/sdd，ext4 虚拟盘）: 1007G 总量
 
 ### 3.2 独立运行布局（红线适配）
 
-脚本设计为在 `kernel/sysimage/` 内运行并向 `../xnu-deps`、`../tools` 写/读。为不污染 kernel 树（Wave12a 并行构建中），复制脚本到新目录、symlink 只读依赖到上一级：
+脚本设计为在 `kernel/sysimage/` 内运行并向 `../xnu-deps`、`../tools` 写/读。为不污染 kernel 树（阶段 12a 并行构建中），复制脚本到新目录、symlink 只读依赖到上一级：
 
 ```
 ~/hakios/sysimage-20F66/
@@ -68,7 +68,7 @@ WSL /（/dev/sdd，ext4 虚拟盘）: 1007G 总量
 ├── xnu-deps -> ~/hakios/kernel/xnu-deps    # symlink：../xnu-deps/host/bin/unzbm 只读解析
 ├── tools -> ~/hakios/kernel/tools          # symlink：../tools/font_trim.py 只读执行
 ├── var-hfs-data.img           # v0.4 HFS+ data volume 模板（12G sparse，实际占 36M）
-└── WAVE14-NOTES.md            # 本波次运行记录
+└── WAVE14-NOTES.md            # 本阶段运行记录
 ```
 
 **踩坑（已修复）**：首次运行失败——symlink 建在了 `work/` 里，而脚本引用 `../xnu-deps`（相对脚本所在目录的**上一级**）；`[ ! -x ../xnu-deps/host/bin/unzbm ]` 为真触发重编译，`cc` 在 `sysimage-20F66/xnu-deps/` 下误建目录树。修复 = symlink 移到上级 + `rm -rf` 误建目录 + 重跑 EXIT=0。kernel 树未被写入（`ls -la` 事后核验 `xnu-deps/` 全部文件时间戳仍为 Nov 2）。
@@ -95,9 +95,9 @@ KEEP=1 bash unpack.sh ~/hakios/ipsw/iPhone10,3,iPhone10,6_16.5_20F66_Restore.ips
 | cryptex-os dmg | `work/cryptex-os.dmg` | 2.6G | KEEP=1 保留（改 select-system 后免重读 IPSW） |
 | rootfs dmg | `work/rootfs.dmg` | 4.5G | 同上 |
 | 设备树 | `work/DeviceTree.d22ap.im4p` | 33,694 B | d22ap = iPhone10,3（iPhone X），供 `xnuloader/mkidentity.sh` |
-| **BuildManifest** | `work/BuildManifest.plist` | 449,650 B | 本波次从 IPSW 补抽（元数据记录用） |
-| **trust cache ×3** | `work/096-*.dmg.trustcache` | 66,265 / 1,511 / 767 B | 分别对应 rootfs / OS cryptex / App cryptex 三卷的 CDHash 列表，本波次从 IPSW `Firmware/` 补抽 |
-| **HFS+ data volume 模板** | `~/hakios/sysimage-20F66/var-hfs-data.img` | 12G sparse（实占 36M） | `mkfs.hfsplus -s -J -U 0 -G 0 -M 755 -v Data`，8192k journal——UFS/挂载波次可直接拿去灌 var.skel |
+| **BuildManifest** | `work/BuildManifest.plist` | 449,650 B | 本阶段从 IPSW 补抽（元数据记录用） |
+| **trust cache ×3** | `work/096-*.dmg.trustcache` | 66,265 / 1,511 / 767 B | 分别对应 rootfs / OS cryptex / App cryptex 三卷的 CDHash 列表，本阶段从 IPSW `Firmware/` 补抽 |
+| **HFS+ data volume 模板** | `~/hakios/sysimage-20F66/var-hfs-data.img` | 12G sparse（实占 36M） | `mkfs.hfsplus -s -J -U 0 -G 0 -M 755 -v Data`，8192k journal——UFS/挂载阶段可直接拿去灌 var.skel |
 
 ### 4.1 Mach-O 切片核查（magic + cputype/cpusubtype 逐文件读）
 
@@ -136,25 +136,25 @@ KEEP=1 bash unpack.sh ~/hakios/ipsw/iPhone10,3,iPhone10,6_16.5_20F66_Restore.ips
 
 ### 5.2 upstream 的 Sileo/Procursus 生态（CHANGELOG 情报的落实）
 
-`docs/ru/notes.md` §"Sileo и пакеты"（683-779 行）：upstream 实机已跑通 Sileo 2.5.1 + dpkg + apt（rootless 前缀 `/var/jb`），含 setuid 位还原清单（login/su/sudo/passwd/chpass/newgrp/quota + Sileo 的 giveMeRoot 4755）、sileolists 目录、`/bin` 五链接等嫁接细节全部在 `init.c` 与 `mk-jb.sh`。**对本项目的意义：SSH shell 不需要自己编译任何东西，`mk-jb.sh` + `rc.jobs.ssh` 是现成链**。注意 `mk-jb.sh` 需要网络（走 7897 代理）+ `zstd`（WSL 需确认，构建波次装）。
+`docs/ru/notes.md` §"Sileo и пакеты"（683-779 行）：upstream 实机已跑通 Sileo 2.5.1 + dpkg + apt（rootless 前缀 `/var/jb`），含 setuid 位还原清单（login/su/sudo/passwd/chpass/newgrp/quota + Sileo 的 giveMeRoot 4755）、sileolists 目录、`/bin` 五链接等嫁接细节全部在 `init.c` 与 `mk-jb.sh`。**对本项目的意义：SSH shell 不需要自己编译任何东西，`mk-jb.sh` + `rc.jobs.ssh` 是现成链**。注意 `mk-jb.sh` 需要网络（走 7897 代理）+ `zstd`（WSL 需确认，构建阶段装）。
 
-## 6. v0.4 接线清单（后续波次拿来即用）
+## 6. v0.4 接线清单（后续阶段拿来即用）
 
 ### 直接可用（零改动）
 1. **launchd**：`work/rootfs/sbin/launchd`（arm64）→ build.sh 链自动改名 `/sbin/launchd.darwin` 并以 stage0 引导
 2. **dyld shared cache**：`work/20F66__iPhone10,3_6/`（43 文件）→ build.sh 原样放进 system image
-3. **rootfs 全树 + manifest**：`work/rootfs/` + `work/system.manifest` → `userland/build.sh` 直接消费（它 cd 到 kernel 树内运行；产物落 kernel/userland/——**运行时机由后续波次与 Wave12a 协调，勿并行跑**）
+3. **rootfs 全树 + manifest**：`work/rootfs/` + `work/system.manifest` → `userland/build.sh` 直接消费（它 cd 到 kernel 树内运行；产物落 kernel/userland/——**运行时机由后续阶段与 阶段 12a 协调，勿并行跑**）
 4. **App cryptex dmg**：`work/cryptex-app.dmg` 原样内存驻留路径（FLASHBOOT=1）
 5. **HFS+ data volume**：`~/hakios/sysimage-20F66/var-hfs-data.img`（12G 已格式化）或自建（§6.1）；内容种子 = `work/var.skel`（112 行，init 语义）
 6. **DeviceTree**：`work/DeviceTree.d22ap.im4p` → `xnuloader/mkidentity.sh`
 
 ### 缺、需构建/取数
-1. **sshd**：跑 `tools/mk-jb.sh`（网络+zstd）生成 `jb/` 前缀 → build.sh JB=1 镜像；**或**单取 openssh-server 包最小化灌入 /var（后续 SSH 波次决策）
+1. **sshd**：跑 `tools/mk-jb.sh`（网络+zstd）生成 `jb/` 前缀 → build.sh JB=1 镜像；**或**单取 openssh-server 包最小化灌入 /var（后续 SSH 阶段决策）
 2. **host key**：主机侧 `ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N ''` 随镜像走（rc.jobs.ssh 硬编码路径）
-3. **PHK110 侧缺口**（非本波次）：UFS transport、SMMU/DMA、`ufs_darwin_data` 分区定位（init.c `var_hfs=DEV` 期待 `/dev/ufs_darwin_data` 节点 = darwin 卷 + cryptex 之后的分区）
+3. **PHK110 侧缺口**（非本阶段）：UFS transport、SMMU/DMA、`ufs_darwin_data` 分区定位（init.c `var_hfs=DEV` 期待 `/dev/ufs_darwin_data` 节点 = darwin 卷 + cryptex 之后的分区）
 
 ### 需要构建的工具（命令已验证）
-**v0.4 12GB HFS+ data volume 创建**（本波次实测）：
+**v0.4 12GB HFS+ data volume 创建**（本阶段实测）：
 ```bash
 dnf install -y hfsplus-tools          # 已装（540.1）
 truncate -s 12G var-hfs-data.img
@@ -172,7 +172,7 @@ mkfs.hfsplus -s -J -U 0 -G 0 -M 755 -v Data var-hfs-data.img
 
 ## 7. QEMU 对照实验：跳过说明（可选加分项未取）
 
-`docs/getting-started/qemu.md` 的 M1 验收链 = `REST=1 userland/build.sh` → `make loader` → `qemu/run-darwin.sh`（x86 TCG 约 20 分钟/会话）。**跳过原因**：①`build.sh`/`make loader` 均在 kernel 树内产出镜像/loader.efi，与 Wave12a 并行构建冲突（红线：kernel 树只读）；②需要完整 edk2/Mu 构建链与 7GB 客户机内存。**替代的自洽验证已完成**：unpack.sh EXIT=0 + 三段内建校验（dyld cache 43 文件计数、decmpfs 零残留、App cryptex 哨兵文件）+ §4.1 切片核查 + §6 HFS+ 实物模板。WSL 已具备 qemu-system-aarch64，后续波次跑全链无工具障碍。
+`docs/getting-started/qemu.md` 的 M1 验收链 = `REST=1 userland/build.sh` → `make loader` → `qemu/run-darwin.sh`（x86 TCG 约 20 分钟/会话）。**跳过原因**：①`build.sh`/`make loader` 均在 kernel 树内产出镜像/loader.efi，与 阶段 12a 并行构建冲突（红线：kernel 树只读）；②需要完整 edk2/Mu 构建链与 7GB 客户机内存。**替代的自洽验证已完成**：unpack.sh EXIT=0 + 三段内建校验（dyld cache 43 文件计数、decmpfs 零残留、App cryptex 哨兵文件）+ §4.1 切片核查 + §6 HFS+ 实物模板。WSL 已具备 qemu-system-aarch64，后续阶段跑全链无工具障碍。
 
 ## 8. 磁盘占用账目
 

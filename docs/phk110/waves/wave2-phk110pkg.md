@@ -1,4 +1,4 @@
-# Wave2 报告：phk110Pkg（UEFI 平台包）文件构造
+# 阶段 2 · 2026-11-02 · UEFI 平台包的文件构造
 
 实现代理 D · 2026-11-02 · 按规格书 `docs/waves/wave1-phk110pkg-spec.md` §9 顺序机械执行。
 模板 = 上游 `Platforms/Xiaomi/ingresPkg`（Mu-Silicium BASE e51cd87，HEAD 6b3d90b），内存数据 = `docs/waves/wave1-socargs.md` + `intel/fdt-reserved-dump.txt` + `intel/iomem-full.txt`（FDT 全文反编译复核过）。
@@ -105,7 +105,7 @@ MemoryInitPeiLib 只给**表内**行建资源 HOB —— 不列高 bank，DXE �
 
 ---
 
-## 5. 给 Wave3 集成者的占位符/待验证清单
+## 5. 给 阶段 3 集成者的占位符/待验证清单
 
 ### 已定稿常量（改任何一处都要三处同步：MemoryMapLib.c / XnuLoader.h / BootShim.S 缺省 + mkxnuimg 变体）
 

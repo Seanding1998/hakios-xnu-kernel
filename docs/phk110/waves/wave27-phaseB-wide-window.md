@@ -1,7 +1,7 @@
-# Wave 27 — Phase B 宽窗 SSH 续战（零刷写）
+# 阶段 27 · 2026-11-10 · 宽窗 SSH 验证：三条独立会话全部通过
 
-> 2026-11-10 00:50 → 06:20（收官：**v0.4 SSH 门 PASS**）· Wave 27 执行子代理
-> 任务书：v23 长会话（1800s）宽窗内捕获 WAVE21-SSH-OK；零刷写；接管 Wave 26 未竟工作
+> 2026-11-10 00:50 → 06:20（完成：**v0.4 SSH 门 PASS**）· 阶段 27 执行记录
+> 任务书：v23 长会话（1800s）宽窗内捕获 WAVE21-SSH-OK；零刷写；接管 阶段 26 未竟工作
 > 红线执行：零刷写 ✓（全程无 fastboot write）；loader 相位禁 usbipd attach ✓（单一 Windows-libusb 所有者）；PID 精确 kill ✓（每次 taskkill 均按 PID，见日志）；boot_b 只读 ✓；进程树清杀仅限本波自启的 ssh/proxy 树
 
 ## 0. 判定（终局 → 详见 §7）
@@ -16,7 +16,7 @@
 - KEX 完成 → NEWKEYS → userauth 消息交换（SSH-REACHED ×9 连发）
 - 唯一剩余失败 = 主机侧私钥文件 ACL（见 §3.3）
 
-## 1. 移交清理（前任 Wave 26 遗留）
+## 1. 起点清理（阶段 26 遗留）
 
 1. `wave26-scripts/timed-ssh-v26.py` 语法坏死（`return` 后死代码含循环外 `break`）——已修复（回归第 8 项恢复）。
 2. **孤儿 arming hunter（PID 76156，wave26 遗留进程）**：占住 libusb context 令所有 open 得 LIBUSB_ERROR_ACCESS，总线上呈"死 devnode"形态 1 小时+；01:10 按 PID 精确 kill 后节点立即恢复可开。**教训：wave26 式"持续 probe"主机进程退场时必须随 wave 清杀；其 context 会拒绝其他 opener。**
@@ -93,11 +93,11 @@ Win32-OpenSSH 拒载 `id_ed25519_phk110`（"bad permissions"——ACL 过宽，�
 | 内容校验传输 | ✓ | 262144 B 随机字节经 stdin→`wc -c`，phone 端 `count=262144 want=262144`，rc=0 |
 | 客户端正常退出后管理通道 | ✓ | 三连接干净退出（FIN/ACK 交换在 trace）后 drain+getvar = `OKAY (alive)` |
 | stdout/stderr/设备代际/脚本身份归档 | ✓ | verdict + `tssh27-20261110-060630-*.{out,err}` + run-id + boot_b=v23 graft 9e0609fb 绑定 |
-| 桌面运行期连接推进 | ✓（待用户侧屏证归档） | 连接发生在桌面会话运行期内（用户实时观察通道在证会话形态） |
+| 桌面运行期连接推进 | ✓（待屏证归档） | 连接发生在桌面会话运行期内（实时观察通道在证会话形态） |
 
 首 HIT（04:58:45，run 050010，`verdict27-20261110-050010.txt`）：conn1 单连接过最小门（Darwin/root/marker/rc=0），conn2 起被会话尾环残留+保存窗打断——两个"附加验收未竟"根因（getvar 误读排队内核帧；保存窗不可抗）已定位并修复（open_fresh_session 先 flush-upload；保存窗纯等待，reset 只用于死局）。次周期（06:17）全栈复跑即完整过门。
 
-## 8. 波次预算与移交
+## 8. 阶段额度与后续工作
 
 - 刷写预算：**0/3**（零刷写红线全程成立；march 只做 reboot，无 flash）
 - 主机侧修复件：tunnel25w（推序/清洁退出/MSS=160/宽限重试/自限期）、timed-ssh-v27（相位占空比/六分支/验收包）、timed-ssh-v26 语法修复、私钥 ACL

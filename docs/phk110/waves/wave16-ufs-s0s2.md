@@ -1,7 +1,7 @@
-# Wave 16 报告：v0.4 第一战 —— UFS 存储栈 S0-S2 只读验证（Boot #22，零行代码改动）
+# 阶段 16 · 2026-11-04 · UFS 存储栈只读枚举一次点亮
 
-> 2026-11-04 · 执行子代理产出 · 输入 = Wave15 施工单（docs/waves/wave15-ufs-research.md §4）+ fork 树（config/cmdline 叠加，禁重置）+ Boot #21 v10e 现场
-> 结论先行：**S0 ✅ / S1 ☑（注明）/ S2 ✅（附一项良性发现）——UFS 存储栈一次点亮**。内核/loader **零行代码改动**（只动 config 2 行 + cmdline 追加 6 字节），`ufs=2` 上机即出 S0 验收行：**129 个分区以 /dev/ufs_NAME + /dev/rufs_NAME 发布、loader 页 0xfaa41000、4096 KB buffer**；6 个 UFS LUN GPT 头/表 CRC 全过；darwin 缺席符合预期（P0 未做）；零 panic、60 s 干净返回、v0.3 全部回归项无损。
+> 2026-11-04 · 执行记录产出 · 输入 = 阶段 15 施工单（docs/waves/wave15-ufs-research.md §4）+ fork 树（config/cmdline 叠加，禁重置）+ Boot #21 v10e 现场
+> 结论先行：**S0 ✅ / S1 ☑（注明）/ S2 ✅（附一项良性发现）——UFS 存储栈一次点亮**。内核/loader **零行代码改动**（只动 config 2 行 + cmdline 追加 6 字节），`ufs=2` 真机验证即出 S0 验收行：**129 个分区以 /dev/ufs_NAME + /dev/rufs_NAME 发布、loader 页 0xfaa41000、4096 KB buffer**；6 个 UFS LUN GPT 头/表 CRC 全过；darwin 缺席符合预期（P0 未做）；零 panic、60 s 干净返回、v0.3 全部回归项无损。
 
 ---
 
@@ -9,16 +9,16 @@
 
 | 项 | 结果 |
 |---|---|
-| 施工量 | config 2 行（`phk110.config:38` → `CONFIG_HAKIOS_UFS=y`；`common_defconfig:277` → `CONFIG_UFS_NATIVE=y`）+ cmdline 追加 ` ufs=2`（374→380 B）——**代码 0 行**，Wave15 预判兑现 |
+| 施工量 | config 2 行（`phk110.config:38` → `CONFIG_HAKIOS_UFS=y`；`common_defconfig:277` → `CONFIG_UFS_NATIVE=y`）+ cmdline 追加 ` ufs=2`（374→380 B）——**代码 0 行**，阶段 15 预判兑现 |
 | 内核 | v11 增量重编（14,860,288 → 14,920,640 B，+60,352 B = hakios.ufs.c + ufshc.c 编入；sha `a7f4641f…`） |
 | 镜像 | `udon-hakios-grafted-v11.img`（192 MiB，sha `f97b5e6e…`），verify **42/42 全绿**（fd/shim/loader.efi/ramdisk/kernel.ver 全部 cmp 断言未动） |
 | 刷写 | 标准通道一次通过：adb → bootloader（busid 2-2, 18d1:d00d）→ usbipd attach → WSL root fastboot：getvar `taro` ✓ → sha 对包 ✓ → flash boot_b（Sending 4.9 s / Writing 0.6 s 全 OKAY）→ set_active b → reboot |
-| 回安卓 | ~12 min 8 轮兜底自发回（60 s × 8 循环，与 v10e 家族行为一致） |
+| 回安卓 | ~12 min 8 轮回退自发回（60 s × 8 循环，与 v10e 家族行为一致） |
 | 判定 | **S0 ✅ / S1 ☑（sysctl 不可读，已注明）/ S2 ✅（附发现 F1）；无新 panic；R4 解除；R1 本轮未被行使（无数据读）** |
 
 ---
 
-## 1. 施工记录（照 Wave15 §4 S0 单）
+## 1. 施工记录（照 阶段 15 §4 S0 单）
 
 ### 1.1 config 开关（2 行）
 
@@ -31,8 +31,8 @@ configs/common_defconfig:277              # CONFIG_UFS_NATIVE is not set  →  C
 
 ### 1.2 构建（增量）
 
-- `make kernel`（tools/make-kernel.sh 判定通过：只有 kext symbol-set 步骤失败，与 Wave2 以来的配置性 exit 2 同款）。
-- **插曲（构建环境，非代码）**：首轮失败 `hakios.s3910.o: Operation not permitted` —— Wave12c 曾以 root 构建，BUILD/obj 下 8 个产物 root 拥有。`chown -R <host>` 修复后重跑即过。产物 `hakios-kernel` 14,920,640 B（+60,352 B = UFS 驱动体积），UFS 日志串（`ufs: no node for` / `partitions of the phone` / `ufs_requests` / `native:`）全部在链接产物内。
+- `make kernel`（tools/make-kernel.sh 判定通过：只有 kext symbol-set 步骤失败，与 阶段 2 以来的配置性 exit 2 同款）。
+- **插曲（构建环境，非代码）**：首轮失败 `hakios.s3910.o: Operation not permitted` —— 阶段 12c 曾以 root 构建，BUILD/obj 下 8 个产物 root 拥有。`chown -R <host>` 修复后重跑即过。产物 `hakios-kernel` 14,920,640 B（+60,352 B = UFS 驱动体积），UFS 日志串（`ufs: no node for` / `partitions of the phone` / `ufs_requests` / `native:`）全部在链接产物内。
 
 ### 1.3 cmdline（6 字节）
 
@@ -46,7 +46,7 @@ configs/common_defconfig:277              # CONFIG_UFS_NATIVE is not set  →  C
 
 ---
 
-## 2. 判定（Wave15 §4 验收行逐字对）
+## 2. 判定（阶段 15 §4 验收行逐字对）
 
 ### S0 ✅ UFS init + 枚举
 
@@ -56,7 +56,7 @@ configs/common_defconfig:277              # CONFIG_UFS_NATIVE is not set  →  C
 [   37.087004]: ufs: 129 partitions of the phone's storage as /dev/ufs_NAME and /dev/rufs_NAME, read only, through the loader's page at faa41000 and its 4096 KB buffer
 ```
 
-- 与 Wave15 §S0 预测行逐字吻合（ufs.c:1759）。**N = 129**（devfs 节点数；表内共 133 项，4 项因同名被 devfs 拒绝，见 F1）。
+- 与 阶段 15 §S0 预测行逐字吻合（ufs.c:1759）。**N = 129**（devfs 节点数；表内共 133 项，4 项因同名被 devfs 拒绝，见 F1）。
 - loader 侧 6 个 LUN（unit 0-5）全部枚举且 GPT 校验通过（logdump loader 段）：
   - `ufs: unit 0: … 61514752 blocks of 4096 (240292 MB)` + `GPT header crc right (e6d54133), table of 32 entries crc right (98d6498e)`
   - unit 1/2: 8 MB、unit 3: 32 MB、**unit 4: 3144 MB、table of 96 entries**、unit 5: 572 MB——六个 LUN 的 header/table CRC 全部 `crc right`。
@@ -68,7 +68,7 @@ configs/common_defconfig:277              # CONFIG_UFS_NATIVE is not set  →  C
 
 - `kern.hakios.ufs_requests` **sysctl 不可读**：loader 返回时的 sysctl dump 只含固定集（soc_name/soc_id/pmic_peripherals/thermal_*），无 ufs 键；本轮无用户态 shell、未开 `ufs_check=1`，无任何 /dev/ufs_* 读者 → 无块数据请求发生，计数保持 0 是设计内行为。
 - **mailbox 页交付成功的间接证据（S0 行本身）**：loader 页 0xfaa41000 + 4096 KB buffer 的 parts 表被内核完整解析出 133 项（名字/LBA/块大小全部 sane 且与 survey 交叉一致）——mailbox 共享内存路径（loader 写 → 内核映射读）端到端工作。
-- 数据对拍（FNV/ufs_check）移交 S3 附带行使；R1（DALSYSDxe coherence）本轮**未被行使**——mailbox 页是 loader CPU 写（非 UFSDxe DMA 窗），F1 的 129 项元数据正确不构成 R1 证据。
+- 数据对拍（FNV/ufs_check）留给 S3 附带行使；R1（DALSYSDxe coherence）本轮**未被行使**——mailbox 页是 loader CPU 写（非 UFSDxe DMA 窗），F1 的 129 项元数据正确不构成 R1 证据。
 
 ### S2 ✅ GPT 可见性（附发现 F1）
 
@@ -90,7 +90,7 @@ configs/common_defconfig:277              # CONFIG_UFS_NATIVE is not set  →  C
 
 | # | 观察 | 本轮证据 | 对 S3+ 的含义 |
 |---|---|---|---|
-| R1 | DALSYSDxe coherence 嫌疑 | **未被行使**：本轮 mailbox 页为 loader CPU 写/内核映射读（UFSDxe DMA 不经手），133 项元数据全对。FNV 对拍（ufs_check=1）或首个数据卷读才会真正行使。**主代理补情报（2026-11-04，源头 wave1-phk110pkg-spec.md:102/:326）**：redwood Binaries README 把 "DALSYSDxe UFS cache coherence" 列为 5 个必需二进制补丁之一；**我们 udon FD 里的 DALSYSDxe 是 senna_bc 原厂原版（Wave 4 填充，无此 patch）**——logdump 自身 DMA 一直正常，但 S3 起的块数据读会把 UFSDxe DMA 写进 4096 KB 共享 buffer（payload 窗口新布局），正是该 patch 针对的场景 | S3 首刷带 `ufs_check=1`（cmdline 余 228 字符）一次定位；**若 FNV 对拍不一致 → 第一嫌疑坐实**，处理路径 = 对照 redwood Binaries README 给 udon DALSYSDxe 打同款 patch（graft 流程加一步，FD sha 将变） |
+| R1 | DALSYSDxe coherence 嫌疑 | **未被行使**：本轮 mailbox 页为 loader CPU 写/内核映射读（UFSDxe DMA 不经手），133 项元数据全对。FNV 对拍（ufs_check=1）或首个数据卷读才会真正行使。**补充情报（2026-11-04，源头 wave1-phk110pkg-spec.md:102/:326）**：redwood Binaries README 把 "DALSYSDxe UFS cache coherence" 列为 5 个必需二进制补丁之一；**我们 udon FD 里的 DALSYSDxe 是 senna_bc 原厂原版（阶段 4 填充，无此 patch）**——logdump 自身 DMA 一直正常，但 S3 起的块数据读会把 UFSDxe DMA 写进 4096 KB 共享 buffer（payload 窗口新布局），正是该 patch 针对的场景 | S3 第一次刷写带 `ufs_check=1`（cmdline 余 228 字符）一次定位；**若 FNV 对拍不一致 → 第一嫌疑坐实**，处理路径 = 对照 redwood Binaries README 给 udon DALSYSDxe 打同款 patch（graft 流程加一步，FD sha 将变） |
 | R2 | stale logdump | 未发生（`== KERNEL LOG ==` 完整 + END OF LOG 在位） | 例行检查即可 |
 | R3 | UIC/doorbell 超时 | 不适用（native 未激活——CONFIG 编进但无 boot-arg，`native:` 串在筒未出声） | N 步阶梯时再议 |
 | R4 | GPT 枚举差异 | **解除**（133 < 160；6 LUN CRC 全过） | 无需扩 BLOCK_MAX_PARTS |
@@ -99,11 +99,11 @@ configs/common_defconfig:277              # CONFIG_UFS_NATIVE is not set  →  C
 
 ## 4. S3 预备清单（下一战施工单）
 
-1. **P0 darwin carve 用户批准门**（破坏性，照 Wave15 §P0：userdata-carve-phk110 工具化 + 20 GiB 对齐 + 双表 CRC + mkdatavol 12 G 卷）——所有 S3+ 的前置。
+1. **P0 darwin carve 写盘前确认**（破坏性，照 阶段 15 §P0：userdata-carve-phk110 工具化 + 20 GiB 对齐 + 双表 CRC + mkdatavol 12 G 卷）——所有 S3+ 的前置。
 2. config：phk110.config 覆盖 `CONFIG_UFS_WRITE=y`（+ 可选 `CONFIG_VAR_STORE=y`）；cmdline 追加 `ufs_write=1`（+ **必刷** `ufs_check=1` 行使 S1 数据对拍，一并坐实/排除 R1）。
-   - **R1 应急预案（主代理补情报固化）**：若 ufs_check FNV ≠ host survey 哈希 → DALSYSDxe cache coherence patch 缺失坐实（udon FD 的 DALSYSDxe = senna_bc 原厂原版；redwood Binaries README 列其为 5 必需补丁之一，wave1-phk110pkg-spec.md:102）→ 处理 = 对照 redwood README 给 udon DALSYSDxe 打同款二进制 patch，graft 流程加一步。mailbox 元数据路径（loader CPU 写）不受此影响，S0 行不受污染。
-   - **SMMU 路线佐证（UniXNU BRINGUP 原文）**："SMMU programming is deliberately skipped on SM8475 because it caused an external abort"——同款手机真机观测，与 Wave15 §1.6 裁决（不碰 SMMU）互证；若 R1 坐实也不动摇 SMMU 路线，病灶只会在 DALSYSDxe 的 DMA 一致性。
-3. 测试矩阵（Wave15 §S3）：4K 单块 → 256K 整 buffer → 跨 buffer 两块 → 越界拒绝（offset=UFS_WRITE_FIRST-1 → EROFS）；验收行 `ufs: /dev/rufs_darwin takes writes, …`（ufs.c:1802）+ `kern.hakios.ufs_writes` 增长、`ufs_write_errors=0`。
+   - **R1 应急预案（补充情报固化）**：若 ufs_check FNV ≠ host survey 哈希 → DALSYSDxe cache coherence patch 缺失坐实（udon FD 的 DALSYSDxe = senna_bc 原厂原版；redwood Binaries README 列其为 5 必需补丁之一，wave1-phk110pkg-spec.md:102）→ 处理 = 对照 redwood README 给 udon DALSYSDxe 打同款二进制 patch，graft 流程加一步。mailbox 元数据路径（loader CPU 写）不受此影响，S0 行不受污染。
+   - **SMMU 路线佐证（UniXNU BRINGUP 原文）**："SMMU programming is deliberately skipped on SM8475 because it caused an external abort"——同款手机真机观测，与 阶段 15 §1.6 裁决（不碰 SMMU）互证；若 R1 坐实也不动摇 SMMU 路线，病灶只会在 DALSYSDxe 的 DMA 一致性。
+3. 测试矩阵（阶段 15 §S3）：4K 单块 → 256K 整 buffer → 跨 buffer 两块 → 越界拒绝（offset=UFS_WRITE_FIRST-1 → EROFS）；验收行 `ufs: /dev/rufs_darwin takes writes, …`（ufs.c:1802）+ `kern.hakios.ufs_writes` 增长、`ufs_write_errors=0`。
 4. F1 若顺路修：ufs.c 发布循环重名去重（非阻塞）。
 5. 判定行检查 `fast` vs 慢路文案（ufs.c:1808-1809）确认 loader 侧 BLOCK_CAN_FAST 语义（R5 前哨）。
 

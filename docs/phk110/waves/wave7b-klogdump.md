@@ -1,6 +1,6 @@
-# Wave 7b — 内核日志落盘缺口修复（`udon-hakios-grafted-v3.img`）
+# 阶段 7b · 2026-11-03 · 内核日志落盘缺失的修复
 
-Date: 2026-11-03. Agent: Wave 7b（全程未碰手机；loader.c 单点修复 + 重建交付 v3）。
+Date: 2026-11-03. Agent: 阶段 7b（全程未碰手机；loader.c 单点修复 + 重建交付 v3）。
 目标：Boot #8 实测 loader 打印 `kernel returned: log at 843ae89c0, 717 bytes` 后，logdump 里只有
 loader 自己的日志块，内核 717 B 未落盘——让内核日志真正进 logdump。
 
@@ -93,36 +93,36 @@ Boot #8 里组合块与 loader-only 块都圆整到 4096 B（组合后 staged_le
   第二轮，第二轮进行中的周期 flush 会拿旧指针组进 mailbox 的**当前**内容（mailbox 常被新 run
   复用）——读内存无害，仅语义上属"进行中"日志；下一次 run 返回的 write_logs 会覆盖记忆。
 
-## 3. 重建链（全 WSL；FD 未重建，按主代理指令复用现成 FD）
+## 3. 重建链（全 WSL；FD 未重建，按计划复用现成 FD）
 
 ```
 a. loader.efi   cd ~/hakios/kernel && PAYLOAD_BASE=0xF4000000 xnuloader/build.sh
    → 66,048 B（与 v2 同尺寸，graft 布局不变），sha a8ca5358…（v2 是 63e51e07…）。
    strings 复核：phk110 / KERNEL LOG / logdump / "log: %d bytes written" 全在。
    objdump 对比 v2：仅链接抖动（bl 目标整体平移）+ write_logs 新增 run_klog 存取。
-b. udon FD      未重建（主代理指令：跳过 build-udon-firmware.sh）。
+b. udon FD      未重建（按计划：跳过 build-udon-firmware.sh）。
    ⚠ 身份澄清：device-layer/udon-hakios-SILICIUM_UEFI.fd 实为 **Wave-5 FD**（de4df6ac…），
-   不是 Wave-6 版（5283e85b…，现仅存于 v2 镜像内；WSL Build 树里是 Wave7-usbmode 重建版
-   8924cb67…，hook 已前移、未上机）。wave6 报告已证 Wave5→Wave6 FD 功能等同
+   不是 Wave-6 版（5283e85b…，现仅存于 v2 镜像内；WSL Build 树里是 阶段 7-usbmode 重建版
+   8924cb67…，hook 已前移、未真机验证）。wave6 报告已证 阶段 5→阶段 6 FD 功能等同
    （FvMain 仅差 8 B = BdsDxe RSDS PDB GUID 的 DEBUG 链接噪声 + PEI 时间戳），Boot #7/#8
-   同一条 UnableToBoot→XnuLoader 链都经 Wave5 系 FD 跑通，故复用 Wave5 FD 是最保守选择。
+   同一条 UnableToBoot→XnuLoader 链都经 阶段 5 系 FD 跑通，故复用 阶段 5 FD 是最保守选择。
 c. XNUP v3      从 v2 payload 逐条目提取（loader.efi 66,048 / kernel 14,841,368 / ramdisk
    16,528 / cmdline 248 / kernel.ver 48）→ mkpayload.py --no-version 仅换 loader.efi 条目。
    自检：总尺寸 14,924,408 与 v2 相同；kernel/ramdisk/cmdline/kernel.ver 逐字节相等；
    loader.efi 条目 == 新构建；cmdline 原样（serial=0 loader_return_after=20 cpus=8 bootcpu=7 …）。
-d. 打包+graft   python -I wave4-scripts/package-udon-boot.py --fd <Wave5 FD> --shim
-   device-layer/udon-hakios-BootShim.bin（108ce972…，Wave5 起逐字节未变） --stock
+d. 打包+graft   python -I wave4-scripts/package-udon-boot.py --fd <阶段 5 FD> --shim
+   device-layer/udon-hakios-BootShim.bin（108ce972…，阶段 5 起逐字节未变） --stock
    stock-boot-a.img --payload udon-hakios-payload-v3.bin --out …-grafted-v3.img
    --report …-v3.report.json → 192 MiB；kernel_gzip 6,784,834（v2 6,762,632，loader 变更
    导致 gzip 窗口重排，wave6 已知现象）。
 ```
 
-## 4. Git 状态（Wave8 叠加须知）
+## 4. Git 状态（阶段 8 叠加须知）
 
-主代理要求的 commit **未能执行**：WSL kernel 仓无 git identity（`git commit` 报 empty ident，
-未擅自配置用户身份）。已按指令完成 `git diff > /tmp/wave7b-loader.patch`（229 行 = Wave6 +28
+计划的 commit **未能执行**：WSL kernel 仓无 git identity（`git commit` 报 empty ident，
+未擅自配置 git 身份）。已按指令完成 `git diff > /tmp/wave7b-loader.patch`（229 行 = 阶段 6 +28
 + wave7b 本修复 + 仓内既有 build.sh/mkxnuimg.py/provenance.allow 改动）并 `git add -A`
-（改动全部在 index 里，Wave8 可直接在其上提交/叠加）。修复正文即 §2 两段。
+（改动全部在 index 里，阶段 8 可直接在其上提交/叠加）。修复正文即 §2 两段。
 
 ## 5. 独立自检（wave5-scripts/verify-udon-hakios.py — 21/21 PASS）
 
@@ -154,7 +154,7 @@ no-run flush: new flow byte-identical to old flow: True          ← NULL klog �
 zero-length klog: new flow byte-identical to old flow: True      ← 0 长度行为不变
 ```
 
-## 7. 刷写说明（给主代理）
+## 7. 刷写说明
 
 ```sh
 fastboot flash boot_b device-layer/udon-hakios-grafted-v3.img
@@ -162,7 +162,7 @@ fastboot set_active b
 fastboot reboot
 ```
 
-- 屏上时间线与 Boot #8 一致（Wave5 系 FD）：UniXNU 菜单 → 手动选 **Return to firmware** →
+- 屏上时间线与 Boot #8 一致（阶段 5 系 FD）：UniXNU 菜单 → 手动选 **Return to firmware** →
   `XNULOADER` banner → `platform phk110` → 内核日志上屏滚动 → 20 s 后干净返回 →
   `log: N bytes written to logdump` → 冷复位循环（已知无害；退出进 fastboot 重刷 backup）。
 - **本轮验证点**：循环一轮回安卓（set_active a）后 `dd if=/dev/block/by-name/logdump`

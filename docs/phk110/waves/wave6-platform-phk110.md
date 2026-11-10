@@ -1,6 +1,6 @@
-# Wave 6 — loader 平台表 `platform_phk110` + 完整镜像重建（`udon-hakios-grafted-v2.img`）
+# 阶段 6 · 2026-11-03 · loader 平台表 platform_phk110 与整镜像重建
 
-Date: 2026-11-03. Agent: Wave 6 (全程未碰手机; WSL 构建全链)。目标：修掉 Boot #7 的根因
+Date: 2026-11-03. Agent: 阶段 6 (全程未碰手机; WSL 构建全链)。目标：修掉 Boot #7 的根因
 —— loader 平台表无 SM8475 条目 → FB 基址匹配失败 → 回落 `qemu-virt` 配置 → 内核拿到 QEMU 的
 fb/GIC/拓扑 → Data Abort → EDK2 `CpuExceptionHandlerLib.c(438)` 冻结。
 
@@ -14,9 +14,9 @@ fb/GIC/拓扑 → Data Abort → EDK2 `CpuExceptionHandlerLib.c(438)` 冻结。
 | XNUP payload (cmdline +`cpus=8 bootcpu=7`) | `udon-hakios-payload-v2.bin` | 14,924,408 B | `51aede89a15afcae0177667e90f3d6133d74aef3f1f1992c9309c1392acd4c57` |
 
 WSL 中间产物：`/tmp/wave6/`（loader.dis/new.dis、xnup-payload.bin、unsigned.img）。
-内核仓改动：`~/hakios/kernel/xnuloader/loader.c` **仅 +22 行**（含 Wave3 存量 6 行 PAYLOAD_BASE
+内核仓改动：`~/hakios/kernel/xnuloader/loader.c` **仅 +22 行**（含 阶段 3 存量 6 行 PAYLOAD_BASE
 #ifndef 时 `git diff --stat` 为 +28），redwood/qemu 条目零触碰。
-Wave5 原型 `udon-hakios-grafted.img`（sha `7b97f1e3…`）**未覆盖**，BootShim 与 Wave5 **逐字节相同**
+阶段 5 原型 `udon-hakios-grafted.img`（sha `7b97f1e3…`）**未覆盖**，BootShim 与 阶段 5 **逐字节相同**
 （240 B，`108ce972…`——纯汇编无时间戳）。
 
 ---
@@ -70,12 +70,12 @@ static const struct platform platform_phk110 = {
 | --- | --- | --- |
 | **FB key（选台）** | `0xB8000000` | **源码实证**：`uefi-udon/Silicon/Silicium/SiliciumPkg/Drivers/SimpleFbDxe/SimpleFb.c` → `GetFrameBufferInfos()` 按名 `LocateMemoryRegionByName("Display Reserved")` → `*BaseAddress = FrameBufferRegion.Address` 原样进 `Mode->FrameBufferBase`；`udonPkg/Library/MemoryMapLib/MemoryMapLib.c:30` `{"Display Reserved", 0xB8000000, 0x02B00000, …}`。loader 的 `SCREEN.base = GOP->mode->fb_base`（loader.c:4367），故 key = 0xB8000000。任务书预期值与源码一致 |
 | `io_base/io_size` | `0x00400000 / 0x3FC00000` | 照抄 redwood（同为 Qualcomm 8+ Gen 1 系外设窗）；udon MemoryMapLib 寄存器区 `IPC_ROUTER_TOP 0x00400000 … APSS_HM 0x17000000+0x02000000` 全部落入窗内；非零要求见 loader.c 注释（XNU 把 0 当 "no SoC"） |
-| `gic_dist/gic_redist` | `0x17A00000 / 0x17A60000` | Cape FDT `intc@17a00000`（Wave3 §5.3 已核）；redwood 同值 |
+| `gic_dist/gic_redist` | `0x17A00000 / 0x17A60000` | Cape FDT `intc@17a00000`（阶段 3 §5.3 已核）；redwood 同值 |
 | `uart` | `0` | PHK110 无串口（任务书 + wave1）；屏显 console 路径（loader 只自动加 `debug=0x8`，不加 `serial=3`） |
 | `psci_hvc` | 0（SMC，缺省） | 真机 Qualcomm TF-A PSCI 走 SMC；redwood 同 |
 | `log_other_cpu` | `1` | bootcpu=7 时内核在 loader 之外的核上跑，需要日志分区跟记（loader.c:2351/2363 的语义，redwood 同值） |
 | `cores` | `8` | 任务书 + wave1 §2.4 |
-| `core_shift` | `8` | **真机 FDT 实证**（`intel/wave1b-scripts/fdt-full.txt`，Wave1-B 抓的真机树）：`/cpus/cpu@0/100/200/…/700` 的 `reg = 0x0/0x100/…/0x700` → MPIDR 第二 affinity 字段编号，与 redwood 完全同构；`bootcpu=7` → `kernel_mpidr=0x700` 与 FDT `cpu@700` 精确一致 |
+| `core_shift` | `8` | **真机 FDT 实证**（`intel/wave1b-scripts/fdt-full.txt`，阶段 1-B 抓的真机树）：`/cpus/cpu@0/100/200/…/700` 的 `reg = 0x0/0x100/…/0x700` → MPIDR 第二 affinity 字段编号，与 redwood 完全同构；`bootcpu=7` → `kernel_mpidr=0x700` 与 FDT `cpu@700` 精确一致 |
 | `small_cores` | `0x0f`（cpu0-3） | **⚠ 与任务书口径不同，见 §3 偏差说明** |
 | `timeout_scale` | 0（缺省） | 真机硬件不需要 qemu 的 20 倍放宽；redwood 同（不设） |
 
@@ -88,7 +88,7 @@ loader 自己留在核 0 看护）。所以它走 **§4 的 cmdline 变更**实�
 ## 3. 突出偏差：small_cores 任务书写 "3"，按真机 FDT 证据取 4 位掩码 0x0f
 
 任务书 PHK110 事实写 "3×A510(cpu0-2) + 4×A710(cpu3-6) + 1×X2(cpu7)"（即 3 小核 → 掩码 0x07）。
-但 wave1 文档该结论（"Wave1-A 已证"）无一手来源引用，而**同一份真机 FDT**（wave1b fdt-full.txt）
+但 wave1 文档该结论（"阶段 1-A 已证"）无一手来源引用，而**同一份真机 FDT**（wave1b fdt-full.txt）
 有三组独立证据都指向 **4 小核（cpu0-3）+ 3 大核（cpu4-6）+ 1 prime（cpu7）**：
 
 1. **EPSS freq-domain**：`qcom,freq-domain = <…,0,4>` cpu@0/100/200/300 同 domain **0**；
@@ -106,8 +106,8 @@ loader 自己留在核 0 看护）。所以它走 **§4 的 cmdline 变更**实�
 
 ## 4. payload cmdline 变更：+`cpus=8 bootcpu=7`
 
-Wave3 §6 遗留项（"cpus=8 bootcpu=7 上命令行 | 依赖平台表修复"）与 Wave5 §6.2（"intentionally
-absent … Fix belongs to the kernel repo"）在本 wave 兑现。新 cmdline（248 B，Wave5 为 231 B）：
+阶段 3 §6 遗留项（"cpus=8 bootcpu=7 上命令行 | 依赖平台表修复"）与 阶段 5 §6.2（"intentionally
+absent … Fix belongs to the kernel repo"）在本 wave 兑现。新 cmdline（248 B，阶段 5 为 231 B）：
 
 ```
 serial=0 loader_return_after=20 cpus=8 bootcpu=7 soc_ipa_base=0x3e40000 soc_gsi_base=0x3e04000
@@ -134,20 +134,20 @@ a. loader.efi   cd ~/hakios/kernel/xnuloader && PAYLOAD_BASE=0xF4000000 ./build.
 b. udon FD      融合重放 apply-wave5-fusion.py → 6 处编辑全 "already present, skipped"
    （含 XnuLoader.c/h 从 upstream 原样重写）→ JOBS=$(nproc) ./scripts/build-udon-firmware.sh
    → Build/udonPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd（4 MiB，27 s 增量）。
-   FvMain 解压 8,060,936 B；与 Wave5 FD 的 FvMain 仅差 8 字节 = BdsDxe 的 RSDS PDB GUID
-   （DEBUG 链接时间派生；Wave5 记录的 FvMain sha 5dc409e1… 在旧 FD 上复现成功，提取器已校准）。
+   FvMain 解压 8,060,936 B；与 阶段 5 FD 的 FvMain 仅差 8 字节 = BdsDxe 的 RSDS PDB GUID
+   （DEBUG 链接时间派生；阶段 5 记录的 FvMain sha 5dc409e1… 在旧 FD 上复现成功，提取器已校准）。
    PEI 部分 47 字节差 = __DATE__/__TIME__ 字符串（"Nov  2 2026" vs "15:24:26"）+ 连带的 4 条
    PC 相对寻址立即数微调。均为 EDK2 DEBUG 构建固有非重现性，功能等同。
    FvMain 内字符串实证 hook 在位："loader.efi" ×1、"XNULOADER LOG v1" ×1、"XNU Payload" ×45。
 c. BootShim     cd ~/hakios/uefi-udon/BootShim && make REQUIRES_KERNEL_HEADER=1
    FD_BASE=0xA7100000 FD_SIZE=0x400000 'CFLAGS=… -DPAYLOAD_BASE=0xF4000000'
-   → 240 B，sha 与 Wave5 逐字节相同（108ce972…）。
+   → 240 B，sha 与 阶段 5 逐字节相同（108ce972…）。
 d. XNUP         mkpayload.py …（cmdline 见 §4）→ 14,924,408 B；容器自检：magic/size/5 条目、
    loader.efi 条目内含 "phk110"。
 e. 打包         python3 -I wave4-scripts/package-udon-boot.py --fd … --shim …
    --payload /tmp/wave6/xnup-payload.bin --stock device-layer/stock-boot-a.img
    --out device-layer/udon-hakios-grafted-v2.img --report …-v2.report.json
-   → 192 MiB；kernel_gzip 6,762,632 B（Wave5 6,762,817——payload 变化导致 gzip 窗口重排）。
+   → 192 MiB；kernel_gzip 6,762,632 B（阶段 5 6,762,817——payload 变化导致 gzip 窗口重排）。
 ```
 
 ## 6. 独立自检（wave5-scripts/verify-udon-hakios.py — **21/21 PASS**）
@@ -161,7 +161,7 @@ graft 偏移逐字节一致；vbmeta 后零填充；192 MiB。
 
 ---
 
-## 7. 刷写说明（给主代理）
+## 7. 刷写说明
 
 ```sh
 fastboot flash boot_b device-layer/udon-hakios-grafted-v2.img
@@ -192,12 +192,12 @@ fastboot reboot
   （对照 wave1 hwmap 定位）；
 - 屏无任何新输出、直接复位 → 用 `dd if=/dev/block/by-name/logdump` 取 loader 日志看走到哪步。
 
-**回退**：`fastboot flash boot_b backups-slotb/backup-boot_b.img`（Wave5 原型
+**回退**：`fastboot flash boot_b backups-slotb/backup-boot_b.img`（阶段 5 原型
 `udon-hakios-grafted.img` 与 wave4 `udon-uefi-grafted.img` 均在盘上可重刷）。
 
 ## 8. 待真机验证清单
 
 1. **small_cores=0x0f vs 0x07**（§3）：首跑屏显 `MIDR=%x` 逐核比对微架构位段后定稿。
 2. PSCI CPU_ON 0x700（bootcpu=7）在 udon 固件下的实际应答值（屏上直接可读）。
-3. `logdump` 分区是否存在、可写（wave3 §5.2 同一项仍未上机）。
+3. `logdump` 分区是否存在、可写（wave3 §5.2 同一项仍未真机验证）。
 4. EPSS LUT 行数 / `modem_ipa_fw_at=0x8b910000` / `soc_pas_mpss`（wave1 既有未验项，未变）。

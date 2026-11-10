@@ -1,4 +1,4 @@
-# Wave3 外部案例研究报告：高通手机 `fastboot boot` 自定义 UEFI（聚焦一加 Ace 2 / PHK110 / SM8475）
+# 阶段 3 · 2026-11-02 · 调研：高通手机用 fastboot boot 引导自制 UEFI 的外部案例
 
 - 研究日期：2026-11-02
 - 研究方法：WebSearch + GitHub 源码/文档直读（WebFetch / GitHub API / raw.githubusercontent），全部 URL 均已逐一访问验证（HTTP 200），未编造。
@@ -162,7 +162,7 @@ PHK110 上存在一个**已公开验证能跑通 Mu-Silicium UEFI 的完整外�
 3. **AVB/vbmeta**：常见法是 `fastboot flash vbmeta vbmeta.img --disable-verity --disable-verification`；PHK110 特化法是 **OEM vbmeta blob + 192 MiB footer 嫁接**（udon graft-boot-footer.py，见 Q4）：https://github.com/takasugl/UniXNU-udon/blob/main/package/linux-log/graft-boot-footer.py
 4. **换路径验证**：同一镜像"fastboot boot 不行就 flash 到当前 slot 试"——udon 正是靠 flash boot_b + graft 拿到唯一成功路径：https://github.com/takasugl/uefi-udon/blob/main/docs/STATUS.md
 5. **ABL 错误串监听**：一加 13 上 ABL 会回显 `Failed to load/authenticate boot image: Bad Buffer Size`；镜像过 ABL 但卡死时屏幕停在 "Fastboot mode" 静态画面（此时 fastboot 已死，USB 消失），需 `fastboot reboot`/强拆电池重启：https://xdaforums.com/t/my-attempts-to-boot-linux.4767261
-6. **拿早期日志**：pstore/last_kmsg 兜底（ABL 回落 fastboot 时可 `fastboot oem` 拉 pstore）与 XBL/ABL ULog 显示驱动（Daniel-Abrecht 给 Mu-Silicium 写的 ULogDxe 把 XBL 日志直接画屏，调试利器）：https://xdaforums.com/t/phone-always-boot-to-fastboot-after-flashing-custom-kernel-from-twrp.3902470 、https://github.com/Daniel-Abrecht/Mu-Silicium/tree/ULogDxe
+6. **拿早期日志**：pstore/last_kmsg 回退（ABL 回落 fastboot 时可 `fastboot oem` 拉 pstore）与 XBL/ABL ULog 显示驱动（Daniel-Abrecht 给 Mu-Silicium 写的 ULogDxe 把 XBL 日志直接画屏，调试利器）：https://xdaforums.com/t/phone-always-boot-to-fastboot-after-flashing-custom-kernel-from-twrp.3902470 、https://github.com/Daniel-Abrecht/Mu-Silicium/tree/ULogDxe
 7. **内存映射对齐**：FD base/大小必须与 xbl uefiplat.cfg 的 MemoryMap 对齐（官方移植指南）；自定义 MemoryMap 参考同 SoC 已验证平台：https://github.com/Project-Silicium/Guides/blob/main/Silicium/Porting/Snapdragon/Device/README.md
 8. **fdisk/分区类事故规避**（marble 教训：勿 `fastboot flash userdata` 硬塞大镜像）：https://unixnu.com/zh/devices/marble-milacy
 

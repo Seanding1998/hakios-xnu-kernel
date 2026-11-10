@@ -1,6 +1,6 @@
-# Wave 9 — 中断控制器根因修复（`udon-hakios-grafted-v4.img`）
+# 阶段 9 · 2026-11-03 · 中断控制器（GIC）配置修复
 
-Date: 2026-11-03. Agent: Wave 9（全程未碰手机；loader.c 单点修复 + 重建交付 v4）。
+Date: 2026-11-03. Agent: 阶段 9（全程未碰手机；loader.c 单点修复 + 重建交付 v4）。
 目标：Boot #10 真机内核日志里 `pe_arm_map_interrupt_controller: failed to find the
 interrupt-controller.` → `pe_arm_init_debug: failed to find cpu-debug-interface` →
 `Unclassified kernel abort (fault_code=0x10)` 三连，找到根因并让下一轮不再出现。
@@ -19,7 +19,7 @@ interrupt-controller.` → `pe_arm_init_debug: failed to find cpu-debug-interfac
 **一句话结论**：abort 的根因不是 pexpert 那两行 fail（它们在 QEMU 也打印、无害），而是
 `platform_phk110` 抄了 **redwood（SM8350）的 GIC 地址 0x17A00000/0x17A60000**，而 SM8475
 (taro) 的 GIC 实际在 **0x17100000 / 0x17180000（GICR 区 0x200000，stride 0x40000）**——
-这是设备自己的 live FDT（Wave 2 抓的 `intel/live-fdt.dtb`，`intc@17100000`）的实证。内核
+这是设备自己的 live FDT（阶段 2 抓的 `intel/live-fdt.dtb`，`intc@17100000`）的实证。内核
 第一次读 redistributor（0x17A60000，taro 上不解码的地址）→ 同步外部中止（FSC 0x10）→
 早期 panic 挂死。任务书里"Cape FDT 实证 0x17A00000"是把别的 SoC 的树当成了本机的。
 
@@ -59,12 +59,12 @@ interrupt-controller.` → `pe_arm_init_debug: failed to find cpu-debug-interfac
 ### 1.3 根因：`platform_phk110` 的 GIC 常量是 redwood/SM8350 的
 
 - `loader.c:615-632`（修复前）：`.gic_dist = 0x17A00000, .gic_redist = 0x17A60000`，
-  与 `platform_redwood`（`loader.c:602-613`）逐位相同——Wave 6 建条目时"照抄 redwood"
+  与 `platform_redwood`（`loader.c:602-613`）逐位相同——阶段 6 建条目时"照抄 redwood"
   （wave6 doc §表格明说 gic 两项 "Cape FDT intc@17a00000 …；redwood 同值"）。
 - 0x17A00000/0x17A60000 是 **SM8350 (lahaina)** 的 GIC（上游 sm8350.dtsi
   `intc@17a00000`，reg `<0x17a00000 0x10000>, <0x17a60000 0x100000>`——redwood 条目对它
   自己是准的）。SM8475 是 taro/SM8450 家族，GIC 在 **0x17100000**。
-- 本机铁证：`intel/live-fdt.dtb`（Wave 2 从真机抓的、设备固件交给它自己内核的树），
+- 本机证据：`intel/live-fdt.dtb`（阶段 2 从真机抓的、设备固件交给它自己内核的树），
   `dtc` 解出：
   ```
   intc: interrupt-controller@17100000 {
@@ -73,7 +73,7 @@ interrupt-controller.` → `pe_arm_init_debug: failed to find cpu-debug-interfac
       reg = <0x17100000 0x10000 0x17180000 0x200000>;
   ```
   → **GICD 0x17100000 (0x10000)，GICR 0x17180000 (0x200000)，8 个 PE 每 PE 0x40000**。
-  （顺带：Wave 3 引的 "Cape FDT 0x17A00000" 是别家 SoC 的树，对 PHK110 是错误权威。）
+  （顺带：阶段 3 引的 "Cape FDT 0x17A00000" 是别家 SoC 的树，对 PHK110 是错误权威。）
 
 ### 1.4 abort 的完整链路
 
@@ -136,16 +136,16 @@ panic。taro 真实 GICR 区是 0x200000（stride 0x40000）；内核 0x20000 �
 消费者。qemu/redwood 不设 `pexpert_compat` → DT 字节级与 v3 一致 →
 **按任务书规则免跑 QEMU 冒烟**（条件化路径与旧路径输出同一字节序列，是可静态证明的）。
 
-## 3. 重建链（全 WSL；FD 未重建，按主代理指令复用 Wave7 FD）
+## 3. 重建链（全 WSL；FD 未重建，按计划复用阶段 7 的 FD）
 
 ```
 a. loader.efi   cd ~/hakios/kernel && PAYLOAD_BASE=0xF4000000 xnuloader/build.sh
    → 66,560 B（v3 66,048，+512；XNUP 条目尺寸独立，graft 布局自适应），
-   sha 5223ba37…。strings 复核：phk110 / "KERNEL LOG"（Wave7b）/ "usb: try"（Wave8）/
+   sha 5223ba37…。strings 复核：phk110 / "KERNEL LOG"（阶段 7b）/ "usb: try"（阶段 8）/
    master / interrupt-controller / cpu-debug-interface 全在。
 b. FD           未重建。复用 ~/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/FV/
    SILICIUM_UEFI.fd，sha256 8924cb67e349f7c188c258bde08fe90155d81a9d27ef5d0a965399ffb7a7180f
-   （与主代理给定的 Wave7 FD 哈希逐位一致，Boot #9 真机已验证的挂点版）。
+   （与阶段 7 给定的 FD 哈希逐位一致，Boot #9 真机已验证的挂点版）。
 c. XNUP v4      从 device-layer/udon-hakios-payload-v3.bin 提取五条目（loader.efi 66,048 /
    kernel 14,841,368 / ramdisk 16,528 / cmdline 248 / kernel.ver 48）→
    python3 xnuloader/mkpayload.py -o payload-v4.bin --no-version
@@ -153,7 +153,7 @@ c. XNUP v4      从 device-layer/udon-hakios-payload-v3.bin 提取五条目（lo
    → 14,924,920 B；程序化断言 kernel/ramdisk/cmdline/kernel.ver 四条目 v3==v4 逐字节相等，
    loader.efi 条目 == 新构建。cmdline 原样（serial=0 loader_return_after=20 cpus=8
    bootcpu=7 soc_* 全串未动）。
-d. 打包+graft   python3 -I wave4-scripts/package-udon-boot.py --fd <Wave7 FD> --shim
+d. 打包+graft   python3 -I wave4-scripts/package-udon-boot.py --fd <阶段 7 FD> --shim
    device-layer/udon-hakios-BootShim.bin --stock device-layer/stock-boot-a.img
    --payload payload-v4.bin --out device-layer/udon-hakios-grafted-v4.img
    --report device-layer/udon-hakios-grafted-v4.report.json
@@ -165,9 +165,9 @@ d. 打包+graft   python3 -I wave4-scripts/package-udon-boot.py --fd <Wave7 FD> 
 
 ## 4. Git 状态（kernel 仓，未提交，未 identity，不 commit）
 
-- staged（Wave7b，原样未动）：`mkxnuimg.py`、`tools/provenance.allow`、
+- staged（阶段 7b，原样未动）：`mkxnuimg.py`、`tools/provenance.allow`、
   `xnuloader/build.sh`、`xnuloader/loader.c`（+48）。
-- unstaged：`xnuloader/loader.c`（+134/-11 = Wave8 usb_start 重试 ~+76/-8 ⊕ 本 wave
+- unstaged：`xnuloader/loader.c`（+134/-11 = 阶段 8 usb_start 重试 ~+76/-8 ⊕ 本 wave
   DT 修复 +58/-3）。**未执行任何 git reset/checkout/stash/clean**；
   `git status --short` = `M mkxnuimg.py / M tools/provenance.allow / M xnuloader/build.sh /
   MM xnuloader/loader.c`，与接手时一致叠加。
@@ -175,7 +175,7 @@ d. 打包+graft   python3 -I wave4-scripts/package-udon-boot.py --fd <Wave7 FD> 
 ## 5. 自检
 
 `python3 -I wave5-scripts/verify-udon-hakios.py device-layer/udon-hakios-grafted-v4.img
-device-layer/stock-boot-a.img device-layer/udon-hakios-BootShim.bin <Wave7 FD>
+device-layer/stock-boot-a.img device-layer/udon-hakios-BootShim.bin <阶段 7 FD>
 payload-v4.bin` → **ALL 21 CHECKS PASSED**（header diff 仅 bytes 8..14 / gzip round-trip
 19,119,472 B / shim 头 0xA7100000 + shim+fd=0x4000f0 / FD _FVH@shim+0x28 / XNUP 逐字节 /
 entries {loader.efi 66,560, kernel 14,841,368, ramdisk 16,528, cmdline 248, kernel.ver 48} /
@@ -214,6 +214,6 @@ kernel（下一 wave 决定，本 wave 红线禁改内核）。
 - 只退 DT 行为：Windows `device-layer/` 重刷 `udon-hakios-grafted-v3.img`（621db6f5…，
   v3 = Boot #10 实测镜像，GIC 地址错误的现状）。v1/v2/v3 全部在位未动。
 - 代码层：本 wave 改动全部在 unstaged 的 loader.c，`git diff xnuloader/loader.c` 里
-  Wave8 块之外的 hunks 即本 wave（`gic_redist_size`/`pexpert_compat` 字段、phk110 条目、
-  DT 构造两块），可按 hunk 丢弃；Wave7b（staged）与 Wave8 块不受影响。
+  阶段 8 块之外的 hunks 即本 wave（`gic_redist_size`/`pexpert_compat` 字段、phk110 条目、
+  DT 构造两块），可按 hunk 丢弃；阶段 7b（staged）与 阶段 8 块不受影响。
 - kernel/ramdisk/cmdline/kernel.ver 与 v3 逐字节相同，无需回退考虑。

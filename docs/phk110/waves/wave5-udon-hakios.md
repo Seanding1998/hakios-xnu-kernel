@@ -1,7 +1,7 @@
-# Wave 5 — HakiOS payload grafted into the udonPkg UEFI base (`udon-hakios-grafted.img`)
+# 阶段 5 · 2026-11-02 · 把 HakiOS payload 嫁接进 udonPkg UEFI 底座
 
-Date: 2026-11-02. Agent: Wave 5 (no device access; flashing is done by the main agent).
-Goal: make the hardware-proven takasugl/uefi-udon (udonPkg, Wave 4) UEFI launch the
+Date: 2026-11-02. Agent: 阶段 5 (no device access; flashing is done by the main agent).
+Goal: make the hardware-proven takasugl/uefi-udon (udonPkg, 阶段 4) UEFI launch the
 HakiOS XNUP payload (loader.efi + hakios-kernel + hello) instead of sitting at its
 no-payload state.
 

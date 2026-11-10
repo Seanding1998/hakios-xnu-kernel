@@ -1,6 +1,6 @@
-# Wave 4 — uefi-udon (udonPkg) full rebuild, boot_v4 packaging + graft
+# 阶段 4 · 2026-11-02 · uefi-udon（udonPkg）完整重建与 boot 镜像封装
 
-Date: 2026-11-02. Agent: Wave 4 (no device access; flashing is done by the main agent).
+Date: 2026-11-02. Agent: 阶段 4 (no device access; flashing is done by the main agent).
 Goal: rebuild the proven takasugl/uefi-udon SM8475 platform package end-to-end in WSL and
 produce a flashable `boot_b` image (`udon-uefi-grafted.img`) for the OnePlus Ace 2 (PHK110).
 
@@ -225,6 +225,6 @@ python3 /mnt/c/.../hakios-phk110/wave4-scripts/package-udon-boot.py ...   # see 
 3. **ramdisk_size=0 deviation** (see §6) — intentional; flagging in case the main agent
    wants an alternate variant with the stock value for A/B comparison.
 4. The UniXNU payload (XNU kernel etc.) is not part of this image; UEFI will boot to the
-   UniXNU menu and look for the payload FAT volume in `super` (out of Wave 4 scope).
+   UniXNU menu and look for the payload FAT volume in `super` (out of 阶段 4 scope).
 5. `intel/wave4-abl-extract/abl-fvmain-inner.fv` (819 KB) is kept as evidence of the
    abl_a contents for future waves.

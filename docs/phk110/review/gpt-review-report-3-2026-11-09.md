@@ -1,6 +1,6 @@
-# 外部审阅第三轮：阶段审阅 + 主机协议三确定性缺陷（2026-11-09 16:20-16:30）
+# 外部评审报告三（2026-11-09）
 
-> 审阅者（ChatGPT，本地阅读）基于提交 87bbdaf、Wave 23-26 报告、原始日志、当前 WSL 代码；含三项内存报文验证（不触手机/文件只读）。原文为用户粘贴的三段长文，本档为要点全保真归档（原文过长，结构化重录；全部 file:line 引用以原文为准，均已复核入档）。
+> 审阅者（ChatGPT，本地阅读）基于提交 87bbdaf、阶段 23-26 报告、原始日志、当前 WSL 代码；含三项内存报文验证（不触手机/文件只读）。原文为粘贴归档的三段长文，本档为要点全保真归档（原文过长，结构化重录；全部 file:line 引用以原文为准，均已复核入档）。
 
 ## 一、阶段位置认定（审阅者判断，我方接受）
 
@@ -30,10 +30,10 @@
 - H4 单变量对照缺失如实保留边界。
 - timed-ssh 日志仍有 PARTIAL / `OKAYxnuloaderxnuloader` 重复应答 / claim 成功但 getvar 无应答窗口 = 命令事务同步分支，单独标记。
 
-## 五、执行计划（审阅建议，我方采纳为 Wave 26 Phase A-D）
+## 五、执行计划（审阅建议，我方采纳为 阶段 26 Phase A-D）
 
 **Phase A（0 刷 0 手机）**：修 ARP / 握手状态机 / 四元组 RST 验证 / DATA+终端 OKAY 事务消费 / Runbook 加固（per-run ID、verdict 新鲜性、退出码门、getvar 身份门、四态处理、loader 期禁 usbipd attach）+ **8 项定向回归**（ARP 字段/reply 学习/SYN-ACK→ACK/错 ACK 不建立/跨端口不影响/ACK 一致性/事务异常识别/旧 verdict 不放行）。闸门 = 回归全绿。
-**Phase B（0 刷，v23 上机）**：B1 固定实验身份；B2 先验管理通道（固定命令 + 校验上传，再 netmode）；B3 Pipe25.push / Link.on_frame 前后全字段报文留痕（时间/方向/四元组/flags/seq/ack/window/payload/校验和/SND.UNA/NXT/RCV.NXT）；B4 单连接判决表（6 分支：RST→查监听；SYN-ACK+数据推进→SSH 层；三段重传不推进→对照发送与设备输入；ACK 到但本地不动→修主机 ACK；数据到未交 stdout→修 ProxyCommand 排空；USB 失同步→事务恢复）。闸门 = 每次失败必须落入明确分支。
+**Phase B（0 刷，v23 真机验证）**：B1 固定实验身份；B2 先验管理通道（固定命令 + 校验上传，再 netmode）；B3 Pipe25.push / Link.on_frame 前后全字段报文留痕（时间/方向/四元组/flags/seq/ack/window/payload/校验和/SND.UNA/NXT/RCV.NXT）；B4 单连接判决表（6 分支：RST→查监听；SYN-ACK+数据推进→SSH 层；三段重传不推进→对照发送与设备输入；ACK 到但本地不动→修主机 ACK；数据到未交 stdout→修 ProxyCommand 排空；USB 失同步→事务恢复）。闸门 = 每次失败必须落入明确分支。
 **Phase C（1 刷，条件）**：仅当证据指向内核盲区——分层计数器（poll/stage prod-cons-丢弃/feeder 进出/网络输入成败/TCP 按连接统计）。判别：stage 涨 feeder 不涨 = feeder 块；feeder 涨 TCP 丢涨 = 报文/校验和/TCP 状态；栈收了无应用进展 = sshd/socket；内核回 loader 才停 = 会话生命周期。
 **Phase D（1 刷，条件）**：只修 C 锁定分支。用户态镜像修改单独说明写入范围（boot_b 研究授权不自动覆盖其它持久镜像）。
 

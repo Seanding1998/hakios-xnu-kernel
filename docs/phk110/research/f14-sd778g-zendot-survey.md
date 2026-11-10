@@ -1,12 +1,12 @@
-# F14 调研报告：zendot 文章考古 + SD 778G（SM7325）驱动全景 + PHK110 物料清单预研
+# SM7325 驱动全景与外部文章考古（含物料清单预研）
 
-> ⚠ **勘误（2026-11-10，Wave 30 实证，`docs/waves/wave30-ath11k-tooling-prep.md`）**：本报告"WiFi = PCIe+CNSS（qca6490 形态）"一节的芯片口径需修正——**主线 ath11k 没有 QCA6490 这个 hw_rev**；PHK110 的芯片在 ath11k 世界 = **WCN6750 hw1.0**（固件目录 `WCN6750/hw1.0/`，IPCR 通道 20/21 复用 qca6390 表）。ath11k_pci 补 WCN6750 = 2 个一行级补丁（pci.c 设备 ID 表 + mhi.c hw_rev case）。
+> ⚠ **勘误（2026-11-10，阶段 30 实证，`docs/waves/wave30-ath11k-tooling-prep.md`）**：本报告"WiFi = PCIe+CNSS（qca6490 形态）"一节的芯片口径需修正——**主线 ath11k 没有 QCA6490 这个 hw_rev**；PHK110 的芯片在 ath11k 世界 = **WCN6750 hw1.0**（固件目录 `WCN6750/hw1.0/`，IPCR 通道 20/21 复用 qca6390 表）。ath11k_pci 补 WCN6750 = 2 个一行级补丁（pci.c 设备 ID 表 + mhi.c hw_rev case）。
 
-日期：2026-11-09 ｜ 执行：F14 调研子代理 ｜ 纯调研：零手机、零刷写、零构建、零 clone
+日期：2026-11-09 ｜ 执行：F14 调研 ｜ 纯调研：零手机、零刷写、零构建、零 clone
 方法：webReader + GitHub REST/raw（代理 127.0.0.1:7897）+ 本仓文档只读 + WSL `~/hakios/kernel`（v2.1.13 树）+ `devices/phk110/uefi/files/Resources/DTBs/phk110.dts`（手机自己设备树的文本形式，2.4 MB，本地在盘）只读取证
 产出：本报告（git add 不 commit）
 
-> 证据分级：**[实证]** = 文件/行号/字节/可复现来源；**[实测转述]** = 上游文档自述的真机结果（我们未复现）；**[推断]** = 类比/待核；**[待核]** = 明确标注需要上机或源码对照的。
+> 证据分级：**[实证]** = 文件/行号/字节/可复现来源；**[实测转述]** = 上游文档自述的真机结果（我们未复现）；**[推断]** = 类比/待核；**[待核]** = 明确标注需要真机验证或源码对照的。
 > 引用缩写：`[ART]` = zendot 文章；`[UP-K]` = github.com/oosexgang/hakios-xnu-kernel（HEAD，2026-11-08 push，v2.3.4）；`[UP-D]` = github.com/oosexgang/hakios-sm7325（redwood 设备仓，HEAD，2026-11-04 push）；`[TREE]` = WSL `~/hakios/kernel`（本地 v2.1.13 + PHK110 移植改动）；`[DTB]` = `[TREE] devices/phk110/uefi/files/Resources/DTBs/phk110.dts`；`[W1]` = 本仓 `docs/waves/wave1-hwmap.md`。
 
 ---
@@ -19,8 +19,8 @@
 4. **redwood（778G）拉固件的实测清单**（PKG110 文档，实测转述）：fw-modem 273 MB（modem.mdt+28 段+370 个 TFTP 文件）、fw-audio 21 MB（adsp.mdt+b00–b36）、fw-wifi 7.3 MB（wpss.mdt+b00–b07）、fw-gpu 137 KB（a660_gmu.bin/a660_sqe.fw/a660_zap.*，7 文件）、fw-haptic 7.5 KB（aw8697_haptic.bin）；合计 837 文件 313 MB 10.7 s。**注意 GPU 固件名 = a660 族**（642L 用 a660 族固件）——同族低配 GPU 用高配固件文件名是我们的直接先例。
 5. **IPA 版本重大修正**：`[W1]` 声称 PHK110 = IPA 4.5（"主线 ipa_data-v4.5.c 可参照"）。**主线证据推翻**：SM8450 IPA 支持系列（2026-09 patchew v2，未合 net-next）明确新增 `ipa_data-v5.1.c`，且作者声明 **"Verified on SM7475, SM8450, and SM8475 with the modem working"**；`[DTB]` `qcom,ipa-hw-ver=<0x16>`（=22，vendor 枚举待解码）与 4.5/4.11 均不符。**PHK110 蜂窝 = IPA v5.1**，上游 `hakios.ipa.c` 是 4.11 硬编码 → 按 upstream 自己的定义"a different IPA version is a larger port"。v0.7 物料 = 主线 ipa_data-v5.1.c + OnePlusOSS sm8475 techpack/ipa（GPL）。
 6. **PHK110 WiFi 一手证据确认**：`[DTB]` `wlan: qcom,cnss-qca6490@b0000000`，**无 WPSS remoteproc 节点**——上游 redwood 的 WPSS-PIL bring-up 整条不适用，PHK110 = CNSS 供电序列（6 路调光器+wlan-en GPIO80）+ PCIe0/MHI + ath11k **QCA6490/hw1.0** 固件族（amss.bin/m3.bin/board-2.bin）。
-7. **内核级驱动文件：上游有我们没有的 ≈ 零**（意外结论）：`[TREE]` drivers/ 全 12 子系统与 `[UP-K]` HEAD 逐文件对大小，绝大多数字节级一致；本地独有 = `loader_net.c`（Wave21 en0）+ `s3910.c`（设备仓）+ 8 个文件的 PHK110 改动（buttons/stubs/ufs 等）；上游略新 = `gpu.cpp`(+4 KB)、`input.c`(+2 KB)、`goodix.c`(+1 KB)。**真正的缺口在设备仓与工具层**（§3.4）：`pull-firmware*.sh` 真实现（我们的是 exit 1 占位）、`pull-soc.sh`、`cellular_probe.py`、`modem_firmware.py`、porting/driver-review 文档族、`drivers-check.py` CI 范式。
-8. **对最近路程的直击**：① `pull-firmware-root.sh` 模板化 → 我们 v0.5 前置的 GPU 固件拉取（30–60 行，且 Magisk root + wave16c WSL adb 配方条件齐备）；② 2.3.3 修了 `fb_beam/fb_measure` 在非 sc7280 SoC 上读 SM7325 显示接口地址的坑——**与我们 23.x 虚拟显示出画链直接相关**；③ `UsbConfigDxe` 在 ExitBootServices 反初始化的 vendor DXE patch（上游必须打）与我们 Wave 21–24 的 USB 战役互证——上游 Binaries README 的 5 个 vendor DXE patch 清单是 udon UEFI 的现成对照表。
+7. **内核级驱动文件：上游有我们没有的 ≈ 零**（意外结论）：`[TREE]` drivers/ 全 12 子系统与 `[UP-K]` HEAD 逐文件对大小，绝大多数字节级一致；本地独有 = `loader_net.c`（阶段 21 en0）+ `s3910.c`（设备仓）+ 8 个文件的 PHK110 改动（buttons/stubs/ufs 等）；上游略新 = `gpu.cpp`(+4 KB)、`input.c`(+2 KB)、`goodix.c`(+1 KB)。**真正的缺口在设备仓与工具层**（§3.4）：`pull-firmware*.sh` 真实现（我们的是 exit 1 占位）、`pull-soc.sh`、`cellular_probe.py`、`modem_firmware.py`、porting/driver-review 文档族、`drivers-check.py` CI 范式。
+8. **对最近路程的直击**：① `pull-firmware-root.sh` 模板化 → 我们 v0.5 前置的 GPU 固件拉取（30–60 行，且 Magisk root + wave16c WSL adb 配方条件齐备）；② 2.3.3 修了 `fb_beam/fb_measure` 在非 sc7280 SoC 上读 SM7325 显示接口地址的坑——**与我们 23.x 虚拟显示出画链直接相关**；③ `UsbConfigDxe` 在 ExitBootServices 反初始化的 vendor DXE patch（上游必须打）与我们 阶段 21–24 的 USB 工作互证——上游 Binaries README 的 5 个 vendor DXE patch 清单是 udon UEFI 的现成对照表。
 
 ---
 
@@ -40,7 +40,7 @@
 |---|---|---|---|
 | A4 | POCO X5 Pro 5G（骁龙 778G）`fastboot boot` 内存启动，不刷机不落盘，重启回安卓 | 实证（与我们同款流程） | 我们 Boot #1–39 同链 |
 | A5 | 真机已能跑：锁屏、主屏、系统手势、Settings、Safari、相机；**Wi-Fi 实测 55–90 Mbit/s**；扬声器+麦克风出声；前后摄可拍 HEIC；**数据跨重启保存** | 实测转述（第三方转发上游 README） | 与 10-22 时点上游 CHANGELOG 相容；数值级数据（Mbit/s）为上游自测 |
-| A6 | **不含任何苹果文件**：系统镜像由用户从苹果 CDN 拉 IPSW 自提；许可证自定义 Other；声明与苹果无关联未获授权 | 实证 | `[UP-K] LICENSE/LEGAL.md` |
+| A6 | **不含任何苹果文件**：系统镜像自苹果 CDN 拉取；许可证自定义 Other；声明与苹果无关联未获授权 | 实证 | `[UP-K] LICENSE/LEGAL.md` |
 | A7 | 工具链完整：C 项目（当时 297★）带 QEMU 脚本、预编译内核/loader/UEFI、构建脚本；**配套 userland 仓**（注入库、launchd 任务、APFS 镜像构建） | 实证 | org 里 `hackios-xnu-userland`（410★，push 10-25）✓ |
 | A8 | 坦诚清单：**蜂窝、蓝牙、Metal 应用、Apple ID 登录不行**；研究台非 ROM；每次会话限时；结束时内核把日志交回加载器 | 实证 | 与 redwood device.conf 状态表（§2.1）逐项吻合 |
 
@@ -59,7 +59,7 @@
 - 仓库链接（旧名）→ 301 → `oosexgang/hakios-xnu-kernel`（id 1429328794，2665★，push 2026-11-08）——已在 §3 深挖。
 - 文章无 issues/其他文章外链。zendot 站同页无相关文章推荐区（HTML 已存 `/tmp` 核对）。
 
-**文章的增量价值判定**：对已通读上游 CHANGELOG 的我们，文章自身新技术增量 ≈ 0；增量在于（a）**第三方独立转载的时间戳锚**（10-22 时的能力清单与数字）；（b）**它把"驱动从自家安卓拉"写进面向读者的标准步骤**（A10）——这正是协调者指定的新重心，见 §4。
+**文章的增量价值判定**：对已通读上游 CHANGELOG 的我们，文章自身新技术增量 ≈ 0；增量在于（a）**第三方独立转载的时间戳锚**（10-22 时的能力清单与数字）；（b）**它把"驱动从自家安卓拉"写进面向读者的标准步骤**（A10）——这正是本文确定的新重心，见 §4。
 
 ---
 
@@ -101,7 +101,7 @@
 |---|---|---|---|---|
 | 显示 | UEFI framebuffer，内核无 DSI 驱动 | 同（NT37705 1240×2772 面板经 ABL/UEFI fb） | 同 | **已有**（v0.2 + 23.x MiniIOMFB 出画链） |
 | 触摸 | Goodix GT9916 / FT3680 SPI（`hakios.goodix.c` 53 KB） | Synaptics S3910 TouchComm v1，SPI SE4 bitbang | 新写 | **已有**（S3910 v10e probe PASS，Boot #21；设备仓 `drivers/input/hakios.s3910.c` 62 KB） |
-| 按键 | PMIC SPMI（taro 上游只认 v5 仲裁器） | taro SPMI **v7** 仲裁器 | 换参 | **已有**（Wave12 v8/v9 真机按键事件） |
+| 按键 | PMIC SPMI（taro 上游只认 v5 仲裁器） | taro SPMI **v7** 仲裁器 | 换参 | **已有**（阶段 12 v8/v9 真机按键事件） |
 | CPU/cpufreq | EPSS，8 核，bootcpu=7 | EPSS@0x17d91000 同址，3 频域 | 换参（表） | **已有**（8/8 核 Boot #13 起） |
 | 存储 UFS | `hakios.ufs.c/ufshc.c` 经 loader mailbox 页 | 同架构同地址（ufshc@1d84000） | 同 | **已有**（v0.4 S0–S8 全通，Boot #22–24） |
 | GPU | **`hakios.adreno.c` 167 KB，22 步法**；Adreno 642L，chipid 0x06030500（DT），无芯片 ID 寄存器，只靠 fuse；固件 a660_{gmu.bin,sqe.fw,zap.mdt/b00–b02} | **Adreno730v3**（gen7），chipid 0x7030002，kgsl@0x3d00000、gen7-gmu@3d69000、adreno-smmu@3da0000、zap-shader 节点在（`[DTB]`） | **新写参数层**（方法论同，全套数字+固件族换 a730/gen7） | 未启动（v0.5） |
@@ -114,10 +114,10 @@
 | 触感 | Awinic AW86927 I2C + 固件 bin | **PM8350B HV-haptics（SPMI）+ SoundWire（swr_haptics）**（`[DTB]`） | 新写（架构不同，低优先） | 未排期 |
 | 相机 | `hakios.camera.c` 165 KB + torch；sensormodule/tuned bin 从 `/vendor/lib64/camera/` 拉 | 4×cam-sensor + OIS + eeprom（型号在运行时 bin 才知） | 新写（v1.0 后） | 未排期 |
 | 热 | TSENS 直读 27 传感器 @0xc222000/0xc223000 | 同基址 v2，16×2=32 传感器 | 换参（计数/热区表） | 部分已有（sm8475.config 记录） |
-| 平台核 | GIC-600（GICR stride 0x20000） | GICR stride **0x40000**（Boot #12 真机破案） | 换参 | **已有** |
-| 平台核 | SPMI v5 仲裁器 | SPMI **v7** 仲裁器（Wave12 v8 适配） | 换参 | **已有** |
-| 平台核 | GENI 引擎（FIFO） | GENI 同 IP（我们 SE4 FIFO 被固件禁用 → bitbang 路径，Wave12a/b） | 换参 | **已有** |
-| 网络 | `hakios.net.c`（enN）+ virtio_net | 同 + 我们自有 `hakios.loader_net.c`（en0 loader 桥） | 同+自有 | **已有**（Wave21 en0 数据面） |
+| 平台核 | GIC-600（GICR stride 0x20000） | GICR stride **0x40000**（Boot #12 真机定位根因） | 换参 | **已有** |
+| 平台核 | SPMI v5 仲裁器 | SPMI **v7** 仲裁器（阶段 12 v8 适配） | 换参 | **已有** |
+| 平台核 | GENI 引擎（FIFO） | GENI 同 IP（我们 SE4 FIFO 被固件禁用 → bitbang 路径，阶段 12a/b） | 换参 | **已有** |
+| 网络 | `hakios.net.c`（enN）+ virtio_net | 同 + 我们自有 `hakios.loader_net.c`（en0 loader 桥） | 同+自有 | **已有**（阶段 21 en0 数据面） |
 
 ### 2.4 soc_* boot-args 全 16 项对照（`[UP-D] soc.args` vs `[TREE] devices/phk110/soc.args`）
 
@@ -176,7 +176,7 @@
 | 2.3.4（11-05） | Metal 运行期 pipeline 邻近变体匹配修复（壁纸红顶/状态栏白带根因）；触摸 lift ≤5–6 ms（原 88–169）；**Metal 基准 109.6 fps / 1.3% 超 16.7 ms**；`devices/<name>/metal.args` 机制（非 redwood 设备不再吃 redwood 参数） | **高**（v0.5 性能锚 + metal.args 范式直接抄） |
 | 2.3.3（11-05） | hakios-metal 并入主仓；**`fb_beam/fb_measure` 只在 sc7280 或 fb_intf= 时读显示接口寄存器（此前在任何 SoC 上读 SM7325 的地址）**；chip id 不符的 GPU 拒绝服务；触摸每 look 必读报告；慢帧即时过滤 | **高**（fb 接口寄存器坑正是跨 SoC 移植会踩的；23.x 出画链相关） |
 | 11-04 | Metal 120 未达的量化归因（SpringBoard 主线程 + home 键帧耗）；`wallpaper_freeze=1`（壁纸定帧：home 键 28→92 fps）；`fb_beam=1`（按面板扫描线错峰写行，去横带零帧损）；`fbsubtype=N`（换 iPhone 机型屏幕等级） | **高**（23.y 进程稳定/帧率调优的现成旋钮） |
-| 11-03 | **Metal on Vulkan（Turnip+AdrenoMetal+metal2vulkan）全链上机**：vk_test/m2v_test 过；metal_m2v=1 窗口服务器 50–57 fps；HakiosGPU 0x7d 客户端页 buffer（`VK_EXT_external_memory_host`） | **高**（v0.5 第二路线的验收级细节） |
+| 11-03 | **Metal on Vulkan（Turnip+AdrenoMetal+metal2vulkan）全链真机验证**：vk_test/m2v_test 过；metal_m2v=1 窗口服务器 50–57 fps；HakiosGPU 0x7d 客户端页 buffer（`VK_EXT_external_memory_host`） | **高**（v0.5 第二路线的验收级细节） |
 | 11-02 | Metal shader 缓存 `/var/db/hakios-metal-cache` + 镜像种子；`tools/metal-run.sh`（Git Bash 一条命令实测跑 Metal） | 中 |
 | 10-29/30 | U-Boot 双系统全家桶；Wi-Fi 控制器寻址修复（ios-sapphire port 发现）；Darwin 化更名 | 已在 landscape 覆盖 |
 
@@ -207,7 +207,7 @@
 
 ---
 
-## ④ 驱动提取工作流与 PHK110 物料清单（协调者指定重点）
+## ④ 驱动提取工作流与 PHK110 物料清单（本文重点）
 
 ### 4.1 上游工作流全解（三个脚本逐条）
 
@@ -234,7 +234,7 @@
 
 **D. 固件怎么进镜像（接入路径）**：
 - **小镜像 `fw/`**：`userland/build.sh` 以 `GPU=1 ADSP=1 ...` 把 fw-gpu/fw-wifi/fw-haptic/fw-audio 打进 payload 小镜像（GPU 137 KB 级别才放得下）；
-- **`system.apfs /fw`**：MODEM=1 SYSTEM=1 时把 fw-modem（273 MB）灌进系统卷 `/fw`，内核运行期从根读（`hakios.mpss.c:1045-1110`）——**PKG110 文档实证：没有 ramdisk/system 镜像时内核在 modem 线程启动前就 panic（root mount fail），modem 链必须配完整 Darwin 镜像**（与我们 Wave18 的 system.apfs 换根结论同构）；
+- **`system.apfs /fw`**：MODEM=1 SYSTEM=1 时把 fw-modem（273 MB）灌进系统卷 `/fw`，内核运行期从根读（`hakios.mpss.c:1045-1110`）——**PKG110 文档实证：没有 ramdisk/system 镜像时内核在 modem 线程启动前就 panic（root mount fail），modem 链必须配完整 Darwin 镜像**（与我们 阶段 18 的 system.apfs 换根结论同构）；
 - 内核驱动以"step 法"消费固件：先 `is it whole, does it fit the reserved memory` 校验，再 TZ 认证加载（zap/wifi/adsp/modem 各有 TZ image 号：GPU zap=12 步、WPSS=image 6、ADSP=image 1、MPSS=image 4）。
 
 ### 4.2 "拉出来之后接在哪"（接入形态分类）
@@ -243,12 +243,12 @@
 |---|---|---|
 | **firmware blob**（.mdt+.bNN 签名分段 / 裸 .bin） | GPU zap/GMU/SQE、WPSS、ADSP、MPSS、IPA fw、触感 bin | 唯一从手机拉的形态；**没有 .ko**——XNU 不能加载 Linux 内核模块 |
 | **Linux 驱动源码级移植** | ath11k（`hakios.wlfw.c` = 其 wlfw 服务的 stand-in；`wifi/lx/` = cfg80211/mac80211 兼容层 + 6 个 Linux 头 patch） | "复用 Linux Wi-Fi 驱动"的真实含义 = 源码编译进 XNU，不是二进制复用 |
-| **vendor UEFI DXE 二进制**（另一条拉取线，从 UEFI 镜像非从 Android） | `[UP-D] uefi/files/Binaries/redwood/`（不入 git）：ButtonsDxe（键码 0x102→Enter，Gustave Monce）/ **DALSYSDxe（UFS cache coherence）**/ TzDxeLA（TZ applet 变量→TRUE）/ **UsbConfigDxe（移除 ExitBootServices 时的 USB 反初始化）** / UsbMsdDxe（Removable→Non-Removable） | 与我们 Wave18 R1（DALSYSDxe 清白免patch）与 Wave21–24（UsbConfigDxe start_ex/端点墙）**互证**：vendor DXE 的这两处坑上游同样要手术 |
+| **vendor UEFI DXE 二进制**（另一条拉取线，从 UEFI 镜像非从 Android） | `[UP-D] uefi/files/Binaries/redwood/`（不入 git）：ButtonsDxe（键码 0x102→Enter，Gustave Monce）/ **DALSYSDxe（UFS cache coherence）**/ TzDxeLA（TZ applet 变量→TRUE）/ **UsbConfigDxe（移除 ExitBootServices 时的 USB 反初始化）** / UsbMsdDxe（Removable→Non-Removable） | 与我们 阶段 18 R1（DALSYSDxe 清白免patch）与 阶段 21–24（UsbConfigDxe start_ex/端点墙）**互证**：vendor DXE 的这两处坑上游同样要手术 |
 | **用户态物料**（不从手机拉） | Mesa 25.0.7（freedreno+Turnip）、hakios-metal、AdrenoMetal+metal2vulkan、Procursus 类 | IPSW 自备 + 工具链自建 |
 
 ### 4.3 PHK110（SM8475/ColorOS）物料清单预研
 
-前置事实：root 可用（Magisk）+ adb 通道已验证（wave16c 配方）→ **"拉"这个动作零障碍；关键是拉什么、接在哪**。下表置信度分级：A = DTB/在盘证据直接支持；B = 上游同族先例+主线证据；C = 待上机/待解包核对。
+前置事实：root 可用（Magisk）+ adb 通道已验证（wave16c 配方）→ **"拉"这个动作零障碍；关键是拉什么、接在哪**。下表置信度分级：A = DTB/在盘证据直接支持；B = 上游同族先例+主线证据；C = 待真机验证/待解包核对。
 
 | 物料 | ColorOS 预期位置 | 预期形态/文件名 | 接入点（v0.x） | 置信 |
 |---|---|---|---|---|
@@ -274,7 +274,7 @@
 
 ### Top 3（立即可用）
 
-**#1 `pull-firmware-root.sh` 模板化 → 实现 `devices/phk110/pull-firmware.sh`**（v0.5 前置，估 30–60 行脚本 + 一次上机 ls/拉取）
+**#1 `pull-firmware-root.sh` 模板化 → 实现 `devices/phk110/pull-firmware.sh`**（v0.5 前置，估 30–60 行脚本 + 一次真机验证 ls/拉取）
 - 价值：上游已把"从 ColorOS 拉固件"的权限墙、暂存法、逐目录验收全部趟平；我们 root+adb 双通道在位。v0.5 GPU 战的第一物料（a730 固件）就靠它。
 - 佐证：PKG110 文档 = 第二台同族点亮用同款脚本一次拉齐 313 MB；`[TREE]` 我们的占位脚本已写明"写这个脚本时参照 devices/redwood/pull-firmware.sh"。
 - 验收：5 个 fw-*/ 目录文件数行；a730 三件（zap/gmu/sqe）真名落档进本报告附录或 wave 报告。
@@ -292,7 +292,7 @@
 ### 观察项（不占 Top 3）
 
 - **lx 兼容层的 bus 抽象**：读 `[UP-K] docs/driver-review/wifi-stack.md`（36 KB）确认 cfg80211/mac80211 上半与 PCI/MHI 下半的隔离度 → v0.6 工作量评估的直接输入；
-- **vendor DXE patch 清单对照**：上游 5 patch（ButtonsDxe/DALSYSDxe/TzDxeLA/UsbConfigDxe/UsbMsdDxe）vs 我们 udonPkg 的实际差异表——特别是 UsbConfigDxe"EBS 反初始化移除"与我们 Wave 21–24 结论（start_ex 端点墙 = vendor UsbDeviceDxe 固有行为）的交叉印证；产出一页 `docs/research/` 对照表（可选）；
+- **vendor DXE patch 清单对照**：上游 5 patch（ButtonsDxe/DALSYSDxe/TzDxeLA/UsbConfigDxe/UsbMsdDxe）vs 我们 udonPkg 的实际差异表——特别是 UsbConfigDxe"EBS 反初始化移除"与我们 阶段 21–24 结论（start_ex 端点墙 = vendor UsbDeviceDxe 固有行为）的交叉印证；产出一页 `docs/research/` 对照表（可选）；
 - **Metal 性能锚**：109.6 fps（滑动基准）/100–104 fps（真实手指）/m2v 50–57 fps——v0.5 验收线的对照基准；帧率墙在 SpringBoard 主线程而非 GPU，PHK110 只会更好 [推断]；
 - **hakios-mt6768**（MTK 第二族）：证明上游设备抽象已跨 SoC 厂——若未来 PHK110 之后扩设备，范式已备；
 - **PKG110 文档的 Windows 工程坑清单**：flock shim、7z `:` 文件名 NTFS 限制、modem 链必须 system 镜像——后两条与我们 wave16c/wave18 经验同构，可在 wave 报告互引。
@@ -301,7 +301,7 @@
 
 ## ⑥ 信息缺口（诚实清单）
 
-1. **PHK110 `/vendor/firmware/` 真实文件清单**（a730 zap/GMU/SQE 真名、wlan 目录形态、adsp/modem 分段数）——需一次上机 `su -c ls` + 拉取；本轮零手机未做。缓解：a730_zap.mbn 主线存在性已证（linux-firmware），GMU/SQE 名为 [待核]。
+1. **PHK110 `/vendor/firmware/` 真实文件清单**（a730 zap/GMU/SQE 真名、wlan 目录形态、adsp/modem 分段数）——需一次真机验证 `su -c ls` + 拉取；本轮零手机未做。缓解：a730_zap.mbn 主线存在性已证（linux-firmware），GMU/SQE 名为 [待核]。
 2. **`qcom,ipa-hw-ver=0x16` 的 vendor 枚举解码**——需 OnePlusOSS sm8475 techpack/ipa 源码（GPL，公开；本地未拉）。两条独立外部证据已指向 v5.1，但 DTB 数值的精确对应未闭合。
 3. **wifi/lx 对 ath11k PCI 的覆盖度**——`wifi-stack.md`/`wifi-bringup.md`（共 69 KB）未逐字读；lx bus 层是否已含 MHI 假身未知（上游 redwood 只用 AHB/WPSS 路径）。
 4. **主线 SM8450 IPA v5.1 系列的合入状态**——patchew v2（2026-09）显示 changes-requested（依赖另一个未合 patch + 系列拆分要求），**未合入 net-next**；引用时注意它当前是"公开系列"非"主线代码"。

@@ -1,10 +1,10 @@
-# Wave16c 报告：P0 执行收官 —— darwin 分区 + 12G HFS+ 数据卷就位（全 adb 通道，零 fastboot）
+# 阶段 16c · 2026-11-04 · darwin 分区与数据卷就位（全程 adb）
 
-> 2026-11-04 · 执行子代理 · 前代（同一 wave16c 执行线）已完成 preflight/backup/resize/dryrun/carve/verify-android 六步并验证（`backups-slotb/p0-run/RESUME-NOTE.txt` + `RECERT-BASELINE.txt`），卡在第 6 步 volume 的 fastboot 通道（usbipd→WSL bulk 数据面被打线事件打死，已弃用）。用户强制重启手机回安卓（唯一物理动作）后，本波以**纯 adb 软件通道**完成灌卷 + verify-volume + 收尾。零 fastboot、零 usbipd、零 git reset。
+> 2026-11-04 · 执行记录 · 前代（同一 wave16c 执行线）已完成 preflight/backup/resize/dryrun/carve/verify-android 六步并验证（`backups-slotb/p0-run/RESUME-NOTE.txt` + `RECERT-BASELINE.txt`），卡在第 6 步 volume 的 fastboot 通道（usbipd→WSL bulk 数据面被打线事件打死，已弃用）。强制重启手机回安卓（唯一物理动作）后，本波以**纯 adb 软件通道**完成灌卷 + verify-volume + 收尾。零 fastboot、零 usbipd、零 git reset。
 
 ## 0. 执行摘要
 
-**P0 完成。** darwin 分区（sda15，20 GiB，carve 产物）内 HFS+ 空数据卷 12G 落盘并通过三重全卷 sha256 全等验证；verify-volume PASS（卷头签名 `HX`）；`adb reboot` 回安卓后盘上签名字节级复验在位、userdata 数据面完好。**S3-S8 全部解锁**（wave15-ufs-research.md §4 施工单的 S0-S2 已由 Wave16 Boot #22 达成）。
+**P0 完成。** darwin 分区（sda15，20 GiB，carve 产物）内 HFS+ 空数据卷 12G 落盘并通过三重全卷 sha256 全等验证；verify-volume PASS（卷头签名 `HX`）；`adb reboot` 回安卓后盘上签名字节级复验在位、userdata 数据面完好。**S3-S8 全部解锁**（wave15-ufs-research.md §4 施工单的 S0-S2 已由 阶段 16 Boot #22 达成）。
 
 | 项 | 值 |
 |---|---|
@@ -12,7 +12,7 @@
 | 通道 | WSL Fedora44 Linux adb 客户端 37.0.0p1 → `ADB_SERVER_SOCKET=tcp:127.0.0.1:5037` → Windows adb 服务器 37.0.1（USB 数据面）|
 | 镜像 | WSL `~/p0-darwin-vol.raw` = 13,109,276,672 B（= 3,200,507 块 × 4096 精确）|
 | 全卷 sha256 | `88c1cd9986b77d382c0b92bb7a953b14d7be67121ae400ea8dd53e292bc96bd8`（源文件 / 写后读回 / 独立重读 三方全等）|
-| 写入位置 | darwin 块 2,042,368..5,242,874（字节 8,365,539,328..21,474,815,999；恰收口于分区末块）|
+| 写入位置 | darwin 块 2,042,368..5,242,874（字节 8,365,539,328..21,474,815,999；恰收尾于分区末块）|
 | dd 实测 | 3,200,507+0 records in/out，13,109,276,672 bytes，47.517 s，263 MB/s（2026-11-04 10:04:02）|
 | verify-volume | PASS：块 2,042,368 签名 **`HX`**（HFS+X 日志式）；darwin 块 0 sum = 全零哈希（未来 Darwin rootfs 区零触碰）|
 | 耗时 | push ~80 s（~164 MB/s 稳态）→ dd 47.5 s → 读回 sha ~51 s；全程 ~4 分钟 |
@@ -31,7 +31,7 @@
 | 5 verify-android | PASS（01:02）| sda15 = 21,474,816,000 B；PARTNAME=darwin；darwin-write check 全链过；/data 200G/41G；用户数据抽查（DCIM 42 / Download 7 / 437 pkgs）|
 | （卷产物）mkdatavol | EXIT=0（01:03）| darwin.simg 53,464 B（sha256 `d82f845c…`，本波补记）；simg2img + tail 裁剪 → WSL `~/p0-darwin-vol.raw` 13,109,276,672 B，sha256 `88c1cd99…` 已登记 |
 
-暂停原因（RESUME-NOTE）：fastboot flash darwin 两次挂死（bulk URB 全零数据；手机侧 ABL fastboot 数据端点被中断的上传打死）→ fastboot 通道弃用 → 等用户强制重启回安卓。**本波即从这里接续。**
+暂停原因（RESUME-NOTE）：fastboot flash darwin 两次挂死（bulk URB 全零数据；手机侧 ABL fastboot 数据端点被中断的上传打死）→ fastboot 通道弃用 → 随后强制重启回安卓。**本波即从这里接续。**
 
 ## 2. 本波执行逐步（全证据）
 
@@ -64,7 +64,7 @@ python3 -I darwin-write-phk110.py write /home/<host>/p0-darwin-vol.raw 2042368
 
 工具内部全链（`logs/darwin-write-phk110.log`）：
 
-1. `prepare`：镜像整 4096 倍数 → 3,200,507 块；范围门：块 ≥ 1,374,208（rootfs.apfs 保护区）且 2,042,368+3,200,507 = **5,242,875 = darwin 末块**，恰收口 ✅
+1. `prepare`：镜像整 4096 倍数 → 3,200,507 块；范围门：块 ≥ 1,374,208（rootfs.apfs 保护区）且 2,042,368+3,200,507 = **5,242,875 = darwin 末块**，恰收尾 ✅
 2. `identity()` 第一次：全链身份 + GPT 双 CRC ✅（10:02:43 计划行登记）
 3. 本地 sha256(镜像) = `88c1cd99…` → `adb push` → `/data/local/tmp/darwin-write.img`（~80 s）
 4. 手机端 `sha256sum` 暂存副本 = `88c1cd99…` ✅ → `identity()` 第二次（写前复查）✅
@@ -126,16 +126,16 @@ ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7  darwin 块 0�
 ## 6. 红线遵守
 
 - 只碰 sda15(darwin)：工具三重身份门 + guarded-dd 同 shell 复核 + 写前/写后 identity() ✅
-- 写入偏移 = 块 2,042,368 起，恰收口分区末块；保护区 0..1,374,207 零触碰（范围门 + sum 证）✅
+- 写入偏移 = 块 2,042,368 起，恰收尾分区末块；保护区 0..1,374,207 零触碰（范围门 + sum 证）✅
 - darwin 范围外零扇区写入（全波唯一块设备写 = 该 dd）✅
 - 禁 fastboot ✅（零 fastboot 调用）；禁 git reset ✅；boot_a/boot_b/slot 表零触碰（GPT 为前代 carve 已验证产物，本波未动）✅
 - 手机临时文件已清（darwin-write.img）；用户数据面全程在线（resize→carve→灌卷→reboot 全链 /data 200G/41G 无损）✅
 
 ## 7. P0 完成 → 解锁与下一步
 
-**P0 全链收官（0-7 子命令全 PASS）。** wave15-ufs-research.md §4 施工单：
+**P0 全链完成（0-7 子命令全 PASS）。** wave15-ufs-research.md §4 施工单：
 
-- ~~P0~~ ✅（本波）· ~~S0~~ ✅ ~~S1~~ ☑ ~~S2~~ ✅（Wave16 Boot #22）
+- ~~P0~~ ✅（本波）· ~~S0~~ ✅ ~~S1~~ ☑ ~~S2~~ ✅（阶段 16 Boot #22）
 - **S3（有界读写回读，第一个开写实验）→ S4（flush/写序）→ S5（设备发布）→ S6（HFS+ 挂载）→ S7（/var 内容）→ S8（持久闭环）：全部解锁**
-- S3 首刷必带 `ufs_check=1`（cmdline 预算余 228 字符；R1 DALSYSDxe coherence 情报见 STATUS.md 1f 条）——内核将把本卷认作 `/dev/ufs_darwin_data`
+- S3 第一次刷写必带 `ufs_check=1`（cmdline 预算余 228 字符；R1 DALSYSDxe coherence 情报见 STATUS.md 1f 条）——内核将把本卷认作 `/dev/ufs_darwin_data`
 - 镜像现状：boot_b 仍为 v11（UFS S0-S2 版）；S3+ 开写属 cmd/配置增量，沿用 boot_b 一揽子授权通道

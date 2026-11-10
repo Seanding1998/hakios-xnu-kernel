@@ -1,7 +1,7 @@
-# Wave 10 — Boot #11 abort 根因修复：GICR 扫描步进（`udon-hakios-grafted-v5.img`）
+# 阶段 10 · 2026-11-03 · GIC 重分配器步进修复：内核首次跑进用户态
 
-Date: 2026-11-03. Agent: Wave 10（全程未碰手机；kernel + loader 双修复 + 全量重编内核 + 重建交付 v5）。
-目标：Boot #11 真机内核日志里，Wave 9 的 DT/GIC 地址修复已生效（`found interrupt-controller` /
+Date: 2026-11-03. Agent: 阶段 10（全程未碰手机；kernel + loader 双修复 + 全量重编内核 + 重建交付 v5）。
+目标：Boot #11 真机内核日志里，阶段 9 的 DT/GIC 地址修复已生效（`found interrupt-controller` /
 `gPicBase` / `gTimerBase` 全部打出），但 `gTimerBase` 之后 ~139 µs 仍见
 `Unclassified kernel abort (fault_code=0x10)`——找到精确位置，修掉，让下一轮不再出现。
 
@@ -16,14 +16,14 @@ Date: 2026-11-03. Agent: Wave 10（全程未碰手机；kernel + loader 双修�
 | 内核 Mach-O（全量重编，+24 B vs v4） | `hakios-kernel-v5` | 14,841,392 B | `210d01734e7828e8cc353dffffc19efdeb6a13bdf776f57fe375c39134aebf1f` |
 
 自检：`wave5-scripts/verify-udon-hakios.py` **ALL 21 CHECKS PASSED**（§7）。v1/v2/v3/v4 全部原样
-（抽验 v4 img/payload/loader、v3 img、BootShim 的 sha256 与 Wave 9 报告逐位一致）。
-FD 未重建（sha `8924cb67…` = Wave 7 FD，Boot #9 验证过的挂点版）。
+（抽验 v4 img/payload/loader、v3 img、BootShim 的 sha256 与 阶段 9 报告逐位一致）。
+FD 未重建（sha `8924cb67…` = 阶段 7 FD，Boot #9 验证过的挂点版）。
 
-**一句话结论**：abort 不在 GIC 地址（Wave 9 已修对），而在 **GICR 扫描步进**：内核
+**一句话结论**：abort 不在 GIC 地址（阶段 9 已修对），而在 **GICR 扫描步进**：内核
 `gic_find_redistributor()` 以硬编码 0x20000（一帧 RD+SGI 两页）步进扫 redistributor 区，而
 SM8475 的 GIC-700 给每个 PE 一个 **0x40000 的槽**，槽内后半（+0x20000..+0x40000）未分配——
 第 2 步读 `0x171A0008`（PE0 槽内的保留垫）→ 互连不解码 → 同步外部中止（FSC 0x10）。
-这是 Wave 9 报告预告的残余风险 #1，本轮兑现修复：**内核按 DT 的 `redistributor-stride`
+这是 阶段 9 报告预告的残余风险 #1，本轮兑现修复：**内核按 DT 的 `redistributor-stride`
 步进（phk110 = 0x40000），loader 给 phk110 的 DT 写入该属性**。QEMU/redwood 无此属性 →
 行为逐字节不变（QEMU 冒烟全链通过）。
 
@@ -38,7 +38,7 @@ SM8475 的 GIC-700 给每个 PE 一个 **0x40000 的槽**，槽内后半（+0x20
   这是 `gTimerBase` 打印（pe_identify_machine.c:551）之后**第一处会访问 GIC MMIO 的代码**。
   中间的 `pe_arm_init_timer`/`ml_init_timebase`（machine_routines.c:858-870，arm64 只重存缺省
   timebase 函数指针）、`pe_arm_init_debug`/`ml_init_arm_debug_interface`（只存指针 +
-  do_debugid 读 ID 寄存器）都不碰 MMIO——Wave 9 已审计，v4 未改。
+  do_debugid 读 ID 寄存器）都不碰 MMIO——阶段 9 已审计，v4 未改。
 - `gic_v3_irq_cpu_init` 里先于一切 GIC MMIO 的是系统寄存器 `ICC_SRE_EL1` 读改写（:467），
   随后 :471 `gicr = … = gic_find_redistributor()`。
 - 扫描循环（v4 行号 :402-403）`for (frame = gicr_base; frame + 0x20000 <= gicr_base + 0x200000;
@@ -59,7 +59,7 @@ SM8475 的 GIC-700 给每个 PE 一个 **0x40000 的槽**，槽内后半（+0x20
   `PE_init_cpu` 的 GIC 首读窗口（QEMU 同窗口 GIC 打印在 +1.1 ms；真机上一两笔 MMIO 读即中止，
   早于一切后续打印，日志在 abort 行后无任何字节，`intel/m3-boot1/b11-logdump-v4.bin` 同构）。
 
-### 1.2 反证：不是 hyp stage-2 拦 GIC（三个独立铁证）
+### 1.2 反证：不是 hyp stage-2 拦 GIC（三个独立证据）
 
 1. **我们自己的 UEFI 固件就在真机上以 0x40000 步进读写 GICR**：udonPkg → PalimaPkg
    （`uefi-udon/Silicon/Qualcomm/PalimaPkg/PalimaPkg.dsc.inc:50-51`）定义
@@ -116,14 +116,14 @@ SM8475 的 GIC-700 给每个 PE 一个 **0x40000 的槽**，槽内后半（+0x20
    逐字符等价）。RD/SGI 页内偏移（`GICR_SGI_BASE` 等）不动——帧内部两页布局是架构规定的。
 4. 文件头注释（:26-27）补 `redistributor-stride` 语义。
 
-### 3.2 loader `xnuloader/loader.c`（+21/-7，叠加在 Wave7b staged + Wave8/9 unstaged 之上）
+### 3.2 loader `xnuloader/loader.c`（+21/-7，叠加在 阶段 7b staged + 阶段 8/9 unstaged 之上）
 
 1. :582 `struct platform` 新增 `uint64_t gic_redist_stride;`（0 → 不写属性 = 旧行为）。
 2. :640 `platform_phk110` 增加 `.gic_redist_stride = 0x40000,`，注释更新为 Boot #10/#11
    双 abort 语义与 PalimaPkg PlatformSecLib 步进出处。
 3. :3504-3508 DT 构造：gic 节点在 `reg` 之后按条件追加
    `dt_prop("redistributor-stride", u64 0x40000)`。qemu-virt/redwood 平台字段为 0 →
-   DT 字节级与 v4 相同（与 Wave 9 `gic_redist_size` 同款条件化模式）。
+   DT 字节级与 v4 相同（与 阶段 9 `gic_redist_size` 同款条件化模式）。
 
 副作用面：`redistributor-stride` 属性在内核里只有 `gic_v3_irq_cpu_init` 一个读者（全仓 grep
 只有本文件命中）；pexpert 不读该属性。QEMU 冒烟证明缺省路径无回归（§6）。
@@ -135,7 +135,7 @@ SM8475 的 GIC-700 给每个 PE 一个 **0x40000 的槽**，槽内后半（+0x20
 - Boot #11 存档 `intel/m3-boot1/b11-kernel-log.txt` 全文复核：abort 行后无字节，
   时间戳窗口与 GIC 首读吻合。
 
-## 5. 重建链（全 WSL；FD 未重建，复用 Wave 7 FD）
+## 5. 重建链（全 WSL；FD 未重建，复用 阶段 7 FD）
 
 ```
 a. kernel   cd ~/hakios/kernel && ./tools/make-kernel.sh -j8
@@ -145,7 +145,7 @@ b. loader   cp identity.h 备份位（qemu-open 先会临时覆盖，见 §6）�
             cd ~/hakios/kernel && PAYLOAD_BASE=0xF4000000 xnuloader/build.sh
             → loader.efi 67,584 B（v4 66,560，+1024），sha 66c6b342…
             strings 复核：phk110 / redistributor-stride / interrupt-controller /
-            cpu-debug-interface / "KERNEL LOG"（Wave7b）/ "usb: try"（Wave8）全在。
+            cpu-debug-interface / "KERNEL LOG"（阶段 7b）/ "usb: try"（阶段 8）全在。
 c. XNUP v5  python3 xnuloader/mkpayload.py -o payload-v5.bin --no-version \
               loader.efi=<b> kernel=hakios-kernel \
               ramdisk=<v4 提取> cmdline=<v4 提取> kernel.ver=<v4 提取>
@@ -181,16 +181,16 @@ d. 打包     python3 -I wave4-scripts/package-udon-boot.py --fd ~/hakios/uefi-u
 virtual timer on PPI 27`（qemu 无 stride 属性 → 走缺省 0x20000 扫描，找到 cpu0 帧并初始化
 全部 8 步内寄存器）→ 8 驱动（.config 集）→ 用户态 `Hello from user space on Darwin! I am
 process 1…` → hello 退出 → `initproc failed to start`（qemu-open 验收的标准终点，hello
-ramdisk 无 init 可再跑）→ stackshot → `== END OF LOG ==`。与 Wave 9 报告引用的验收日志
+ramdisk 无 init 可再跑）→ stackshot → `== END OF LOG ==`。与 阶段 9 报告引用的验收日志
 （`device-layer/qemu-open.log`，3979 行，原 `logs/qemu-open.log` 的归档副本）同构推进。
 注：`make` 失败尝试曾把 `~/hakios/kernel/logs/qemu-open.log` 截断（134 B），已从
-device-layer 归档副本逐字节还原（3979 行，3693 行 gic 行等与 Wave 9 文档引用一致）；
+device-layer 归档副本逐字节还原（3979 行，3693 行 gic 行等与 阶段 9 文档引用一致）；
 新验收日志另存 `logs/qemu-open-w10.log`。old 参考日志与新日志仅内核时间戳/地址随机化差异。
 
 ## 7. 自检（verify-udon-hakios.py）
 
 `python3 -I wave5-scripts/verify-udon-hakios.py device-layer/udon-hakios-grafted-v5.img
-device-layer/stock-boot-a.img device-layer/udon-hakios-BootShim.bin <Wave 7 FD>
+device-layer/stock-boot-a.img device-layer/udon-hakios-BootShim.bin <阶段 7 FD>
 payload-v5.bin` → **ALL 21 CHECKS PASSED**（header diff 仅 bytes 8..14 / gzip round-trip
 19,120,512 B / shim 头 0xA7100000 + shim+fd=0x4000f0 / FD _FVH@shim+0x28 / XNUP 逐字节 /
 entries {loader.efi 67,584, kernel 14,841,392, ramdisk 16,528, cmdline 248, kernel.ver 48} /
@@ -200,9 +200,9 @@ cmdline 含 serial=0+loader_return_after=20+cpus=8+bootcpu=7 / AVBf footer / sto
 ## 8. Git 状态（kernel 仓与 xnu-src 仓，均未 commit、未 identity、不 commit）
 
 - kernel 仓 `git status --short` = `M mkxnuimg.py / M tools/provenance.allow /
-  M xnuloader/build.sh / MM xnuloader/loader.c`——与 Wave 9 接手时同构叠加：
-  staged（Wave7b）原样未动；loader.c unstaged 现含 Wave8 + Wave9 DT 修复 + 本 wave
-  （:582 / :640 / :3504-3508 三个 hunk，`git diff xnuloader/loader.c` 中 Wave8 块之外
+  M xnuloader/build.sh / MM xnuloader/loader.c`——与 阶段 9 接手时同构叠加：
+  staged（阶段 7b）原样未动；loader.c unstaged 现含 阶段 8 + 阶段 9 DT 修复 + 本 wave
+  （:582 / :640 / :3504-3508 三个 hunk，`git diff xnuloader/loader.c` 中 阶段 8 块之外
   即可辨认）。**未执行任何 git reset/checkout/stash/clean**。
 - xnu-src 仓：`gic_v3_irq.c` 为 apply.sh 覆盖产生的未跟踪文件（`??`），本 wave 的改动
   留在树中（该仓无 identity，不 commit）。
@@ -242,6 +242,6 @@ Darwin Kernel Version 22.5.0: …
 - 代码层：kernel 侧 `gic_v3_irq.c` 是未跟踪文件，`git diff` 不可用——改动集中在
   :85 / :410-412 / :446-453 / :26-27 四块，可按块还原为 v4 行为（stride 恒 0）；
   loader 侧 unstaged 的三个 hunk（:582 / :640 / :3504-3508）可按 hunk 丢弃，
-  Wave7b（staged）与 Wave8/Wave9 块不受影响。
+  阶段 7b（staged）与 阶段 8/阶段 9 块不受影响。
 - kernel/ramdisk/cmdline/kernel.ver 语义：v5 的 ramdisk/cmdline/kernel.ver 与 v4 逐字节
   相同，kernel 条目仅含 gic_v3_irq.c 增量（+24 B）——重刷 v4 即回到 Boot #11 行为。

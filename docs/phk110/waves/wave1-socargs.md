@@ -1,4 +1,4 @@
-# Wave 1：PHK110（Cape/SM8475）soc_* 启动参数补全 + 内存映射 + loader 窗口分析
+# 阶段 1 · 2026-11-02 · SM8475 启动参数表与内存图分析
 
 调查代理 A 产出 · 2026-11-02 · 全部结论基于 PHK110 实机（adb 只读取证）与
 `intel/phk110-fdt.dtb`（Cape 设备树，含 `__symbols__`）的逐节点解析。
@@ -62,7 +62,7 @@ FDT 证据同时用 ABL 基线树（`phk110-fdt.dtb`）与实机 `/sys/firmware/
   经 soc-args 输出为 `soc_ipa_fw=ipa_fws`（redwood 是 `yupik_ipa_fws`）。
 - 验证途径（wave 2）：刚开机时 `su -c dmesg | grep ipa_fws` 应出现
   `ipa_fws: loading from 0x8b910000 to 0x8b91xxxx`；若 vendor PIL 改载 ipa_fw_region，
-  则改传 0x8b900000（此时驱动仍按 0xa000 收口）。
+  则改传 0x8b900000（此时驱动仍按 0xa000 收尾）。
 
 ### soc_pas_mpss = 0x4（沿用，待真机验证）
 
@@ -208,9 +208,9 @@ payload（0xF0000000+64MB）与窗口不相交；6 GB cap 截断而非分配失�
   `forced_base=0x840000000` 在本机可行——高 bank 有 13 GB，allocate 6 GB 能成）。
 - 后续如需 >6 GB：上限是 bootstrap 页表的 8 GB 覆盖；先把 `MAX_MEM_SIZE` 提到 0x200000000 之前，
   按 16K 页实际配置核对 `BOOTSTRAP_TABLE_SIZE` 分支（patch 注释的算术是 4K 页口径）。
-- ⚠ 与本任务无关但同属上机风险的已存问题：payload 固定在 `0xF0000000`，而 Cape 的 DT 里
+- ⚠ 与本任务无关但同属真机验证风险的已存问题：payload 固定在 `0xF0000000`，而 Cape 的 DT 里
   `0xF0000000–0xF13fffff` 不在 RAM 内（RAM 从 0xf1400000 起）——payload 放置由 boot shim 负责，
-  上机前需确认 shim 在 Cape 上的落位逻辑避开该 20 MB 缺口。
+  真机验证前需确认 shim 在 Cape 上的落位逻辑避开该 20 MB 缺口。
 
 ---
 
@@ -232,7 +232,7 @@ payload（0xF0000000+64MB）与窗口不相交；6 GB cap 截断而非分配失�
 
 未尽事项：调查尾声无线 adb 掉线（`adb connect` 被拒），pstore（上次开机的 PIL 日志）与
 `ro.product.device` 复核未取到；pstore 只是 `modem_ipa_fw_at`/`soc_pas_mpss` 的锦上添花证据，
-wave 2 上机时可补。
+wave 2 真机验证时可补。
 
 自主决策记录：
 1. `modem_ipa_fw_at` 取 ipa_gsi_region（0x8b910000）而非 ipa_fw_region（0x8b900000）——依据
