@@ -2,7 +2,8 @@
 
 > **谱系**：本分支是 [oosexgang/hakios-xnu-kernel](https://github.com/oosexgang/hakios-xnu-kernel)（上游，参考设备 POCO X5 Pro / redwood）的**设备移植分支**，维护 **HakiOS on OnePlus Ace 2（PHK110 / SM8475）**。上游视角的 README 原样保留在 [README-UPSTREAM.md](README-UPSTREAM.md)；GitHub 的 "forked from" 徽章即谱系声明。
 
-把 HakiOS——让 Apple 的 XNU 内核直接跑在安卓高通手机上的开源项目——移植到一加 Ace 2（PHK110，骁龙 8+ Gen 1 / SM8475，16 GB 内存）。上游的参考设备是 POCO X5 Pro（SM7325）；社区在 SM8475 上已有 K60（mondrian）、MIX Fold 2、POCO F5 Pro 等同 SoC 先例，本分支把上游扩展到 PHK110，是目前唯一持续维护的 PHK110 移植。所有改动只落在备用启动槽 `boot_b` 上（手机出厂有 A/B 两个 boot 槽：`boot_a` 跑日常安卓，`boot_b` 空置，本分支把它用作实验槽）；一次失败的实验会由 bootloader 自带的 A/B 回退机制自动退回安卓，`boot_a` 从未被刷写或修改。除首页 README 的呈现层替换（上游原 README 原样保留为 [README-UPSTREAM.md](README-UPSTREAM.md)）外，本分支不改上游任何已有文件，所有内容以新增形式存在（`devices/phk110/`、`docs/phk110/`、`waveNN-scripts/`、`logs/`）。
+把 HakiOS——让 Apple 的 XNU 内核直接跑在安卓高通手机上的开源项目——移植到一加 Ace 2（PHK110，骁龙 8+ Gen 1 / SM8475，16 GB 内存）。
+上游的参考设备是 POCO X5 Pro（SM7325）；社区在 SM8475 上已有 K60（mondrian）、MIX Fold 2、POCO F5 Pro 等同 SoC 先例，本分支把上游扩展到 PHK110，是目前唯一持续维护的 PHK110 移植。所有改动只落在备用启动槽 `boot_b` 上（手机出厂有 A/B 两个 boot 槽：`boot_a` 跑日常安卓，`boot_b` 空置，本分支把它用作实验槽）；一次失败的实验会由 bootloader 自带的 A/B 回退机制自动退回安卓，`boot_a` 从未被刷写或修改。除首页 README 的呈现层替换（上游原 README 原样保留为 [README-UPSTREAM.md](README-UPSTREAM.md)）外，本分支不改上游任何已有文件，所有内容以新增形式存在（`devices/phk110/`、`docs/phk110/`、`waveNN-scripts/`、`logs/`）。
 
 ## 当前状态（2026-11-10，全部来自真机实测；"Boot #N" 是历次刷写启动的编号，全表见 [docs/phk110/STATUS.md](docs/phk110/STATUS.md)）
 
