@@ -1,0 +1,80 @@
+[01:03:52 t+0000.0s] wave27 wide-window SSH hunt armed (run-id w42ssh3, deadline 90 min)
+[01:03:52 t+0000.0s] knock cmd: 'uname -a && id && echo WAVE21-SSH-OK W27-w42ssh3'
+[01:03:52 t+0000.0s] report| hunt armed, run-id w42ssh3, deadline 90 min, single-owner mode
+[01:03:52 t+0000.0s] bus: d00d addrs [4] (was None)
+[01:04:28 t+0035.4s] attempt k001 -> rc=255 in 35.3s
+[01:04:28 t+0035.4s] branch: DEAD-PAIR (armed=False, ct=170)
+[01:04:28 t+0035.4s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[01:04:28 t+0035.4s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[01:04:28 t+0035.4s]   err| tunnel25w: no live kernel session within 600 s
+[01:04:28 t+0035.4s]   err| Connection closed by UNKNOWN port 65535
+[01:05:06 t+0073.2s] attempt k002 -> rc=255 in 35.3s
+[01:05:06 t+0073.2s] branch: DEAD-PAIR (armed=False, ct=170)
+[01:05:06 t+0073.2s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[01:05:06 t+0073.2s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[01:05:06 t+0073.2s]   err| tunnel25w: no live kernel session within 600 s
+[01:05:06 t+0073.2s]   err| Connection closed by UNKNOWN port 65535
+[01:05:43 t+0111.1s] attempt k003 -> rc=255 in 35.3s
+[01:05:43 t+0111.1s] branch: DEAD-PAIR (armed=False, ct=170)
+[01:05:43 t+0111.1s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[01:05:43 t+0111.1s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[01:05:43 t+0111.1s]   err| tunnel25w: no live kernel session within 600 s
+[01:05:43 t+0111.1s]   err| Connection closed by UNKNOWN port 65535
+[01:06:21 t+0148.9s] attempt k004 -> rc=255 in 35.3s
+[01:06:21 t+0148.9s] branch: DEAD-PAIR (armed=False, ct=170)
+[01:06:21 t+0148.9s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[01:06:21 t+0148.9s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[01:06:21 t+0148.9s]   err| tunnel25w: no live kernel session within 600 s
+[01:06:21 t+0148.9s]   err| Connection closed by UNKNOWN port 65535
+[01:07:00 t+0187.5s] attempt k005 -> rc=255 in 36.1s
+[01:07:00 t+0187.5s] branch: DEAD-PAIR (armed=False, ct=170)
+[01:07:00 t+0187.5s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[01:07:00 t+0187.5s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[01:07:00 t+0187.5s]   err| tunnel25w: no live kernel session within 600 s
+[01:07:00 t+0187.5s]   err| Connection closed by UNKNOWN port 65535
+[01:07:38 t+0225.5s] attempt k006 -> rc=255 in 35.5s
+[01:07:38 t+0225.5s] branch: DEAD-PAIR (armed=False, ct=170)
+[01:07:38 t+0225.6s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[01:07:38 t+0225.6s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[01:07:38 t+0225.6s]   err| tunnel25w: no live kernel session within 600 s
+[01:07:38 t+0225.6s]   err| Connection closed by UNKNOWN port 65535
+[01:08:16 t+0263.4s] attempt k007 -> rc=255 in 35.3s
+[01:08:16 t+0263.4s] branch: DEAD-PAIR (armed=False, ct=170)
+[01:08:16 t+0263.4s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[01:08:16 t+0263.4s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[01:08:16 t+0263.4s]   err| tunnel25w: no live kernel session within 600 s
+[01:08:16 t+0263.4s]   err| Connection closed by UNKNOWN port 65535
+[01:08:18 t+0265.9s] bus: d00d addrs [] (was [4])
+[01:08:49 t+0296.5s] bus: d00d addrs [4] (was [])
+[01:11:00 t+0427.5s] attempt k008 -> rc=0 in 131.1s
+[01:11:00 t+0427.5s] branch: HIT (armed=True, ct=170) HIT-CANDIDATE
+[01:11:00 t+0427.5s]   err| tunnel25w: pkt OUT 10.0.0.1:28641 -> 10.0.0.2:22 flags=ACK seq=268437742 ack=1353317278 win=16384 len=0 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1353317278 state=ESTABLISHED
+[01:11:00 t+0427.5s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:28641 flags=PSH|ACK seq=1353317278 ack=268437742 win=65535 len=60 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1353317278 state=ESTABLISHED
+[01:11:00 t+0427.5s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:28641 flags=PSH|ACK seq=1353317338 ack=268437742 win=65535 len=36 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1353317338 state=ESTABLISHED
+[01:11:00 t+0427.5s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:28641 flags=PSH|ACK seq=1353317374 ack=268437742 win=65535 len=140 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1353317374 state=ESTABLISHED
+[01:11:00 t+0427.6s] === ACCEPTANCE MODE (session must still be live) ===
+[01:11:00 t+0427.9s] attempt acc2 -> rc=0 in 0.4s
+[01:11:00 t+0427.9s] acceptance conn2 -> rc=0, marker OK, Darwin OK
+[01:11:18 t+0446.1s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:11:21 t+0448.9s] attempt acc3 -> rc=0 in 0.3s
+[01:11:21 t+0448.9s] acceptance conn3 -> rc=0, marker OK, Darwin OK
+[01:11:39 t+0467.0s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:12:16 t+0503.4s] attempt transfer -> rc=0 in 33.8s
+[01:12:16 t+0503.4s] acceptance transfer -> rc=0, phone counted 262144 of 262144 bytes in 33.8s
+[01:12:34 t+0521.5s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:13:42 t+0589.9s] attempt sha-in -> rc=0 in 68.4s
+[01:13:42 t+0589.9s] sha host->device -> rc=0, device hash 68eee1f9bf47fa03.., MATCH in 68.4s
+[01:14:00 t+0608.1s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:14:01 t+0608.7s] attempt sha-out -> rc=0 in 0.7s
+[01:14:01 t+0608.7s] step sha-out try1 unsatisfied (rc=0) -- retrying after the attach race (8 s)
+[01:14:10 t+0617.2s] attempt sha-out -> rc=0 in 0.5s
+[01:14:10 t+0617.2s] step sha-out try2 unsatisfied (rc=0) -- retrying after the attach race (8 s)
+[01:14:18 t+0625.5s] attempt sha-out -> rc=0 in 0.3s
+[01:14:18 t+0625.5s] step sha-out try3 unsatisfied (rc=0) -- retrying after the attach race (8 s)
+[01:14:26 t+0633.5s] sha device->host -> rc=0, MISMATCH in 0.3s (0 B round trip)
+[01:14:44 t+0651.7s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:15:02 t+0669.8s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:15:02 t+0669.8s] verdict written: C:\Users\<host>\.zcode\workspace\9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7\hakios-phk110\wave27-scripts\verdict27-w42ssh3.txt (transfer PASS, sha FAIL, mgmt OKAY)
+[01:15:02 t+0669.8s] report| HIT + acceptance: conn2/conn3 + transfer(PASS) + sha(FAIL) + mgmt(OKAY); verdict verdict27-w42ssh3.txt
+[01:15:02 t+0669.8s] report| === WAVE21-SSH-OK on record: verdict27-w42ssh3.txt ===
+[01:15:02 t+0669.8s] === v0.4 SSH GATE: PASS (hit + 3 conns + verified transfer + mgmt) ===

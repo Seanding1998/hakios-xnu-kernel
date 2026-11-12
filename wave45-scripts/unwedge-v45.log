@@ -1,0 +1,108 @@
+[06:11:02] try 1: fastboot: error: Command failed
+[06:11:55] try 2: Rebooting                                          
+[06:12:52] try 3: fastboot: error: Command failed
+[06:13:42] try 4: fastboot: error: Command failed
+[06:14:32] try 5: fastboot: error: Command failed
+[06:15:24] try 6: fastboot: error: Command failed
+[06:16:21] try 7: < waiting for any device >
+[06:17:15] try 8: fastboot: error: Command failed
+[06:18:01] try 9: bus has  -- leaving it alone
+[06:18:02] the d00d gadget is gone; the unwedge loop retires
+[06:18:02] unwedge loop finished (9 tries)
+[06:20:06] try 1: fastboot: error: Command failed
+[06:20:58] try 2: fastboot: error: Command failed
+[06:21:50] try 3: fastboot: error: Command failed
+[06:22:43] try 4: fastboot: error: Command failed
+[06:23:34] try 5: fastboot: error: Command failed
+[06:24:28] try 6: fastboot: error: Command failed
+[06:25:23] try 7: Rebooting                                          
+[06:26:14] try 8: fastboot: error: Command failed
+[06:27:06] try 9: fastboot: error: Command failed
+[06:27:58] try 10: fastboot: error: Command failed
+[06:28:51] try 11: Rebooting                                          
+[06:29:46] try 12: fastboot: error: Command failed
+[06:30:40] try 13: fastboot: error: Command failed
+[06:31:31] try 14: fastboot: error: Command failed
+[06:32:21] try 15: fastboot: error: Command failed
+[06:33:12] try 16: fastboot: error: Command failed
+[06:34:03] try 17: fastboot: error: Command failed
+[06:34:58] try 18: fastboot: error: Command failed
+[06:35:52] try 19: Rebooting                                          
+[06:36:45] try 20: < waiting for any device >
+[06:56:10] try 1: < waiting for any device >
+[06:57:05] try 2: < waiting for any device >
+[06:58:00] try 3: Rebooting                                          
+[06:58:56] try 4: Rebooting                                          
+[06:59:51] try 5: Rebooting                                          
+[07:00:47] try 6: Rebooting                                          
+[07:01:42] try 7: Rebooting                                          
+[07:02:37] try 8: Rebooting                                          
+[07:03:32] try 9: Rebooting                                          
+[07:04:28] try 10: Rebooting                                          
+[07:05:23] try 11: Rebooting                                          
+[07:06:18] try 12: Rebooting                                          
+[07:07:14] try 13: Rebooting                                          
+[07:08:09] try 14: Rebooting                                          
+[07:09:04] try 15: Rebooting                                          
+[07:10:00] try 16: Rebooting                                          
+[07:10:56] try 17: Rebooting                                          
+[07:11:51] try 18: Rebooting                                          
+[07:12:47] try 19: Rebooting                                          
+[07:13:42] try 20: Rebooting                                          
+[07:14:37] try 21: Rebooting                                          
+[07:15:33] try 22: Rebooting                                          
+[07:16:29] try 23: Rebooting                                          
+[07:17:24] try 24: Rebooting                                          
+[07:18:19] try 25: Rebooting                                          
+[07:19:13] try 26: Rebooting                                          
+[07:20:08] try 27: Rebooting                                          
+[07:21:04] try 28: Rebooting                                          
+[07:21:59] try 29: Rebooting                                          
+[07:22:55] try 30: Rebooting                                          
+[07:23:50] try 31: Rebooting                                          
+[07:24:46] try 32: Rebooting                                          
+[07:25:42] try 33: Rebooting                                          
+[07:26:37] try 34: Rebooting                                          
+[07:27:32] try 35: Rebooting                                          
+[07:28:28] try 36: Rebooting                                          
+[07:29:24] try 37: Rebooting                                          
+[07:30:19] try 38: Rebooting                                          
+[07:31:15] try 39: Rebooting                                          
+[07:32:10] try 40: Rebooting                                          
+[07:33:06] try 41: Rebooting                                          
+[07:34:01] try 42: Rebooting                                          
+[07:34:57] try 43: Rebooting                                          
+[07:35:52] try 44: Rebooting                                          
+[07:36:48] try 45: Rebooting                                          
+[07:37:43] try 46: Rebooting                                          
+[07:38:39] try 47: Rebooting                                          
+[07:39:34] try 48: Rebooting                                          
+[07:40:30] try 49: Rebooting                                          
+[07:41:25] try 50: Rebooting                                          
+[07:42:21] try 51: Rebooting                                          
+[07:43:16] try 52: Rebooting                                          
+[07:44:12] try 53: Rebooting                                          
+[07:45:07] try 54: Rebooting                                          
+[07:46:03] try 55: Rebooting                                          
+[07:46:58] try 56: Rebooting                                          
+[07:47:53] try 57: Rebooting                                          
+[07:48:49] try 58: Rebooting                                          
+[07:49:44] try 59: Rebooting                                          
+[07:50:40] try 60: Rebooting                                          
+[07:51:35] try 61: Rebooting                                          
+[07:52:30] try 62: Rebooting                                          
+[07:53:26] try 63: Rebooting                                          
+[07:54:21] try 64: Rebooting                                          
+[07:55:17] try 65: Rebooting                                          
+[08:30:14] try 1: Rebooting                                          
+[08:31:09] try 2: Rebooting                                          
+[08:32:04] try 3: Rebooting                                          
+[08:33:00] try 4: Rebooting                                          
+[08:33:55] try 5: Rebooting                                          
+[08:34:50] try 6: Rebooting                                          
+[08:35:46] try 7: Rebooting                                          
+[08:36:41] try 8: Rebooting                                          
+[08:37:37] try 9: Rebooting                                          
+[08:38:33] try 10: Rebooting                                          
+[08:39:26] try 11: < waiting for any device >
+[08:40:19] try 12: < waiting for any device >

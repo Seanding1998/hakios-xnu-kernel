@@ -150,7 +150,7 @@ Darwin : configd/SSH 全走现成 BSD 栈（en0 上 configd 照 USB-Ethernet 方
 | **root.apfs** | md1（第二 ramdisk） | 每次 userland 构建 | 小镜像：init/rc/LaunchDaemons/测试件 | `build.sh:5, 158, 406-413` |
 | delivery | — | — | 上游两通道：`xl ramdisk`（loader 会话一次，`uefi-boot.md:48`）或 flash 分区（`docs/install.md` 路线，`tools/darwin-write.py`）。**PHK110 走 flash 通道**（阶段 16c adb 配方已证 263 MB/s 稳态） | `docs/uefi-boot.md:48-53`；`tools/darwin-write.py:7-25` |
 
-**payload 双 ramdisk**：loader 原生支持两条：`"RAMDisk" becomes /dev/md0, the root…; "RAMDisk1" becomes /dev/md1`（`loader.c:3347-3348`；`:3052` "it is the root (md0), the payload ramdisk is md1"）→ flash boot 的 payload = RAMDisk=flashboot.apfs + RAMDisk1=root.apfs + kernel + cmdline。**需核验项**：v11 在机的 loader.efi（sha 66c6b342…）是否已含此版本行为（在机 loader 已证含 UFS block service v3 = 较新；构建时以 `kernel/xnuloader/build.sh` 重编 + mkpayload.py 打双 ramdisk 为准）。
+**payload 双 ramdisk**：loader 原生支持两条：`"RAMDisk" becomes /dev/md0, the root…; "RAMDisk1" becomes /dev/md1`（`loader.c:3347-3348`；`:3052` "it is the root (md0), the payload ramdisk is md1"）→ flash boot 的 payload = RAMDisk=flashboot.apfs + RAMDisk1=root.apfs + kernel + cmdline。**需核验项**：v11 机上的 loader.efi（sha 66c6b342…）是否已含此版本行为（机上 loader 已证含 UFS block service v3 = 较新；构建时以 `kernel/xnuloader/build.sh` 重编 + mkpayload.py 打双 ramdisk 为准）。
 
 ### 2.3 真实 launchd 切换施工单（v0.4）
 
@@ -163,7 +163,7 @@ Darwin : configd/SSH 全走现成 BSD 栈（en0 上 configd 照 USB-Ethernet 方
 **步骤**：
 
 1. **config**（+2 行）：`devices/phk110/configs/phk110_defconfig` 追加 `CONFIG_ROOT_APFS=y` + `CONFIG_VAR_HFS=y`（覆盖 `configs/common_defconfig:1122/1128`）。
-2. **userland 构建**（WSL，写 kernel 树 = 施工波执行，非本轮）：`FLASHBOOT=1 CRYPTEXES=flash bash userland/build.sh`，DARWIN 指 `~/hakios/sysimage-20F66/work`（unpack.sh 的产出布局）；可选 `tools/mk-jb.sh` 先备 `/jb`（PREINSTALL 默认含 openssh-server，`mk-jb.sh:113-115`；构建时 build.sh 自动嵌 /jb，`build.sh:649-668`）→ 产物：`flashboot.apfs`（md0）+ `root.apfs`（md1）+ `system.apfs`（2.5 GB）。
+2. **userland 构建**（WSL，写 kernel 树 = 施工阶段执行，非本轮）：`FLASHBOOT=1 CRYPTEXES=flash bash userland/build.sh`，DARWIN 指 `~/hakios/sysimage-20F66/work`（unpack.sh 的产出布局）；可选 `tools/mk-jb.sh` 先备 `/jb`（PREINSTALL 默认含 openssh-server，`mk-jb.sh:113-115`；构建时 build.sh 自动嵌 /jb，`build.sh:649-668`）→ 产物：`flashboot.apfs`（md0）+ `root.apfs`（md1）+ `system.apfs`（2.5 GB）。
 3. **灌 darwin 前段**（adb 通道，写盘前确认）：system.apfs @ 块 0 + OS cryptex + App cryptex 依上游布局排在 cryptex 区（全在 0..2,042,367 内）；工具 = `darwin-write-phk110.py`（PROTECTED 语义反转为"本次写入目标即前段"，identity/skip 校验逐条过）。
 4. **payload**：mkpayload.py 打双 ramdisk（RAMDisk=flashboot.apfs、RAMDisk1=root.apfs）+ v11 内核（+ROOT_APFS/VAR_HFS 重编后）+ cmdline。
 5. **cmdline**（v11 基础追加，预算余 228 字符）：` root_apfs=ufs_darwin var_hfs=ufs_darwin_data`（40 字符，预算足）。

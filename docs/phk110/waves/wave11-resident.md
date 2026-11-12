@@ -16,7 +16,7 @@ expired ---` 干净返回落盘，**7 个 AP 全部上线**（"GenericARMPE: the
 
 | Artifact | Path（仓库根相对；Windows 侧只新增） | Size | SHA-256 |
 | --- | --- | --- | --- |
-| **Flashable image（本波交付）** | `device-layer/udon-hakios-grafted-v6.img` | 201,326,592 B (192 MiB) | `c69c64c463b98fa123cd9f30e2968f7eac331b033ab5a0ba9208105d7628550e` |
+| **Flashable image（本阶段交付）** | `device-layer/udon-hakios-grafted-v6.img` | 201,326,592 B (192 MiB) | `c69c64c463b98fa123cd9f30e2968f7eac331b033ab5a0ba9208105d7628550e` |
 | Packaging report | `device-layer/udon-hakios-grafted-v6.report.json` | 1,660 B | `20ae489df4c26c87d3d7bf8f267506e7097b9ceb378260292641923d4643eedc` |
 | XNUP payload v6（仅 ramdisk+cmdline 与 v5 不同） | `device-layer/udon-hakios-payload-v6.bin` | 14,925,960 B | `c329dcfd706a1d18cac31fcbc8d194cc261cee5f32bf0b59c8e570eabde650bf` |
 | **新 ramdisk = 驻留 stub launchd** | `device-layer/udon-hakios-ramdisk-v6.bin` | 16,528 B | `4f72da6165a81a1ec6adf616cba169072cbdeb6fc613812bbd73fb334393821a` |
@@ -95,7 +95,7 @@ b12 panic 在 t≈10.47 s < 28 s → 慢核还没被唤醒，PC=0。**预言**�
 
 ## 4. 自检（verify）
 
-- `wave11-scripts/verify-udon-hakios-v6.py`（wave5 脚本的 21 项形状断言 + 本波条目级断言，cmdline
+- `wave11-scripts/verify-udon-hakios-v6.py`（wave5 脚本的 21 项形状断言 + 本阶段条目级断言，cmdline
   期望改为 `loader_return_after=60` 且显式拒绝 `=20`）：**ALL 27 CHECKS PASSED**：
   - 形状 21 项：ANDROID! magic / header diff 仅 kernel_size,ramdisk_size / 页对齐零填充 / gzip
     round-trip == shim+FD+payload(+pad) / shim 头 (text_offset 0xA7100000, image_size, ARMd) /
@@ -149,7 +149,7 @@ adb.exe 拒绝）→ `logdump-v6.bin` 65,536 B → python 提取 `== KERNEL LOG 
 | **panic** | **无**（全日志 14 处 "panic" 字样全是 `panic_trace` 调试使能打印；无 stackshot、无 `initproc failed`——b12 的两样都没有了） |
 | 内核日志尺寸 | 19,542 B vs b12 26,846 B（差值 = panic dump + stackshot 不存在了） |
 
-### 6.4 8 核上线证据（本波核心交付）
+### 6.4 8 核上线证据（本阶段核心交付）
 
 | Logical | 物理 MPIDR | 上线时刻 | 日志行 |
 | --- | --- | --- | --- |
@@ -163,7 +163,7 @@ adb.exe 拒绝）→ `logdump-v6.bin` 65,536 B → python 提取 `== KERNEL LOG 
 
 - 大核 1-3 在 t≈10.37-10.38 s 各 ~1 ms 依次上线（与 b12 相同）；慢核 4-6 在 t≈38.38 s 成批上线。
 - **PSCI CPU_ON 无一失败**：日志无任何 `psci: cpu … was not started` / `has not joined` / exception 行。
-- **8/8 物理核被内核接管 = 本波 8 核验证达成**；每核 GICR redistributor 打印 + panic dump 时代
+- **8/8 物理核被内核接管 = 本阶段 8 核验证达成**；每核 GICR redistributor 打印 + panic dump 时代
   （CORE 0-6 PC 全非零）的条件也已具备——本轮无 panic，故以 `arm_cpu_init(): online` 行 + "7
   processors running" 为准。
 
@@ -211,7 +211,7 @@ Loading driver at 0x000FA5EF000 EntryPoint=0x000FA5F1140
 - 回退红线未动：slot a 原厂安卓未刷过；`backups-slotb/` 原厂备份可用 `fastboot set_active a` 回
   日常系统。
 
-## 9. 本波自检表
+## 9. 本阶段自检表
 
 | # | 项 | 结果 |
 | --- | --- | --- |

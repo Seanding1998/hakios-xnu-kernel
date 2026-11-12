@@ -1,0 +1,105 @@
+[02:46:51 t+0000.0s] wave28 /var watcher armed (run-id w42var1, mode write tag S1, deadline 60 min)
+[02:46:51 t+0000.0s] knock cmd: 'uname -a && echo W28-PROBE w42var1'
+[02:46:51 t+0000.0s] bus: d00d addrs [4] (was None)
+[02:46:51 t+0000.3s] attempt k001 -> rc=0 in 0.3s
+[02:46:51 t+0000.3s] branch: HIT
+[02:46:51 t+0000.3s]   err| tunnel25w: pkt OUT 10.0.0.1:27406 -> 10.0.0.2:22 flags=ACK seq=268437734 ack=3754296575 win=16384 len=0 cksum=ok | SND.UNA=268437734 SND.NXT=268437734 RCV.NXT=3754296575 state=ESTABLISHED
+[02:46:51 t+0000.3s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27406 flags=PSH|ACK seq=3754296575 ack=268437734 win=65535 len=228 cksum=ok | SND.UNA=268437734 SND.NXT=268437734 RCV.NXT=3754296575 state=ESTABLISHED
+[02:46:51 t+0000.3s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27406 flags=PSH|ACK seq=3754296803 ack=268437734 win=65535 len=52 cksum=ok | SND.UNA=268437734 SND.NXT=268437734 RCV.NXT=3754296803 state=ESTABLISHED
+[02:46:51 t+0000.3s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27406 flags=PSH|ACK seq=3754296855 ack=268437734 win=65535 len=176 cksum=ok | SND.UNA=268437734 SND.NXT=268437734 RCV.NXT=3754296855 state=ESTABLISHED
+[02:46:51 t+0000.3s] === LIVE SESSION (write mode): firing the marker package ===
+[02:46:51 t+0000.3s]   hit-err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27406 flags=ACK seq=3754296503 ack=268437734 win=65535 len=0 cksum=ok | SND.UNA=268437650 SND.NXT=268437734 RCV.NXT=3754296503 state=ESTABLISHED
+[02:46:51 t+0000.3s]   hit-err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27406 flags=PSH|ACK seq=3754296503 ack=268437734 win=65535 len=72 cksum=ok | SND.UNA=268437734 SND.NXT=268437734 RCV.NXT=3754296503 state=ESTABLISHED
+[02:46:51 t+0000.3s]   hit-err| tunnel25w: pkt OUT 10.0.0.1:27406 -> 10.0.0.2:22 flags=ACK seq=268437734 ack=3754296575 win=16384 len=0 cksum=ok | SND.UNA=268437734 SND.NXT=268437734 RCV.NXT=3754296575 state=ESTABLISHED
+[02:46:51 t+0000.3s]   hit-err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27406 flags=PSH|ACK seq=3754296575 ack=268437734 win=65535 len=228 cksum=ok | SND.UNA=268437734 SND.NXT=268437734 RCV.NXT=3754296575 state=ESTABLISHED
+[02:46:51 t+0000.3s]   hit-err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27406 flags=PSH|ACK seq=3754296803 ack=268437734 win=65535 len=52 cksum=ok | SND.UNA=268437734 SND.NXT=268437734 RCV.NXT=3754296803 state=ESTABLISHED
+[02:46:51 t+0000.3s]   hit-err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27406 flags=PSH|ACK seq=3754296855 ack=268437734 win=65535 len=176 cksum=ok | SND.UNA=268437734 SND.NXT=268437734 RCV.NXT=3754296855 state=ESTABLISHED
+[02:46:51] mark-var-v28 mode=write tag=S1 run=w42var1
+[02:46:51] step recon: firing (796 B cmd)
+[02:46:52] step recon -> rc=0 in 0.4s (1129 B stdout)
+[02:46:52] step blob: firing (36 B cmd)
+[02:46:54] step blob -> rc=0 in 2.3s (65536 B stdout)
+[02:46:54] blob read back: 65536 B sha256=cb4c4f12f69750bb27beca0ee81ba57a2cb66e6af130b390a5885991ce0135f1
+[02:46:54] step hostkeys: firing (124 B cmd)
+[02:46:54] step hostkeys -> rc=0 in 0.3s (291 B stdout)
+[02:46:54] step disksha: firing (132 B cmd)
+[02:46:55] step disksha -> rc=0 in 0.3s (298 B stdout)
+[02:46:55] summary written: C:\Users\<host>\.zcode\workspace\9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7\hakios-phk110\wave28-scripts\mark1-w42var1-S1.txt
+wave28 /var marker package
+mode: write
+tag: S1
+run-id: w42var1
+when: 2026-11-12 02:46:55
+blob sha256: cb4c4f12f69750bb27beca0ee81ba57a2cb66e6af130b390a5885991ce0135f1
+
+[recon/write] rc=0
+==RECON==
+Darwin localhost 22.5.0 Darwin Kernel Version 22.5.0: Wed Nov 11 07:06:53 PM CST 2026; cyrux:xnu-8796.121.2[xnu-8796.121.2-dirty]/BUILD/obj/DEVELOPMENT_ARM64_BCM2837 iPhone10,3 arm Darwin
+Thu Jan  1 08:10:19 CST 1970
+drwxr-xr-x  2 root wheel   0 May 12  2023 /jb
+drwxr-xr-x 15 root wheel 578 Jan  1 08:00 /var/jb
+--var--
+Keychains
+Managed Preferences
+MobileAsset
+MobileDevice
+MobileSoftwareUpdate
+audit
+buddy
+containers
+datamigrator
+db
+dextcores
+empty
+folders
+hardware
+installd
+jb
+log
+logs
+mobile
+msgs
+networkd
+preferences
+protected
+root
+run
+select
+tmp
+vm
+wave28-blob-S1.bin
+wave28-marker-S1.txt
+wireless
+--hostkeys--
+==WRITE==
+RC1=0 RC2=0 RC3=0
+==VERIFY==
+-rw-r--r-- 1 root wheel    53 Jan  1 08:10 /var/jb/wave28-marker-S1.txt
+-rw-r--r-- 1 root wheel 65536 Jan  1 08:10 /var/wave28-blob-S1.bin
+-rw-r--r-- 1 root wheel   243 Jan  1 08:10 /var/wave28-marker-S1.txt
+--marker--
+wave28 marker S1 root
+written_utc=1970-01-01T00:10:19Z
+Darwin localhost 22.5.0 Darwin Kernel Version 22.5.0: Wed Nov 11 07:06:53 PM CST 2026; cyrux:xnu-8796.121.2[xnu-8796.121.2-dirty]/BUILD/obj/DEVELOPMENT_ARM64_BCM2837 iPhone10,3 arm Darwin
+
+[blob readback] rc=0
+bytes=65536 sha256=cb4c4f12f69750bb27beca0ee81ba57a2cb66e6af130b390a5885991ce0135f1
+
+[hostkey files] rc=0
+-- /var/root/.ssh/ssh_host_ed25519_key.pub
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBJzzK2T9zVi5NVhkWdb7PMmdjYdOfJMWLMB43q4jOcQ hakios-phk110-host-v0.4
+-- /var/root/.ssh/authorized_keys
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDj9jT2NReWL1Joq4rSfSZQLza2G4U0Qxr9s3L6o8eee hakios-phk110-user-20261104
+
+[disk sha256] rc=0
+cb4c4f12f69750bb27beca0ee81ba57a2cb66e6af130b390a5885991ce0135f1  /var/wave28-blob-S1.bin
+-rw-r--r-- 1 root wheel    53 Jan  1 08:10 /var/jb/wave28-marker-S1.txt
+-rw-r--r-- 1 root wheel 65536 Jan  1 08:10 /var/wave28-blob-S1.bin
+-rw-r--r-- 1 root wheel   243 Jan  1 08:10 /var/wave28-marker-S1.txt
+
+[hostkey fingerprints] rc=0
+/var/root/.ssh/authorized_keys | 256 SHA256:khN1rYtfAQCpXD8HTD8CZUJ0pdO+fZtoVE2ZEx8+kmI hakios-phk110-user-20261104 (ED25519)
+/var/root/.ssh/ssh_host_ed25519_key.pub | 256 SHA256:6SkuNg4H50sjyKK5PQ3eX23nIEBR/Z9d7TqFGMPND6k hakios-phk110-host-v0.4 (ED25519)
+
+[02:46:55 t+0003.9s] marker pack -> rc=0
+[02:46:55 t+0003.9s] === marker pack done (rc=0); watcher exits ===

@@ -1,0 +1,33 @@
+[01:32:37 t+0000.0s] wave27 wide-window SSH hunt armed (run-id w42ssh5, deadline 90 min)
+[01:32:37 t+0000.0s] knock cmd: 'uname -a && id && echo WAVE21-SSH-OK W27-w42ssh5'
+[01:32:37 t+0000.0s] report| hunt armed, run-id w42ssh5, deadline 90 min, single-owner mode
+[01:32:37 t+0000.0s] bus: d00d addrs [4] (was None)
+[01:32:38 t+0000.4s] attempt k001 -> rc=0 in 0.3s
+[01:32:38 t+0000.4s] branch: HIT (armed=True, ct=170) HIT-CANDIDATE
+[01:32:38 t+0000.4s]   err| tunnel25w: pkt OUT 10.0.0.1:30455 -> 10.0.0.2:22 flags=ACK seq=268437742 ack=1900607280 win=16384 len=0 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1900607280 state=ESTABLISHED
+[01:32:38 t+0000.4s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:30455 flags=PSH|ACK seq=1900607280 ack=268437742 win=65535 len=76 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1900607280 state=ESTABLISHED
+[01:32:38 t+0000.4s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:30455 flags=PSH|ACK seq=1900607356 ack=268437742 win=65535 len=60 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1900607356 state=ESTABLISHED
+[01:32:38 t+0000.4s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:30455 flags=PSH|ACK seq=1900607416 ack=268437742 win=65535 len=176 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1900607416 state=ESTABLISHED
+[01:32:38 t+0000.4s] === ACCEPTANCE MODE (session must still be live) ===
+[01:32:38 t+0000.7s] attempt acc2 -> rc=0 in 0.3s
+[01:32:38 t+0000.7s] acceptance conn2 -> rc=0, marker OK, Darwin OK
+[01:32:56 t+0018.8s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:32:59 t+0021.6s] attempt acc3 -> rc=0 in 0.3s
+[01:32:59 t+0021.6s] acceptance conn3 -> rc=0, marker OK, Darwin OK
+[01:33:17 t+0039.7s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:33:52 t+0074.7s] attempt transfer -> rc=0 in 32.4s
+[01:33:52 t+0074.7s] acceptance transfer -> rc=0, phone counted 262144 of 262144 bytes in 32.4s
+[01:34:10 t+0092.9s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:34:11 t+0093.5s] attempt sha-rt -> rc=255 in 0.6s
+[01:34:11 t+0093.5s] step sha-rt try1 unsatisfied (rc=255) -- retrying after the attach race (8 s)
+[01:34:19 t+0101.6s] attempt sha-rt -> rc=255 in 0.2s
+[01:34:19 t+0101.6s] step sha-rt try2 unsatisfied (rc=255) -- retrying after the attach race (8 s)
+[01:34:27 t+0109.8s] attempt sha-rt -> rc=255 in 0.1s
+[01:34:27 t+0109.8s] step sha-rt try3 unsatisfied (rc=255) -- retrying after the attach race (8 s)
+[01:34:35 t+0117.8s] content sha round trip -> rc=255 in 0.1s: device hash MISMATCH, returned payload MISMATCH (0/524288 B) -- FAIL
+[01:34:54 t+0136.5s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:35:12 t+0154.6s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:35:12 t+0154.6s] verdict written: C:\Users\<host>\.zcode\workspace\9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7\hakios-phk110\wave42-scripts\verdict42-w42ssh5.txt (transfer PASS, sha FAIL, mgmt OKAY)
+[01:35:12 t+0154.6s] report| HIT + acceptance: conn2/conn3 + transfer(PASS) + sha(FAIL) + mgmt(OKAY); verdict verdict42-w42ssh5.txt
+[01:35:12 t+0154.6s] report| === WAVE21-SSH-OK on record: verdict42-w42ssh5.txt ===
+[01:35:12 t+0154.6s] === v0.4 SSH GATE: PASS (hit + 3 conns + verified transfer + mgmt) ===

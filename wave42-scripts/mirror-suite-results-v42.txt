@@ -1,0 +1,24 @@
+== wave38 isolation harness (P0-4 + P1-5 generation) ==
+  PASS T1 the whole write is reported consumed
+  PASS T1 the original writer saw the line
+  PASS T1 the log ring recorded it
+  PASS T2 both first causes shown verbatim and nothing else
+  PASS T2 the first causes are in the log ring
+  PASS T2 the repeats were counted per family
+  PASS T2 the repeats are suppressed, not shown (the flood stopped)
+  PASS T3 20 in-beat repeats produced no display
+  PASS T3 past the beat exactly one aggregate crossed the budget
+  PASS T3 the aggregate names the family and the counts
+  PASS T3 the aggregate is in the log ring
+  PASS T3 the storm was fully consumed (22 of this family: first + 20 in-beat + the aggregate trigger)
+  PASS T4 the first SETUP_PENDING passed verbatim
+  PASS T4 the family total counts them all
+  PASS T4 the family classifier names SETUP_PENDING
+  PASS T5 nothing classified while the line is open
+  PASS T5 the completed line showed once (the 0xC first cause)
+  PASS T5 the assembled line is what the original saw
+  PASS T6 shown, suppressed and passthrough all report the full length
+  PASS T7 the PHIT bound stops the walk: the shim past it is NOT hooked
+  PASS T7 the short HOB did not stop the walk; the writer member is now the filter
+  PASS T7 the install kept the original writer (the filter's fallback)
+== 22 passed, 0 failed ==

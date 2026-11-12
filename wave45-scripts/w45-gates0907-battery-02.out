@@ -1,0 +1,27 @@
+==SYSCTL-1==
+BATTERY_PROBE: kern.hakios.battery_soc = -1
+BATTERY_PROBE: kern.hakios.battery_voltage_mv = -1
+BATTERY_PROBE: kern.hakios.battery_current_ma = 0
+BATTERY_PROBE: kern.hakios.battery_temperature_c = -273
+BATTERY_PROBE: kern.hakios.battery_present = 0
+BATTERY_PROBE: kern.hakios.battery_charger_present = 0
+BATTERY_PROBE: kern.hakios.battery_charging = 0
+BATTERY_PROBE: kern.hakios.battery_soc_estimated = 0
+BATTERY_PROBE: kern.hakios.battery_charger_action = -1
+BATTERY_PROBE: kern.hakios.battery_full_uah = 0
+BATTERY_PROBE: readable 10 of 10 oids
+==SYSCTL-2==
+BATTERY_PROBE: kern.hakios.battery_soc = -1
+BATTERY_PROBE: kern.hakios.battery_voltage_mv = -1
+BATTERY_PROBE: kern.hakios.battery_current_ma = 0
+BATTERY_PROBE: kern.hakios.battery_temperature_c = -273
+BATTERY_PROBE: kern.hakios.battery_present = 0
+BATTERY_PROBE: kern.hakios.battery_charger_present = 0
+BATTERY_PROBE: kern.hakios.battery_charging = 0
+BATTERY_PROBE: kern.hakios.battery_soc_estimated = 0
+BATTERY_PROBE: kern.hakios.battery_charger_action = -1
+BATTERY_PROBE: kern.hakios.battery_full_uah = 0
+BATTERY_PROBE: readable 10 of 10 oids
+==SYSEXIST==
+ls: cannot access '/sys/class/power_supply': No such file or directory
+==D==DONE

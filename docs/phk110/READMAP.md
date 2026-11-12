@@ -1,9 +1,12 @@
 # 这批文档怎么读
 
-项目一共写下了 58 篇阶段日志和调研记录（外加进度快照与计划）。很少有人需要
+项目一共写下了 70 篇阶段日志和调研记录（外加 7 篇外部评审、进度快照与计划）。很少有人需要
 从头读到尾，所以这里按主题分了组：你想弄明白哪件事，就去看对应的那几篇。
 每篇都标注了日期，写法是工程师写给工程师——做法、命令、日志证据、结论，
 以及当时判断错了什么、后来怎么纠正的。
+
+只想知道"系统现在能做什么、证据在哪"的，直接看一页式汇总
+[SYSTEM-REPORT-2026-11-12.md](SYSTEM-REPORT-2026-11-12.md)。
 
 两件事先说明白：
 
@@ -56,10 +59,11 @@
 - [waves/wave12c-electrical.md](waves/wave12c-electrical.md)（11-03）— 第三轮：原始字节取证推翻了"芯片电气故障"的误诊，找到"每帧 9 字节、约 20 ms 重新武装"的规律，探针通过，部件号与面板参数全部读到（Boot #19–#21）。想学"怎么从日志里断案"的，读这篇。
 - [research/research-tcm-miso.md](research/research-tcm-miso.md) — 写驱动前后的外部功课：TouchComm over SPI 有哪些已知坑。
 
-## 三、USB 服务通道与 SSH（11 月 8–10 日）
+## 三、USB 服务通道与 SSH（11 月 8–12 日）
 
 SSH 是 v0.4 的最后一关，也是耗时最长的一段：手机侧的 USB 服务通道时好时坏，
-前前后后七个阶段才把两侧的问题都清干净。
+前前后后七个阶段才把两侧的问题都清干净；之后错误墙又在更高负载下回来过，
+又用四代修复（含一次"编译器把修复代码优化删除"的根因定位）才彻底解决。
 
 - [waves/wave13-usb-host.md](waves/wave13-usb-host.md)（11-03）— Windows 主机直连 loader USB 的工具链（`loader_talk.py`，零依赖），免刷写迭代从这里开始。
 - [waves/wave21-net-design.md](waves/wave21-net-design.md)（11-08）— 设计稿：怎么借 loader 的 USB 通道给内核提供网络（SSH 数据面）。
@@ -77,17 +81,27 @@ SSH 是 v0.4 的最后一关，也是耗时最长的一段：手机侧的 USB �
 - [waves/wave27-phaseB-wide-window.md](waves/wave27-phaseB-wide-window.md)（11-10）— 验证完成：三条独立 SSH 会话 + 256 KiB 校验传输 + 干净退出后 loader 存活，v0.4 的 SSH 关门（2026-11-10 晨）。
 - [research/f12-ep2-not-configured.md](research/f12-ep2-not-configured.md) — "endpoint[2] not configured" 这堵墙的专项排查记录。
 
-## 四、存储：UFS 与数据卷（11 月 3–4 日）
+错误墙的收尾（v0.4 宣告之后、v0.5 期间）单独成段：
+
+- [waves/wave38-usb-selfheal.md](waves/wave38-usb-selfheal.md)（11-11）— 错误墙的两个 loader 侧根因（应答放弃不排空、服务窗热旋）与整对自愈修复；离线完成待上机。
+- [review/gpt-review-2026-11-11-usb-wall.md](review/gpt-review-2026-11-11-usb-wall.md) / [review/gpt-review-report-3-2026-11-11-usb.md](review/gpt-review-report-3-2026-11-11-usb.md) — USB 专项外部评审：导读（问题史与五问）与报告三（对修复包的逐条审定与分代路线）。
+- [waves/wave38-handoff.md](waves/wave38-handoff.md)（11-11）— 交接页：修复四代完成时的设备状态与 v34 判定任务单。
+- 阶段 42 的上机判定（SSH 双向内容 SHA 524288/524288、/var 复验、LLVM 常量折叠删码的根治）记录在 [waves/wave38-usb-selfheal.md](waves/wave38-usb-selfheal.md) §8 与 [wave42-scripts/verdict42-*.txt](../../wave42-scripts/)。
+
+## 四、存储：UFS 与数据卷，以及 /var 持久化（11 月 3–11 日）
 
 让内核看见手机的 UFS 存储、在尾部挖一个 darwin 卷、把 /private/var 挂上并
 让它跨启动保留。上游的验收阶梯（S0–S8）在本机一次点亮，没改一行内核代码
-就过了只读阶段。
+就过了只读阶段。/var 的持久化则经历了一次完整的"判定失败 → 根因到行 →
+修复 → 翻绿"：
 
 - [waves/wave15-ufs-research.md](waves/wave15-ufs-research.md)（11-03）— 动手前的功课：UFS 驱动的实施级设计与风险清单。
 - [waves/wave16-ufs-s0s2.md](waves/wave16-ufs-s0s2.md)（11-04）— 只读枚举一次点亮：129 个分区、6 个 LUN 的 GPT 校验全过（Boot #22）。
 - [waves/wave16b-p0-prep.md](waves/wave16b-p0-prep.md)（11-03）— 数据卷工具的 PHK110 适配：只勘察、不写盘。
 - [waves/wave16c-p0-exec.md](waves/wave16c-p0-exec.md)（11-04）— darwin 分区与 12 GB HFS+ 数据卷就位，全程走 adb，不经 fastboot；前后校验和三方比对。
 - [waves/wave18-s3s8.md](waves/wave18-s3s8.md)（11-04）— 写路径打开：/private/var 跨启动保留、日志跨启动重放、数据卷哈希在安卓侧回读复验（Boot #23/#24）。
+- [waves/wave31-var-verdict.md](waves/wave31-var-verdict.md)（11-11）— /var 持久回归判定 FAIL：写进去的东西重启后消失——init 二次运行把内存盘叠在真实卷上（Boot #40）。
+- [waves/wave34-var-fix.md](waves/wave34-var-fix.md)（11-11）— 一行守卫修复遮蔽问题；写→内核死亡→读全部幸存，v0.4 的最后一门转绿（Boot #41）。
 
 ## 五、用户态与身份链（11 月 3–8 日）
 
@@ -95,7 +109,7 @@ launchd 起不来的一段，根因在设备身份：内核答不出 "你是谁"
 libignition 就拒绝继续。
 
 - [waves/wave14-sysimage-prep.md](waves/wave14-sysimage-prep.md)（11-03）— 用户空间前置：iOS 16.5（20F66）镜像解包、盘点、就绪化，含 SSH bootstrap 的做法。
-- [wave17-ssh-bootstrap.md](../wave17-ssh-bootstrap.md)（11-03）— SSH 引导链机制备忘：sshd、密钥、libiosexec 细节（这篇早年在目录树里放错位置，文件名保留）。
+- [wave17-ssh-bootstrap.md](wave17-ssh-bootstrap.md)（11-03）— SSH 引导链机制备忘：sshd、密钥、libiosexec 细节（这篇早年在目录树里放错位置，文件名保留）。
 - [waves/wave19-prep.md](waves/wave19-prep.md)（11-04）— 动手前把 SSH 数据面与真实 launchd 系统卷这两个开放问题摊开。
 - [waves/wave20-launchd.md](waves/wave20-launchd.md)（11-08）— launchd 存活：`hw.target` 查询失败的根因（loader 占位身份 → 设备树无 `model` → EINVAL）与双层修复；28 个进程跑起来，sshd 监听 :22（Boot #25）。Emilelu/UniXNU-mondrian 卡过的正是这一关。
 
@@ -108,11 +122,35 @@ libignition 就拒绝继续。
 
 - [waves/wave30-ath11k-tooling-prep.md](waves/wave30-ath11k-tooling-prep.md)（11-10）— ath11k 路线的检查器与打包工具；配套脚本在 [wave30-scripts/](../../wave30-scripts/)。
 
-## 八、调研与外部评审
+## 八、GPU：从内核侧首亮到真·首帧（11 月 10–12 日）
+
+v0.5 的全程。主线是自研 Adreno 730 内核驱动（a7xx 形态）加 Mesa freedreno
+用户态；中间穿插了一轮 GPU 专项外部评审，评审发现的三个缺陷经独立验证后
+全部修复，最后在 v36 上以四门判定完成——硬件渲染首帧上屏，人眼可见。
+
+- [research/f16-k60-sm8475-census.md](research/f16-k60-sm8475-census.md) — 同 SoC（K60/mondrian）移植线普查；MIX Fold 2 的自研驱动先例成为 v0.5 的参照。
+- [waves/wave35-gpu-prestage.md](waves/wave35-gpu-prestage.md)（11-10）— 动手前的功课：同 SoC 先例核实、a730 固件三件套双源核实、Mesa 25.0.7 的 FD725 身份裁决；固件实拉脚本在 [wave35-scripts/](../../wave35-scripts/)。
+- [waves/wave36-gpu-firstlight.md](waves/wave36-gpu-firstlight.md)（11-11）— 驱动第一次上机：固件实拉 + gen7 参数层进内核；启动参数被截断的 bug 在这一轮定位并修复。
+- [waves/wave36-handoff.md](waves/wave36-handoff.md)（11-11）— 交接页：第 1 步挂点已知的全部事实与逐步定位协议。
+- [waves/wave37-gpu-firstlight.md](waves/wave37-gpu-firstlight.md)（11-11）— 七刷七判：gcc/熔丝/GPUCC/zap 布局/寄存器表五处假设逐一以本机设备树与厂商源码锚定修正，21 步全绿，3D 核接受命令并写内存；全套补丁脚本与判定 runner 在 [wave36-scripts/](../../wave36-scripts/)、[wave37-scripts/](../../wave37-scripts/)。
+- [waves/wave39-mesa-userland.md](waves/wave39-mesa-userland.md)（11-11）— 用户态下半场：Mesa 25.0.7 交叉构建本树打通（含 FD725 设备串），内核接口无需新增 shim 的裁决；构建脚本在 [wave39-scripts/](../../wave39-scripts/)。
+- [review/gpt-review-report-4-2026-11-11-gpu.md](review/gpt-review-report-4-2026-11-11-gpu.md) — GPU 专项外部评审：fence 完成事件缺位 / NC_MODE 编码错误 / 测试无断言假绿。
+- [waves/wave40-gpu-verify.md](waves/wave40-gpu-verify.md)（11-11）— 对评审报告的独立验证：逐条源码级确认，并补了两处评审本身遗漏的细节。
+- [waves/wave41-gpu-fix.md](waves/wave41-gpu-fix.md)（11-11）— 四项修复落地：fence 事件按厂商/主线/Mesa 三方参照字段化，NC_MODE 改厂商公式，gl_test 重写为带像素真值断言的验收器；补丁与 diff 在 [wave41-scripts/](../../wave41-scripts/)。
+- [waves/wave44-adreno740-survey.md](waves/wave44-adreno740-survey.md)（11-12）— 同代原生驱动八仓只读对照：fence 字段逐位佐证修复方向，另登记 14 行硬件初始化差异。
+- [waves/wave45-v36-firstframe.md](waves/wave45-v36-firstframe.md)（11-12）— **完成：v36 上机四门判定**——步进回归 PASS / fence 探针 PASS / 硬件渲染 DONE（面板三角形人眼目击）/ 电量 PARTIAL；判定文件在 [wave45-scripts/](../../wave45-scripts/)。
+
+## 九、电量显示（11 月 11–12 日，数据链未通）
+
+- [research/f17-battery-display.md](research/f17-battery-display.md) — 两层根因（内核配置未开 + 本机无数据源驱动）与分期方案。
+- [waves/wave43-battery.md](waves/wave43-battery.md)（11-12）— 燃油计驱动落地：PM8350B 充电器观察 + bq27541 位带，寄存器全部从厂商树机械核对（零猜测），62 项自检；上机判定 PARTIAL，数据链修复进行中。
+
+## 十、调研与外部评审
 
 - [research/f10-dxe-abort-solutions.md](research/f10-dxe-abort-solutions.md) — DXE 阶段 Data Abort（FAR=0xF0000000）的外部先例与修复模式库。
 - [research/f14-sd778g-zendot-survey.md](research/f14-sd778g-zendot-survey.md) — SM7325 驱动全景与外部文章考古，兼做物料清单预研。
 - [research/f15-raphael-k20pro-survey.md](research/f15-raphael-k20pro-survey.md) — "K20 Pro 的 WiFi/4G/GPU 已经修好"这类传闻的核实，与对本项目的迁移价值评估。
 - [research/landscape-2026-11-08.md](research/landscape-2026-11-08.md) — 同类项目生态盘点与进度基线（2026-11-08）。
+- [research/ecosystem-census-2026-11-11.md](research/ecosystem-census-2026-11-11.md) — 生态普查（2026-11-11）：各移植线当日进展与 UniXNU 原生 Adreno740 驱动的发现。
 - [research/consulting-2026-11-03.md](research/consulting-2026-11-03.md) — 一次外部咨询的意见原文与逐条评估。
-- [review/](review/) — 四篇外部评审记录（2026-11-09），对本项目方法论与结论的第三方复核意见。
+- [review/](review/) — 七篇外部评审记录（2026-11-09 三篇 + 2026-11-11 USB/GPU 专项两轮四篇），对本项目方法论与结论的第三方复核意见。

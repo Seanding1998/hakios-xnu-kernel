@@ -1,0 +1,11 @@
+GLBIN=/redwood/bin/gl_test
+gl_test: freedreno; FD725; OpenGL ES 3.2 Mesa 25.0.7
+gl_test: RENDER backend=hw renderer=FD725
+gl_test: RENDER_PASS backend=hw renderer=FD725
+gl_test: 1080 x 2400 drawn in 19 ms, read back in 26 ms; error 0; red green blue alpha: a corner 26 26 51 255, the middle 68 69 118 255, near the red corner 235 12 8 255, near the green 12 235 8 255, near the blue 10 10 235 255; 673920 of 2592000 pixels inside the triangle (26%; 26% by geometry)
+gl_test: READBACK_PASS samples 5/5 coverage 26% (26% by geometry)
+gl_test: the picture is on the panel (0), for 8 seconds
+gl_test: PRESENT_CALL_OK
+os_same_file_description couldn't determine if two DRM fds reference the same file description. (Operation timed out)
+Let's just assume that file descriptors for the same file probablyshare the file description instead. This may cause problems whenthat isn't the case.
+GL_RC=0

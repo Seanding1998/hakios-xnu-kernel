@@ -2,7 +2,7 @@
 
 > 2026-11-08 · 执行记录全循环：取证 → loader.c 补丁 → v16 构建/自检 → 自刷 → E2E 集中修复 → 判定
 > **判定：本轮 v0.4「SSH 进 Darwin shell」未宣告。USB 服务器在线判据（≥1 次成功 start）已达成并有 logdump 行级证据；N1→N2→N3 数据面闭合仍被 host 侧 catch 阻塞。修复用了 1 轮（v16），第 2 轮留给下一阶段并给出施工单（§6）。**
-> 镜像：boot_b = **v16**（`2e1a2532…`）；收尾时手机经 ABL 自动回退到安卓（slot a，本波已两次实证 ABL ~8 轮自动回退）。
+> 镜像：boot_b = **v16**（`2e1a2532…`）；收尾时手机经 ABL 自动回退到安卓（slot a，本阶段已两次实证 ABL ~8 轮自动回退）。
 
 ## 0. 一句话结论
 
@@ -27,7 +27,7 @@ v16 把 阶段 21 施工单 §6 的前三项全部落地：①**status 码取证
 4. **二进制反查**（senna_bc vendor 驱动，`llvm-objdump` 全反汇编 grep 立即数）：
    - `UsbDeviceDxe.efi` / `UsbfnDwc3Dxe.efi`：**无** `mov w?, #0xb/0xc` 返回构造（两码不出自这两层）。
    - `UsbConfigDxe.efi`：**命中**。状态译码器 `@.text 0x11038`（跳表 `0x16ca3` 区，selector w2 ≤ 6）：case 入口 `0x11088` → bit2 置位 → **`0x110d4: mov w0,#0xb; ret`**；bit3 置位 → **`0x11090: mov w0,#0xc; ret`**；相邻 case 返回 1/2/4/6/7/9/0xa/0xf/0x11/0x12。调用点 `@0x11240`：`bl 0x11038`，入参 = 以 **12 字节步进**的 core 状态表扫描（`madd x21, x9, #0xc, x10`）——即 per-core 状态机（DevSm 族）状态不符译码。**结论：两码 = vendor 自定义"core 状态不符预期"族，非标准 EFI status**（EFIERR(11)/EFIERR(12) 的 vendor 语义占用）。
-5. **真机验证终验拉取**（`logdump-v16-run1.bin`，`8ae7fc82…`，12:33，v16 最后一轮链）：`payload entry 'loader.efi' size 12800` = **75,776 B = v16 loader 字节在机确认**；`usb: the platform is asked up; five quiet seconds before the first try` + `usb: started`（**首试即成**）；4 会话 × en0 attach + `en0 has 10.0.0.2/30`；**零** `vnode table is full`；零 try-failed 行。
+5. **真机验证终验拉取**（`logdump-v16-run1.bin`，`8ae7fc82…`，12:33，v16 最后一轮链）：`payload entry 'loader.efi' size 12800` = **75,776 B = v16 loader 字节机上确认**；`usb: the platform is asked up; five quiet seconds before the first try` + `usb: started`（**首试即成**）；4 会话 × en0 attach + `en0 has 10.0.0.2/30`；**零** `vnode table is full`；零 try-failed 行。
 6. **收尾拉取**（`logdump-v16-final.bin`，`ec271f52…`，13:10，安卓回退回归后的最后一轮链）：**同一健康形态复现**——settle 行 + `usb: started`（又是首试即成、零 try-failed）、4 会话 × en0、零 vnode panic、loader 字节 0x12800。**v16 的 USB 首试成功在两份独立 logdump 中复现**——start 成功率并非 ~1/10，host 侧 catch（F8/F9）才是 N1-N3 闭合的真实瓶颈，§5 的 host 活跃度候选假设进一步加权。
 
 ## 3. 修复（v16，修补丁脚本 `wave21-scripts/patch-loader-v16.py`）
@@ -55,15 +55,15 @@ v16 把 阶段 21 施工单 §6 的前三项全部落地：①**status 码取证
 
 ## 5. E2E 集中修复实录（hunt v1→v5，~2.5 h，~12 个 boot 循环）
 
-**host 侧渠道病理（本波最大新知，比任何单个失败都值钱）**：
+**host 侧渠道病理（本阶段最大新知，比任何单个失败都值钱）**：
 
 - **F8（新）＝半启动 zombie 态**：失败的 start_ex 把 DWC3 留在"ep0 可枚举、bulk 端点未武装"态——host 能读描述符（loader_talk dump 全通过）但 `bulk-OUT` 写超时（`LIBUSB_ERROR_TIMEOUT 0/13`）。该态可存续整个 180s 会话，host 侧无法从"可见性"区分 zombie 与真 serving（两者都是 `18d1:d00d`）。唯一一次"OUT 进 IN 超时"（11:42:37）= lazy 重试刚武装了 RX 又被下一次 20s 复位打断的瞬间。
 - **F9（新）＝usbipd 管道生命周期**：每次 loader 复位设备消失→导出死；重现时持久绑定 auto-attach 可能挂到**已消失的旧设备实例**（Windows 显示 `Attached`、WSL `lsusb` 看不见）——管道死。唯一复活法 = `detach→attach` 手术。但手术本身有双刃：落进 loader 的 start_ex 窗口 = 枚举被拽走（start 失败新诱因）。
 - ** hunt 版本学**：v1（90 轮盲扫）→ v2/v3（fresh-every-N-miss / 修复分类器）→ v4（每 miss 手术——**手术风暴反而毒化 start**）→ **v5（终版：每 dark→visible 代际仅一次手术 + 5s 纯探测 + 应答即整链 E2E）**，400 轮 × 5s 预算。v5 在线期间未再抓到 serving 窗。
-- **成功率观察**：v16 在机 ~12 循环中，logdump 证实 ≥1 次 `usb: started`（最后一轮链，首试即成）；hunt 视角 0 次可应答窗。v15.3 时代 05:02 的可应答窗（getvar/oem 全通）发生在 watcher 活跃 fresh-attach 期——**host 活跃度与 start 成功率的正相关**是本轮最强（但未证实）的因果候选：probe/surgery 的 host 传输活动本身可能在给 DWC3 喂枚举事件；死管道 = 零枚举驱动 = start_ex 内部等待超时（0xB/0xC）。反证也存在（boot #1 的 7.5 min 连续可见窗内 probe 全超时——该窗可能是 zombie 而非 serving）。
+- **成功率观察**：v16 在机上 ~12 循环中，logdump 证实 ≥1 次 `usb: started`（最后一轮链，首试即成）；hunt 视角 0 次可应答窗。v15.3 时代 05:02 的可应答窗（getvar/oem 全通）发生在 watcher 活跃 fresh-attach 期——**host 活跃度与 start 成功率的正相关**是本轮最强（但未证实）的因果候选：probe/surgery 的 host 传输活动本身可能在给 DWC3 喂枚举事件；死管道 = 零枚举驱动 = start_ex 内部等待超时（0xB/0xC）。反证也存在（boot #1 的 7.5 min 连续可见窗内 probe 全超时——该窗可能是 zombie 而非 serving）。
 - **ABL 回退观察**：boot_b 连续循环 ~8 轮（~50 min）后 ABL 自动回安卓并 `set_active a`（两次实证：12:02、收尾时）——**ABL 回退本身就是热循环清零器**，下一轮 E2E 的"回到 v16"操作 = `adb reboot bootloader → set_active b → fastboot reboot`（本轮已演练 2 次，`wait-android-flash-v153.sh` 模式可复用）。
 
-## 6. 下一波施工单（阶段 21.2 建议，按序；修复预算第 2 轮）
+## 6. 下一阶段施工单（阶段 21.2 建议，按序；修复预算第 2 轮）
 
 1. **【先做，零代码】冷启动判据卡**：现场一次强制断电（长按电源 10s+ / 任何断电方式）→ 上电后首个 loader boot 的 start_ex 是"冷电源域首试"。若冷启首试成功（logdump/hunt 双确认），根因坐实 = **热复位（PSCI reset）留下 USB 电源域半初始化态**，操作配方 = "冷启动 → 单轮 E2E（150s 预算内）"，一轮闭环。本轮已排队待安排，未及执行。
 2. **v16b loader 加固（单刷一次带齐）**：
@@ -80,7 +80,7 @@ v16 把 阶段 21 施工单 §6 的前三项全部落地：①**status 码取证
 - boot_b = v16（`2e1a2532…`）；**收尾完成：手机已回安卓（slot a 活跃，adb 在线，`sys.boot_completed=1`），回到安卓**；userdata/darwin 未触碰。v16 的"USB 不通"行为 = v15.3 的安全行为（one-shot 会话 + ABL 自动回退到安卓），无新增风险；F6 已消除（180s 窗）。
 - 回退链完整：v15.3（`d117e48c…`）、v14（`1932412a…`）可随时重刷；下一轮从安卓直接 `adb reboot bootloader → set_active b → fastboot reboot` 即回到 v16 循环（`wait-android-flash-v153.sh` 模式，本轮已演练 2 次）。
 
-## 8. 本波教训（方法论）
+## 8. 本阶段教训（方法论）
 
 - **logdump 是从 LBA 0 覆盖写的**——"等失败轮的日志进 logdump"在结构上不可能；失败取证必须当轮在场（屏/打印），或轮后立即拉盘且该轮必须是最后一轮。
 - **hunt 的手术（detach/attach）是双刃剑**：既是管道唯一的复活法，也是 start_ex 的杀死枚举。手术必须按设备代际（dark→visible）节流，绝不按 miss 节流。

@@ -1,0 +1,10 @@
+[03:10:51 t+0000.0s] gltest runner armed (run-id w42gl1, deadline 60 min, size 'default'; wave41-s6 criteria)
+[03:10:52 t+0000.3s] attempt klog#1 -> rc=0 in 0.3s (out 0 B -> gltest-w42gl1-klog-01.out)
+[03:10:52 t+0000.6s] attempt gl#1 -> rc=0 in 0.3s (out 44 B -> gltest-w42gl1-gl-01.out)
+[03:10:52 t+0000.6s] gl attempt state=remote-fail: gl_test exited 127
+[03:10:52 t+0000.6s]   | GL_RC=127
+[03:10:52 t+0000.9s] attempt fill#1 -> rc=0 in 0.3s (out 46 B -> gltest-w42gl1-fill-01.out)
+[03:10:52 t+0000.9s] fill profile rc=0 (46 B captured)
+[03:10:52 t+0001.2s] attempt u2f#1 -> rc=0 in 0.3s (out 46 B -> gltest-w42gl1-u2f-01.out)
+[03:10:52 t+0001.2s] u2f_test rc=0 (46 B captured)
+[03:10:52 t+0001.2s] DONE (state=remote-fail): the GL evidence set is in wave38-scripts/gltest-w42gl1-*.{{out,err}}

@@ -1,0 +1,4 @@
+# the cross-compiled probe binaries are local builds of their .c sources
+# (build lines in the headers); sources and their shas are tracked here
+fence_probe
+battery_probe

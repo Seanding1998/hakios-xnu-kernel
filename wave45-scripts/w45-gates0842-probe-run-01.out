@@ -1,0 +1,9 @@
+FENCE_PROBE: chip id 0x7030002 (the 0x7030002 family is this phone's)
+FENCE_PROBE: highest bank bit 16 (the NC_MODE registers were computed from it; 16 expected)
+FENCE_PROBE: buffer handle 1 iova 0x20000000 mapped 16384 bytes at 0x100890000
+FENCE_PROBE: round 0 fence 1 not done on the first poll; resubmitting (each resubmit rewrites the WPTR)
+FENCE_PROBE: round 0 fence 2 done, memory reads 0x45f000c0 (the nonce, as written)
+FENCE_PROBE: round 1 fence 3 done, memory reads 0x45f000c1 (the nonce, as written)
+FENCE_PROBE: rounds done 2/2, memory ok 2/2, fence sequence 2 then 3 (increasing), polls 1, timeouts 0
+FENCE_PROBE: PASS the device writes the fence number back and runs the IB (the wave41 fence event works on this hardware)
+PROBE_RC=0

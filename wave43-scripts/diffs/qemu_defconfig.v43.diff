@@ -1,0 +1,10 @@
+--- devices/qemu/configs/qemu_defconfig.v43-orig	2026-11-03 19:02:57.758269589 +0800
++++ devices/qemu/configs/qemu_defconfig	2026-11-12 00:00:36.251200678 +0800
+@@ -20,6 +20,7 @@
+ # CONFIG_HAKIOS_SOUND is not set
+ # CONFIG_HAKIOS_MIC is not set
+ # CONFIG_HAKIOS_BATTERY is not set
++# CONFIG_HAKIOS_FUELGAUGE is not set
+ # CONFIG_HAKIOS_CPUFREQ is not set
+ # CONFIG_HAKIOS_THERMAL is not set
+ # CONFIG_HAKIOS_PMIC is not set

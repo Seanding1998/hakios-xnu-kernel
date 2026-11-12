@@ -1,0 +1,18 @@
+--- devices/phk110/configs/phk110.config.v43-orig	2026-11-11 08:54:52.298612002 +0800
++++ devices/phk110/configs/phk110.config	2026-11-12 00:00:36.250925526 +0800
+@@ -33,7 +33,14 @@
+ # CONFIG_BUTTONS_OBS is not set
+ # CONFIG_HAKIOS_QMI is not set
+ # CONFIG_HAKIOS_MODEM is not set
+-# CONFIG_HAKIOS_BATTERY is not set
++# the battery pipeline (hakios.battery.c/.cpp): kern.hakios.battery_* and HakiosBattery, the
++# IOPMPowerSource powerd reads. Was off: with it off the desktop had no battery service at all
++# (the first of the two reasons F17 gives for the empty red battery)
++CONFIG_HAKIOS_BATTERY=y
++# the fuel gauge, this phone's own driver of the device repository
++# (devices/phk110/drivers/power/): TI bq27541 at I2C 0x55 by hand and the PM8350B's charger
++# blocks over the SPMI observer, feeding the pipeline (fuelgauge=1 static, fuelgauge=2 the readings)
++CONFIG_HAKIOS_FUELGAUGE=y
+ # CONFIG_HAKIOS_BATTGUARD is not set
+ CONFIG_HAKIOS_UFS=y
+ # en0 over the loader's USB channel (Wave 21): sshd's data plane, en0_addr=10.0.0.2 on the command line

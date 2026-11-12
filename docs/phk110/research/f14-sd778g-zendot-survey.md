@@ -262,7 +262,7 @@
 | **相机 blob** | `/vendor/lib64/camera/` | `com.qti.sensormodule.*.bin` + `com.qti.tuned.*.bin`（4 摄，型号在 bin 内） | v1.0 后 | B |
 | **vendor DTB** | `/sys/firmware/fdt`（运行时）或 vendor_boot | **已在盘**（phk110.dtb/dts，wave1 产物） | 不用再拉 | A |
 
-**PHK110 `pull-firmware.sh` v1 施工要点**（给下一波，本报告零执行）：
+**PHK110 `pull-firmware.sh` v1 施工要点**（给下一阶段，本报告零执行）：
 1. 以 `pull-firmware-root.sh` 为模板（ColorOS 大概率同权限墙；`su -c` 暂存法主路径，Magisk 在位）；
 2. 清单差异 vs redwood：fw-gpu 换 **a730_\*（先 `adb shell su -c 'ls /vendor/firmware/'` 取真名再写死清单）**；fw-wifi 改拉 **PCIe 族**（/vendor/firmware/wlan 的 amss/m3/bdwlan 族 + MAC 地址文件）而**不是 wpss.\***；fw-haptic **删**（架构不同）；fw-audio/fw-modem/fw-camera 同上游；
 3. 管道用 wave16c 配方（WSL adb + mirrored USB + ADB_SERVER_SOCKET）；脚本 exit 0 且逐目录报文件数（上游范式）；
@@ -306,7 +306,7 @@
 3. **wifi/lx 对 ath11k PCI 的覆盖度**——`wifi-stack.md`/`wifi-bringup.md`（共 69 KB）未逐字读；lx bus 层是否已含 MHI 假身未知（上游 redwood 只用 AHB/WPSS 路径）。
 4. **主线 SM8450 IPA v5.1 系列的合入状态**——patchew v2（2026-09）显示 changes-requested（依赖另一个未合 patch + 系列拆分要求），**未合入 net-next**；引用时注意它当前是"公开系列"非"主线代码"。
 5. **`hakios.camera.c` 对 sensormodule/tuned bin 的消费方式**（内核直读还是经用户态）未读（165 KB）；PHK110 相机在 v1.0 之后，未影响近期路程。
-6. **`tools/soc-args.py` 未对我们 fdt 实跑对拍**（soc.args 手工版 vs 工具生成版）——零手机可做，留给下一波顺手项。
+6. **`tools/soc-args.py` 未对我们 fdt 实跑对拍**（soc.args 手工版 vs 工具生成版）——零手机可做，留给下一阶段顺手项。
 7. **hackios-xnu-userland 仓未本轮深查**——landscape（§3-A/B）已普查其角色，本轮无新事件（push 停在 10-25）。
 8. **zendot 文章作者身份/与上游关系未考**——文章内容与上游官方文档逐项一致、无独家爆料，判定为第三方导读；未深挖作者背景（对本项目无行动价值）。
 

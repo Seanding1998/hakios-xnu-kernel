@@ -1,0 +1,22 @@
+tunnel25w: no d00d on the bus (round 0)
+tunnel25w: no d00d on the bus (round 1)
+tunnel25w: no d00d on the bus (round 2)
+tunnel25w: no d00d on the bus (round 3)
+tunnel25w: no d00d on the bus (round 4)
+tunnel25w: no d00d on the bus (round 5)
+tunnel25w: no d00d on the bus (round 0)
+tunnel25w: no d00d on the bus (round 1)
+tunnel25w: no d00d on the bus (round 2)
+tunnel25w: no d00d on the bus (round 3)
+tunnel25w: no d00d on the bus (round 4)
+tunnel25w: no d00d on the bus (round 5)
+tunnel25w: no d00d on the bus (round 0)
+tunnel25w: no d00d on the bus (round 1)
+tunnel25w: no d00d on the bus (round 2)
+tunnel25w: no d00d on the bus (round 3)
+tunnel25w: no d00d on the bus (round 4)
+tunnel25w: no d00d on the bus (round 5)
+tunnel25w: round 0: d00d nodes at addr [4]
+tunnel25w: addr 4: LIVE (product b'taro'); this is our loader
+tunnel25w: loader phase (raw b'FAILunknown command'); exiting fast -- the CALLER owns the duty cycle: probing extends the loader's 240 s window forever, so the campaign must alternate active windows with true silence (the reset is what opens the next kernel session)
+Connection closed by UNKNOWN port 65535

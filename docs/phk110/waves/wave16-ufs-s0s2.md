@@ -97,7 +97,7 @@ configs/common_defconfig:277              # CONFIG_UFS_NATIVE is not set  →  C
 | **F1（新）** | devfs 同名拒绝：`last_parti` ×4（Errno=17） | :313/:316/:321/:323 | 良性——4 个 0 尺寸哨兵分区无节点不影响读写路径；若 S3+ 需要精确计数/全部节点，可在 ufs.c 发布处对重名做去重（如 `ufs_last_parti_1..4`），1 行级改动 |
 | **F2（新）** | ufs=2 使 loader 在内核 entry 前多花 ~26.6 s（b22 首条 dmesg t=36.97 s vs b21 t=10.39 s；会话尾部 86.99 s vs 60.41 s，同一 +26.6 s 平移；心跳/expired 相对节奏与 b21 完全一致） | b22 vs b21 对照 | 纯 wall-clock 平移，无功能影响；来源 = block_start 的 6-LUN GPT/survey 同步读（UFSDxe 慢路）。S8 持久化的 var_save_ms 上限核算时记入这笔固定开销 |
 
-## 4. S3 预备清单（下一战施工单）
+## 4. S3 预备清单（下一阶段施工单）
 
 1. **P0 darwin carve 写盘前确认**（破坏性，照 阶段 15 §P0：userdata-carve-phk110 工具化 + 20 GiB 对齐 + 双表 CRC + mkdatavol 12 G 卷）——所有 S3+ 的前置。
 2. config：phk110.config 覆盖 `CONFIG_UFS_WRITE=y`（+ 可选 `CONFIG_VAR_STORE=y`）；cmdline 追加 `ufs_write=1`（+ **必刷** `ufs_check=1` 行使 S1 数据对拍，一并坐实/排除 R1）。

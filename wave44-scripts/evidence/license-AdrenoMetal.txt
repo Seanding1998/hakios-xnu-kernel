@@ -1,0 +1,53 @@
+=== AdrenoMetal: repos API license field ===
+{"default_branch":"main","license":{"key":"mit","name":"MIT License","node_id":"MDc6TGljZW5zZTEz","spdx_id":"MIT","url":"https://api.github.com/licenses/mit"},"pushed_at":"2026-11-11T15:37:32Z","size":798}
+=== AdrenoMetal: /license endpoint ===
+{"name":"MIT License","path":"LICENSE","sha":"424da216ddc4d56df417662d28fd4a1b7f171bdc","size":1081,"spdx":"MIT"}
+=== AdrenoMetal: root listing ===
+file	AGENTS.md	2144
+file	CacheExport.h	17362
+file	ExceptionDiag.h	2295
+file	GpuScanoutClient.h	7956
+file	GpuScanoutPresenter.h	12636
+file	HostMetalCommandServer.h	223
+file	HostMetalCommandServer.mm	59947
+file	IOGPUMetalDeviceShim.h	13746
+file	LICENSE	1081
+file	NativeAdrenoMetalPlugin.mm	51001
+file	NativeAdrenoProbeDaemon.cpp	1436
+file	NativeAdrenoUserTest.h	35158
+file	NativeBridgeMetalFrontend.h	4099
+file	NativeBridgeMetalFrontend.mm	369268
+file	NativeGpuLatency.h	1885
+file	NativeGpuTrace.h	1808
+file	NativeIOGPUProviderProbe.cpp	3793
+file	NativeMetalBridgePhase.h	10579
+file	NativeOfflineAccelerator.cpp	753
+file	NativeOfflineGPU.cpp	21143
+file	NativeOsLogExport.mm	5044
+file	NativeRenderServer.h	751
+file	NativeTurnipSmoke.h	35369
+file	NativeTurnipSwapTest.h	23676
+file	OfflineMetalCommandWire.h	546
+file	OfflineMetalDepthStencilWire.h	1191
+file	OfflineMetalEventWire.h	516
+file	OfflineMetalFenceWire.h	663
+file	OfflineMetalFrontend.mm	75688
+file	OfflineMetalFunctionWire.h	1362
+file	OfflineMetalPlugin.mm	1987
+file	OfflineMetalQueueWire.h	420
+file	OfflineMetalSessionWire.h	461
+file	OfflineMetalSharedEventWire.h	893
+file	OfflineMetalTextureWire.h	551
+file	OfflineMetalVertexWire.h	1848
+file	OfflineMetalWire.h	2781
+file	OriginalAcceleratorABI.h	1022
+file	OriginalGPUProviderABI.h	2698
+file	PrimeShaders.h	25578
+file	QueuePriority.h	878
+file	README.md	11081
+file	SharedShaderCache.h	4612
+dir	bridge	0
+dir	shaders	0
+dir	tools	0
+=== AdrenoMetal: HEAD ===
+54ac1a006d274a9b8ca66b13d1db2f5d09e92900	2026-11-11T15:36:55Z	feat(diag): count what screen-size passes draw on

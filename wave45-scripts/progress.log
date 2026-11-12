@@ -1,0 +1,45 @@
+2026-11-12 04:1x | wave45 armed: v36 packaging (kernel 5b77b418 + ramdisk 51a030c3 + loader 5de055ea frozen), gates A-D planned
+2026-11-12 04:2x-04:3x | v36 packed: payload 0a70ec0a (27496536 B), graft e6ca0b43372634c8c8ab1a459d6c63902bcb77599415d8a9fa82696a3655b7de (192 MiB), verify ALL 72 CHECKS PASSED (wave45-scripts/verify-v36.log); loader 5de055ea frozen, kernel 5b77b418, ramdisk 51a030c3, cmdline 489 chars gpu=1 fuelgauge=2; fence_probe.c cross-compiled (66584 B Mach-O arm64, deps subset of gl_test)
+2026-11-12 04:5x | gate tools ready: fence_probe 66584 B (7843d517), gates-run-v45.py armed, flash-bootb-v36.sh (EXPECT_SHA e6ca0b43...), await-android-and-flash-v36.sh watcher started; device in known 0000:0002 zombie enum (wave42-known, self-heals); fallback-to-Android expected ~05:30-06:00 per wave42 cadence
+2026-11-12 04:49 | watcher slice: still xnuloader cycling, no Android window yet (expected 05:15-06:00)
+2026-11-12 05:0x | watcher slice: still cycling; flash script re-arms at 20-min expiry automatically
+2026-11-12 05:15 | watcher slice: still cycling, no window yet
+2026-11-12 05:40 | watcher slice: ~100 min since 04:00 set_active b; wave42 cadence 1h56m -> window expected any minute now
+2026-11-12 05:45 | both bg tasks (flash watcher + caretaker) were killed externally at ~05:39; restarted as exec_c98d12f4 + exec_8ecd91be; no window missed (log clean, device still cycling xnuloader)
+2026-11-12 05:47 | orphan flash run 052222 killed (pid 1585543); single watcher chain now: await(1594372) -> flash-bootb-v36(1594375)
+2026-11-12 05:52 | flash attempt 1 (v36a): gates taro+slot-b passed, write FAILED (SendBuffer) - device was a fragile mid-fallback d00d; attempt 2 (v36b): attach 'Device in error state', getvar no device - gadget wedged; boot_b untouched, boot_a untouched, zero-brick intact; waiting for ABL fastboot timeout -> re-enumeration; watcher still armed
+2026-11-12 06:1x | FLASH FAILED analysis: v36a gates taro+slot-b PASSed but the 192MiB write died at download start; ABL gadget (entered from the generation fallback, not adb-commanded) wedged device-side: enumerates fine, bulk pair dies ~1s after every attach; adb kill-server / pnputil / Disable-PnpDevice / bind --force all blocked (no admin); port-reset race via sysfs authorized + fastboot reboot races did not land; unwedge-reboot-loop-v45.sh started (65 min, fastboot reboot per window; nothing it does flashes); boot_b still v35 intact (download-phase failure = no partition write), boot_a untouched, zero-brick intact
+2026-11-12 06:37 | ROOT CAUSE FOUND: zombie caretakers from Nov8/00:42/01:53 (wave21 watch-attach.sh x5 + wave42 watch-attach-v42.sh x2) were killing EVERY attached 18d1:d00d on 2-2 every 2s unconditionally - the v36a write death and all subsequent 'flapping' was host-side sabotage, not a device wedge; all zombies killed (11 pids); retrying flash NOW
+2026-11-12 07:05 | registration committed (wave45 doc + STATUS + README + wave45-scripts); guards armed (unwedge + watcher); device static in ABL fastboot; NEED USER = power-cycle
+2026-11-12 07:2x | final guard state: unwedge loop (fastboot reboot/recovery races answer INFO but device never acts), chained watcher (flash->gates runner), caretaker v45; device static d00d Android; NEED USER: power-cycle
+2026-11-12 08:3x | MAIN AGENT: both guards had expired (watcher chain STOP 08:14:35, unwedge 65-min window ended ~07:55) with nothing re-arming them; re-armed both from the main session (await-android-and-flash-v36.sh chained watcher + unwedge-reboot-loop-v45.sh, background execs in the main session, will notify on exit). The user power-cycle remains the one pending step; guards will catch either path (Android window ~2h fallback cadence, or a fresh fastboot window from the forced reboot).
+2026-11-12 08:41:37 | gates hunt armed run=gates0842 (A=None B=None C=None D=None)
+2026-11-12 08:43:58 | HIT; gates ladder entered (open: a,b,d,c)
+2026-11-12 08:44:58 | gate B PASS
+2026-11-12 08:45:23 | gate C hardware-DONE (gl_rc=0)
+2026-11-12 08:45:45 | HIT; gates ladder entered (open: a,d)
+2026-11-12 08:46:56 | HIT; gates ladder entered (open: a,d)
+2026-11-12 08:48:06 | HIT; gates ladder entered (open: a,d)
+2026-11-12 08:49:17 | HIT; gates ladder entered (open: a,d)
+2026-11-12 08:50:28 | HIT; gates ladder entered (open: a,d)
+2026-11-12 08:51:39 | HIT; gates ladder entered (open: a,d)
+2026-11-12 09:05:58 | gates hunt armed run=gates0903 (A=None B=PASS C=hardware-DONE D=None)
+2026-11-12 09:05:58 | HIT; gates ladder entered (open: a,d)
+2026-11-12 09:06:04 | gate A REGRESSED (steps=0 magic=False stays=False)
+2026-11-12 09:06:04 | MARCH STOP: gate A = REGRESSED: the mission's stop-loss stops the ladder here
+2026-11-12 09:11:26 | gates hunt armed run=gates0907 (A=None B=PASS C=hardware-DONE D=None)
+2026-11-12 09:18:12 | HIT; gates ladder entered (open: a,d)
+2026-11-12 09:18:15 | gate A PASS (steps=18 magic=True stays=True)
+2026-11-12 09:18:30 | gate D PASS (fuel lines 14)
+2026-11-12 09:18:51 | HIT; gates ladder entered (open: d)
+2026-11-12 09:19:10 | gate D PASS (fuel lines 14)
+2026-11-12 09:19:31 | HIT; gates ladder entered (open: d)
+2026-11-12 09:19:50 | gate D PASS (fuel lines 14)
+2026-11-12 09:20:11 | HIT; gates ladder entered (open: d)
+2026-11-12 09:20:29 | gate D PASS (fuel lines 14)
+2026-11-12 09:20:50 | HIT; gates ladder entered (open: d)
+2026-11-12 09:21:09 | gate D PASS (fuel lines 14)
+2026-11-12 09:21:30 | HIT; gates ladder entered (open: d)
+2026-11-12 09:2x | FOLLOW-UP COMPLETE: flash confirmed 08:41 (user power-cycle); gates final: A=PASS (march 1-21 via /dev/ufs_logdump, steps 20/21/STAYS-ON verbatim) B=PASS (dual nonce write-back, WPTR branch fired once as wave44 predicted, timeouts 0) C=hardware-DONE (FD725, five samples verbatim, 26% coverage, PRESENT_CALL_OK, user witnessed) D=PARTIAL (S1 arbiter 0x70000000/768 verbatim, S2 negative archive, S3 gauge no-answer -> unfed sentinel; sysctl chain 10/10 via battery_probe 325c24d8); root causes fixed: zsh ==MARKER== =cmd expansion, /dev/logdump absent -> ufs_logdump, sysctl binary absent -> probe; verdict45-overall.txt false alarm deleted
+2026-11-12 09:3x | WAVE45 CLOSED: all guards retired per the hygiene discipline (watch-attach-v45 busid-generic killed; unwedge expired; await chain dead); four gates final A=PASS B=PASS C=hardware-DONE D=PARTIAL; commits 57ed20d + 5d40ac0; v36 stays cycling on boot_b, no reboot issued
+[11:02] MAIN AGENT: killed 2 leftover hung wsl processes (reset-and-probe-v45.sh from the 06:05 wedged window, hung on getvar ~3.5h; outside the WAVE45 CLOSED retired-guards list - process hygiene gap noted; zero risk removed)

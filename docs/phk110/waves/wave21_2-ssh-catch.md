@@ -87,7 +87,7 @@ loader.efi v16b = **`6c7fdb62…`**（75,264 B，`-Wall -Wextra` 零警告，`PA
 
 **红线执行**：修复预算第 2 轮未达 → 停止，转入收尾。按当时口径，F10 根因 = 本轮构建回归 → 修正算第 2 轮预算内（已完成构建+自检）；**刷写与冷启动时机待定**（本轮止步于纯软件准备、未碰手机）。
 
-## 7. PAYLOAD_BASE 问题解剖（冻屏照片 → 指令级根因；本波最重要的新知）
+## 7. PAYLOAD_BASE 问题解剖（冻屏照片 → 指令级根因；本阶段最重要的新知）
 
 **F10 = EDK2 异常断言冻结屏**：`ASSERT [ArmCpuDxe] CpuExceptionHandlerLib.c(438): ((BOOLEAN)(0==1))`（= `DumpCpuContext` 尾 `ASSERT (FALSE); CpuDeadLoop ();`）。两张高清照片给出完整寄存器/栈帧现场：
 
@@ -133,11 +133,11 @@ ConnectSts: Detach, Data Role: UNKNOWN, Lane: OPEN, CoreNum: 0
 
 **v16c 三变体（`patch-loader-v16c.py`，全程 `PAYLOAD_BASE=0xF4000000 ./build.sh`——F10 pin 每版验证）**：`usb_dwc3_susphy_off()`（清 `GUSB3PIPECTL(0)(0xC2C0).SUSPHY(bit6)` + `GUSB2PHYCFG(0)(0xC200).SUSPHY(bit6)`——Linux dwc3 的 dis_u3/u2_susphy）+ `usb_dwc3_wake()`（DCTL(0xC704) RUN_STOP/CS 软断开让主机见真实拔插 → `GCTL(0xC110).CSFTRST(bit11)` 自清轮询 → 再清 SUSPHY；仅 platform_phk110）+ **第三变体新增：start_ex 成功后再清一次 SUSPHY**（vendor 自己的 init 按 snps 默认把 SUSPHY 重新置 1，会把前清覆盖——SET_CONFIG 时刻的 DEPCFG 写再次落入门控域）。三变体 loader = `ee8204e8…` → `e3f51cd4…` → **`45437cd3…`**（最终，75,776 B，零警告）；payload 最终 = `4a2a90ff…`；graft 最终 = **`53f5e077…`**（verify-udon-hakios-v16c.py 53/53，F10 pin 布局无关搜索式 + DWC3 wake 行钉死）。刷写链：cce46f83（e3f51cd4 变体，一次 OKAY）→ **53f5e077（45437cd3 变体，一次 OKAY，双侧 sha 对包）**。
 
-**判定（屏幕实时读数，收尾）**：三变体全部真机验证后**错误墙恒在**（ep[2] not configured / 0x8000000B/C 不变）——基址✓ + 前清✓ + 后清✓ 三重叠加全无效 → **端点未配置不是暖态顽疾，而是 vendor UsbDeviceDxe/UsbfnDwc 栈在 loader 场景下的固有行为**。最可能：UsbfnDwc 期望的 configuration/interface 布局与 loader_talk/Windows 枚举路径不一致，或 vendor 栈需要明示的 ActivateEndpoints 类调用而 fastboot 协议路径没走它。静态扫描佐证：vendor 五模块均不硬编码 0x0A6C110 类绝对地址（运行期从 config/protocol 取基址）——寄存器操作全部经 vendor 栈自己的句柄，loader 侧 MMIO 直写是否真触达同一寄存器域待反汇编 UsbfnDwcSubmitUrbNode/DwcPrepareURB 定案。**下一波方案**：反汇编 UsbfnDwcSubmitUrbNode/DwcPrepareURB 找 ep2 配置判据 + 对照 vendor 正常 fastboot 会话的 ep2 配置路径。
+**判定（屏幕实时读数，收尾）**：三变体全部真机验证后**错误墙恒在**（ep[2] not configured / 0x8000000B/C 不变）——基址✓ + 前清✓ + 后清✓ 三重叠加全无效 → **端点未配置不是暖态顽疾，而是 vendor UsbDeviceDxe/UsbfnDwc 栈在 loader 场景下的固有行为**。最可能：UsbfnDwc 期望的 configuration/interface 布局与 loader_talk/Windows 枚举路径不一致，或 vendor 栈需要明示的 ActivateEndpoints 类调用而 fastboot 协议路径没走它。静态扫描佐证：vendor 五模块均不硬编码 0x0A6C110 类绝对地址（运行期从 config/protocol 取基址）——寄存器操作全部经 vendor 栈自己的句柄，loader 侧 MMIO 直写是否真触达同一寄存器域待反汇编 UsbfnDwcSubmitUrbNode/DwcPrepareURB 定案。**下一阶段方案**：反汇编 UsbfnDwcSubmitUrbNode/DwcPrepareURB 找 ep2 配置判据 + 对照 vendor 正常 fastboot 会话的 ep2 配置路径。
 
 **最终取证（logdump-v16c.bin，`183bb0fc…`，安卓回稳后 adb 拉取）——v16c 事后报告全记录，两个决定性读数**：
 
-1. **`usb: dwc3 soft reset did not settle in one second`** —— CSFTRST 位写进去后**从未自清**（1s 轮询超时）= **寄存器域门控的指令级实锤**：loader 的 SUSPHY 前清没能解开门控（要么 SUSPHY 位/寄存器位置对这块硅片不对，要么门控在 wrapper/GCC 层——GCC USB 时钟投票/pipe_clk，不是 PHY suspend 位能解的）。这解释了端点墙的机理：SSM 的 DEPCFG 写与 CSFTRST 同域同命运（丢写）——而 ep0 枚举却活着（vendor 栈的 ep0 路径可能走不同的寄存器窗口/中断驱动路径）。下一波反汇编 UsbfnDwcSubmitUrbNode/DwcPrepareURB 时，用"CSFTRST 丢写"作为寄存器真伪的试金石。
+1. **`usb: dwc3 soft reset did not settle in one second`** —— CSFTRST 位写进去后**从未自清**（1s 轮询超时）= **寄存器域门控的指令级实锤**：loader 的 SUSPHY 前清没能解开门控（要么 SUSPHY 位/寄存器位置对这块硅片不对，要么门控在 wrapper/GCC 层——GCC USB 时钟投票/pipe_clk，不是 PHY suspend 位能解的）。这解释了端点墙的机理：SSM 的 DEPCFG 写与 CSFTRST 同域同命运（丢写）——而 ep0 枚举却活着（vendor 栈的 ep0 路径可能走不同的寄存器窗口/中断驱动路径）。下一阶段反汇编 UsbfnDwcSubmitUrbNode/DwcPrepareURB 时，用"CSFTRST 丢写"作为寄存器真伪的试金石。
 2. **`usb: started` 首试成功、`try failed: start_ex` 零命中、`no payload` 零命中、`UEFI EXCEPTION` 零命中** —— v16c 的 bring-up 链完全健康：PAYLOAD_BASE 修复持续生效、25s settle 后 start_ex 在安定的平台上一发即中（v16 结论复现）、DWC3 wake 未引发任何新异常（安全失败）。
 
 **手机状态**：ABL 回退链走通（bootloader → set_active a → Android boot_completed=1）——手机已回到安卓。
@@ -156,13 +156,13 @@ ConnectSts: Detach, Data Role: UNKNOWN, Lane: OPEN, CoreNum: 0
 
 **为什么冷启动仍值得**：wave21_1 的 ①卡假设（暖复位留 USB 电源域半初始化态 → start_ex 输）仍未检验；冷启动 + 修正版 v16b' 一次同时给出干净 USB 电源域与 25s settle 三试的增强 boot 窗。即使不做冷启动，暖刷 v16b' 也已回到 v16 同基线。
 
-## 9. 本波教训
+## 9. 本阶段教训
 
-- **🔴 `build.sh` 的 PAYLOAD_BASE 是流程级 landmine（本波最大教训）**：裸调 `./build.sh` 会编进 redwood 默认 `0xF0000000`——在 udon 上未映射，loader 第一读即同步 abort + EDK2 DEBUG 冻屏。**每次编 loader 必须 `PAYLOAD_BASE=0xF4000000 ./build.sh`**；现已在 make-payload-v16b.sh（构建时 pin）与 verify-udon-hakios-v16b.py（验收时 pin）双重钉死，坏件 sha `f445f187` 进拒绝名单。
+- **🔴 `build.sh` 的 PAYLOAD_BASE 是流程级 landmine（本阶段最大教训）**：裸调 `./build.sh` 会编进 redwood 默认 `0xF0000000`——在 udon 上未映射，loader 第一读即同步 abort + EDK2 DEBUG 冻屏。**每次编 loader 必须 `PAYLOAD_BASE=0xF4000000 ./build.sh`**；现已在 make-payload-v16b.sh（构建时 pin）与 verify-udon-hakios-v16b.py（验收时 pin）双重钉死，坏件 sha `f445f187` 进拒绝名单。
 - **verify 只钉 sha 不钉语义 = 缺口**：首版 51/51 全绿挡不住错误基址（sha 是自己刚产出的）。凡带编译期常量的产物，验收必须 pin 语义（指令/常量级），不止字节。
 - **loader 的启动机制首次看清**：BDS 经 `gBS->LoadImage/StartImage`（BdsDxe 帧 Boot Services 偏移 0xC8/0xD0）把 payload 里的 loader.efi 当 UEFI 应用启动——Boot #9 "AfterConsole 自动进 loader"之谜的机制侧答案。
 - **EDK2 DEBUG assert = 冻结屏**（非 reset、非 panic 循环）：`ASSERT(FALSE)+CpuDeadLoop` 不喂看门狗——手机永久冻屏直到人工强启；且 install_exception_hook 之前的崩（如 efi_main 极早期）hook 不可达。任何"下一版可能崩在 UEFI 层"的刷写都要先给出强启配方。
-- **device-layer 里的 FD 提取件是 wave2 旧物**（`udon-hakios-SILICIUM_UEFI.fd` = `de4df6ac…` ≠ 在机 `8924cb67…`）——graft 的 FD 必须取 WSL 构建树；verify 的 FD 钉死断言救了一次错误 graft。
+- **device-layer 里的 FD 提取件是 wave2 旧物**（`udon-hakios-SILICIUM_UEFI.fd` = `de4df6ac…` ≠ 机上 `8924cb67…`）——graft 的 FD 必须取 WSL 构建树；verify 的 FD 钉死断言救了一次错误 graft。
 - **守护固化即刻回本**：固化当天就在刷写通道击退一次真 F9（§4.3）。
 - WSL `/tmp` 跨调用清空（老 footgun 再证）：备份件放 /tmp 会被吃，patch-apply 要单命令闭环。
 - 后台长循环经 `wsl.exe bash -c 'nohup … &'` 会在会话结束时被杀——要用工具的原生 run_in_background。

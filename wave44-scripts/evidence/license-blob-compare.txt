@@ -1,0 +1,17 @@
+UniXNU-UniXNU                  blob f63d2a6e   2673 bytes  spdx-line: SPDX-License-Identifier: BSD-2-Clause-Patent
+UniXNU-UniXNU-sheng            blob f63d2a6e   2673 bytes  spdx-line: SPDX-License-Identifier: BSD-2-Clause-Patent
+UniXNU-UniXNU-sm8550-common    blob f63d2a6e   2673 bytes  spdx-line: SPDX-License-Identifier: BSD-2-Clause-Patent
+UniXNU-AdrenoFirmware          blob 217b4df4   2682 bytes  spdx-line: SPDX-License-Identifier: BSD-2-Clause-Patent
+UniXNU-Adreno740               blob 8803ca32   1082 bytes  spdx-line: (none; first line: MIT License)
+UniXNU-AdrenoPM4               blob 9bcaf670   1079 bytes  spdx-line: (none; first line: MIT License)
+UniXNU-AirNir                  blob 9b9bc8a5   1076 bytes  spdx-line: (none; first line: MIT License)
+UniXNU-AdrenoMetal             blob 424da216   1081 bytes  spdx-line: (none; first line: MIT License)
+--- bodies without their copyright lines (same hash = same text)
+UniXNU-UniXNU                  4d5d43aecc91  | Copyright (c) 2026, UniXNU contributors. All rights reserved.
+UniXNU-UniXNU-sheng            4d5d43aecc91  | Copyright (c) 2026, UniXNU contributors. All rights reserved.
+UniXNU-UniXNU-sm8550-common    4d5d43aecc91  | Copyright (c) 2026, UniXNU contributors. All rights reserved.
+UniXNU-AdrenoFirmware          4d5d43aecc91  | Copyright (c) 2026, ArmVirtPlatform contributors. All rights reserved.
+UniXNU-Adreno740               c9b7c49cdeb4  | Copyright (c) 2026 NativeAdreno contributors
+UniXNU-AdrenoPM4               c9b7c49cdeb4  | Copyright (c) 2026 AdrenoPM4 contributors
+UniXNU-AirNir                  c9b7c49cdeb4  | Copyright (c) 2026 AirNir contributors
+UniXNU-AdrenoMetal             c9b7c49cdeb4  | Copyright (c) 2026 NativeMetal contributors

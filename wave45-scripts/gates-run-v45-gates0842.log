@@ -1,0 +1,146 @@
+[08:41:37 t+0000.0s] wave45 gates hunt armed (run-id gates0842, deadline 300 min)
+[08:41:37 t+0000.0s] gates on record: A=None B=None C=None D=None
+[08:41:45 t+0007.8s] bus: d00d addrs [1] (was None)
+[08:43:58 t+0140.8s] attempt k001 -> rc=0 in 132.9s (out 257 B)
+[08:43:58 t+0140.8s] branch: HIT
+[08:43:58 t+0140.8s] === HIT: entering the gates ladder (open: a,b,d,c) ===
+[08:43:58 t+0141.1s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:43:58 t+0141.1s] step klog try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:44:07 t+0149.4s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:44:07 t+0149.4s] step klog try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:44:15 t+0157.7s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:44:15 t+0157.7s] step klog try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:44:23 t+0165.7s] klog head pull failed (rc=1); continuing with the rest of the ladder
+[08:44:23 t+0166.0s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:44:23 t+0166.0s] step battery try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:44:31 t+0174.3s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:44:31 t+0174.3s] step battery try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:44:40 t+0182.5s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:44:40 t+0182.5s] step battery try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:44:48 t+0190.5s] gate D: no sysctl output (rc=1)
+[08:44:57 t+0200.3s] attempt probe-xfer -> rc=0 in 9.8s (out 89 B)
+[08:44:57 t+0200.3s] gate B: probe staged (66584 B, sha 7843d517deaf) in 9.8s
+[08:44:58 t+0201.0s] attempt probe-run -> rc=0 in 0.7s (out 747 B)
+[08:44:58 t+0201.0s] gate B -> PASS
+[08:44:58 t+0201.3s] attempt klog2 -> rc=1 in 0.3s (out 0 B)
+[08:44:58 t+0201.3s] step klog2 try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:45:07 t+0209.6s] attempt klog2 -> rc=1 in 0.3s (out 0 B)
+[08:45:07 t+0209.6s] step klog2 try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:45:23 t+0226.0s] attempt gl -> rc=0 in 8.4s (out 890 B)
+[08:45:23 t+0226.0s] gate C -> hardware-DONE (GL_RC=0 + RENDER_PASS backend=hw + READBACK_PASS + PRESENT_CALL_OK, no _FAIL)
+[08:45:24 t+0226.5s] attempt fill -> rc=0 in 0.5s (out 1374 B)
+[08:45:24 t+0226.5s] fill profile rc=0 (1374 B)
+[08:45:24 t+0226.9s] attempt u2f -> rc=0 in 0.3s (out 959 B)
+[08:45:24 t+0226.9s] u2f_test rc=0 (959 B)
+[08:45:42 t+0245.0s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[08:45:45 t+0247.8s] attempt k002 -> rc=0 in 0.3s (out 257 B)
+[08:45:45 t+0247.8s] branch: HIT
+[08:45:45 t+0247.8s] === HIT: entering the gates ladder (open: a,d) ===
+[08:45:45 t+0248.1s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:45:45 t+0248.1s] step klog try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:45:54 t+0256.4s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:45:54 t+0256.4s] step klog try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:46:02 t+0264.7s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:46:02 t+0264.7s] step klog try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:46:10 t+0272.7s] klog head pull failed (rc=1); continuing with the rest of the ladder
+[08:46:10 t+0273.0s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:46:10 t+0273.0s] step battery try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:46:18 t+0281.3s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:46:18 t+0281.3s] step battery try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:46:27 t+0289.5s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:46:27 t+0289.5s] step battery try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:46:35 t+0297.5s] gate D: no sysctl output (rc=1)
+[08:46:53 t+0315.7s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[08:46:56 t+0318.5s] attempt k003 -> rc=0 in 0.3s (out 257 B)
+[08:46:56 t+0318.5s] branch: HIT
+[08:46:56 t+0318.5s] === HIT: entering the gates ladder (open: a,d) ===
+[08:46:56 t+0318.9s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:46:56 t+0318.9s] step klog try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:47:04 t+0327.2s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:47:04 t+0327.2s] step klog try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:47:13 t+0335.5s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:47:13 t+0335.5s] step klog try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:47:21 t+0343.5s] klog head pull failed (rc=1); continuing with the rest of the ladder
+[08:47:21 t+0343.8s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:47:21 t+0343.8s] step battery try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:47:29 t+0352.0s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:47:29 t+0352.0s] step battery try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:47:37 t+0360.3s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:47:37 t+0360.3s] step battery try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:47:45 t+0368.3s] gate D: no sysctl output (rc=1)
+[08:48:04 t+0386.4s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[08:48:06 t+0389.2s] attempt k004 -> rc=0 in 0.3s (out 257 B)
+[08:48:06 t+0389.2s] branch: HIT
+[08:48:06 t+0389.2s] === HIT: entering the gates ladder (open: a,d) ===
+[08:48:07 t+0389.5s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:48:07 t+0389.5s] step klog try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:48:15 t+0397.8s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:48:15 t+0397.8s] step klog try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:48:23 t+0406.1s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:48:23 t+0406.1s] step klog try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:48:31 t+0414.1s] klog head pull failed (rc=1); continuing with the rest of the ladder
+[08:48:32 t+0414.4s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:48:32 t+0414.4s] step battery try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:48:40 t+0422.6s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:48:40 t+0422.6s] step battery try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:48:48 t+0430.9s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:48:48 t+0430.9s] step battery try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:48:56 t+0438.9s] gate D: no sysctl output (rc=1)
+[08:49:14 t+0457.0s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[08:49:17 t+0459.8s] attempt k005 -> rc=0 in 0.3s (out 257 B)
+[08:49:17 t+0459.8s] branch: HIT
+[08:49:17 t+0459.8s] === HIT: entering the gates ladder (open: a,d) ===
+[08:49:17 t+0460.1s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:49:17 t+0460.1s] step klog try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:49:26 t+0468.4s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:49:26 t+0468.4s] step klog try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:49:34 t+0476.7s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:49:34 t+0476.7s] step klog try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:49:42 t+0484.7s] klog head pull failed (rc=1); continuing with the rest of the ladder
+[08:49:42 t+0485.0s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:49:42 t+0485.0s] step battery try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:49:51 t+0493.4s] attempt battery -> rc=1 in 0.4s (out 0 B)
+[08:49:51 t+0493.4s] step battery try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:49:59 t+0501.7s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:49:59 t+0501.7s] step battery try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:50:07 t+0509.7s] gate D: no sysctl output (rc=1)
+[08:50:25 t+0527.8s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[08:50:28 t+0530.6s] attempt k006 -> rc=0 in 0.3s (out 257 B)
+[08:50:28 t+0530.6s] branch: HIT
+[08:50:28 t+0530.6s] === HIT: entering the gates ladder (open: a,d) ===
+[08:50:28 t+0530.9s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:50:28 t+0530.9s] step klog try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:50:36 t+0539.2s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:50:36 t+0539.2s] step klog try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:50:45 t+0547.6s] attempt klog -> rc=1 in 0.4s (out 0 B)
+[08:50:45 t+0547.6s] step klog try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:50:53 t+0555.6s] klog head pull failed (rc=1); continuing with the rest of the ladder
+[08:50:53 t+0555.9s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:50:53 t+0555.9s] step battery try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:51:01 t+0564.2s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:51:01 t+0564.2s] step battery try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:51:10 t+0572.4s] attempt battery -> rc=1 in 0.3s (out 0 B)
+[08:51:10 t+0572.5s] step battery try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:51:18 t+0580.5s] gate D: no sysctl output (rc=1)
+[08:51:36 t+0598.6s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[08:51:39 t+0601.4s] attempt k007 -> rc=0 in 0.3s (out 257 B)
+[08:51:39 t+0601.4s] branch: HIT
+[08:51:39 t+0601.4s] === HIT: entering the gates ladder (open: a,d) ===
+[08:51:39 t+0601.7s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:51:39 t+0601.7s] step klog try1 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:51:47 t+0610.0s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:51:47 t+0610.0s] step klog try2 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:51:55 t+0618.3s] attempt klog -> rc=1 in 0.3s (out 0 B)
+[08:51:55 t+0618.3s] step klog try3 unsatisfied (rc=1) -- retrying after the attach race (8 s)
+[08:52:03 t+0626.3s] klog head pull failed (rc=1); continuing with the rest of the ladder
+[08:52:04 t+0626.4s] attempt battery -> rc=255 in 0.1s (out 0 B)
+[08:52:04 t+0626.4s] step battery try1 unsatisfied (rc=255) -- retrying after the attach race (8 s)
+[08:52:12 t+0634.6s] attempt battery -> rc=255 in 0.1s (out 0 B)
+[08:52:12 t+0634.6s] step battery try2 unsatisfied (rc=255) -- retrying after the attach race (8 s)
+[08:52:20 t+0642.7s] attempt battery -> rc=255 in 0.1s (out 0 B)
+[08:52:20 t+0642.7s] step battery try3 unsatisfied (rc=255) -- retrying after the attach race (8 s)
+[08:52:28 t+0650.7s] gate D: no sysctl output (rc=255)
+[08:52:46 t+0668.9s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[08:52:49 t+0671.5s] attempt k008 -> rc=255 in 0.2s (out 0 B)
+[08:52:49 t+0671.5s] branch: LOADER-PHASE
+[08:52:49 t+0671.5s] loader answered: silence until +250 s (the exec clock)

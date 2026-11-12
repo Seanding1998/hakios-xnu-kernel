@@ -1,0 +1,32 @@
+=== UniXNU: repos API license field ===
+{"default_branch":"main","license":{"key":"other","name":"Other","node_id":"MDc6TGljZW5zZTA=","spdx_id":"NOASSERTION","url":null},"pushed_at":"2026-11-11T15:42:50Z","size":13554}
+=== UniXNU: /license endpoint ===
+{"name":"Other","path":"LICENSE","sha":"f63d2a6e4c80c3bf8d44b047458468289927593d","size":2673,"spdx":"NOASSERTION"}
+=== UniXNU: root listing ===
+file	.gitattributes	325
+dir	.github	0
+file	.gitignore	578
+file	.gitmodules	2214
+file	AGENTS.md	11
+file	CONTRIBUTING.md	4640
+file	LICENSE	2673
+file	README.md	3293
+file	README.zh-CN.md	3378
+dir	assets	0
+file	components.toml	20365
+file	devices.toml	155260
+dir	docs	0
+dir	drivers	0
+dir	examples	0
+file	feeds.toml	2454
+dir	kits	0
+dir	package	0
+dir	patches	0
+dir	profiles	0
+dir	scripts	0
+dir	templates	0
+dir	tests	0
+file	unixnu	165
+file	unixnu.example.toml	429
+=== UniXNU: HEAD ===
+75f35420137371d10b5c66399a39619991cde077	2026-11-11T15:42:47Z	docs: describe the default work placements and render mode of AdrenoMetal

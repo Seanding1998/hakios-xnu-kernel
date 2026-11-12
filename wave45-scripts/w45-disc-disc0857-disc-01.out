@@ -1,0 +1,46 @@
+MARK-DEV-UFS
+crw-r----- 1 root operator 17, 100 Jan  1 08:00 /dev/rufs_logdump
+brw-r----- 1 root operator  2, 100 Jan  1 08:00 /dev/ufs_logdump
+MARK-UFS-LIST
+rufs_ALIGN_TO_128K_1
+rufs_ALIGN_TO_128K_2
+rufs_DRIVER
+rufs_abl_a
+rufs_abl_b
+rufs_aop_a
+rufs_aop_b
+rufs_aop_config_a
+rufs_aop_config_b
+rufs_apdp
+rufs_apdp_full
+rufs_apdpb
+MARK-DEV-LOG
+ls: cannot access '/dev/logdump': No such file or directory
+crw-rw-rw- 1 root wheel 0, 0 Jan  1 08:02 /dev/console
+crw------- 1 root wheel 6, 0 Jan  1 08:00 /dev/klog
+MARK-SYSCTL-BIN
+zsh:1: command not found: sysctl
+MARK-SYSCTL-FAMILY
+zsh:1: command not found: sysctl
+MARK-VAR
+Keychains
+Managed Preferences
+MobileAsset
+MobileDevice
+MobileSoftwareUpdate
+audit
+buddy
+containers
+datamigrator
+db
+dextcores
+empty
+fence_probe
+folders
+hardware
+installd
+MARK-DMESG
+zsh:1: command not found: dmesg
+MARK-PATH
+PATH-/usr/bin:/bin:/usr/sbin:/sbin:/var/jb/usr/bin
+MARK-DISCOVERY-DONE

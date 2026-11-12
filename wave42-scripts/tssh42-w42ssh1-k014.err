@@ -1,0 +1,26 @@
+tunnel25w: round 0: d00d nodes at addr [4]
+tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+tunnel25w: round 1: d00d nodes at addr [4]
+tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+tunnel25w: round 2: d00d nodes at addr [4]
+tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+tunnel25w: round 3: d00d nodes at addr [4]
+tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+tunnel25w: round 4: d00d nodes at addr [4]
+tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+tunnel25w: round 5: d00d nodes at addr [4]
+tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+tunnel25w: round 0: d00d nodes at addr [4]
+tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+tunnel25w: round 1: d00d nodes at addr [4]
+tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+tunnel25w: round 2: d00d nodes at addr [4]
+tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+tunnel25w: round 3: d00d nodes at addr [4]
+tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+tunnel25w: round 4: d00d nodes at addr [4]
+tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+tunnel25w: round 5: d00d nodes at addr [4]
+tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+tunnel25w: no live kernel session within 600 s
+Connection closed by UNKNOWN port 65535

@@ -1,0 +1,102 @@
+[00:42:46 t+0000.0s] wave27 wide-window SSH hunt armed (run-id w42ssh2, deadline 90 min)
+[00:42:46 t+0000.0s] knock cmd: 'uname -a && id && echo WAVE21-SSH-OK W27-w42ssh2'
+[00:42:46 t+0000.0s] report| hunt armed, run-id w42ssh2, deadline 90 min, single-owner mode
+[00:42:46 t+0000.1s] bus: d00d addrs [4] (was None)
+[00:43:19 t+0032.2s] attempt k001 -> rc=255 in 32.1s
+[00:43:19 t+0032.2s] branch: DEAD-PAIR (armed=False, ct=170)
+[00:43:19 t+0032.2s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[00:43:19 t+0032.2s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[00:43:19 t+0032.2s]   err| tunnel25w: no live kernel session within 600 s
+[00:43:19 t+0032.2s]   err| Connection closed by UNKNOWN port 65535
+[00:43:57 t+0071.0s] attempt k002 -> rc=255 in 36.3s
+[00:43:57 t+0071.0s] branch: DEAD-PAIR (armed=False, ct=170)
+[00:43:57 t+0071.0s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[00:43:57 t+0071.0s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[00:43:57 t+0071.0s]   err| tunnel25w: no live kernel session within 600 s
+[00:43:57 t+0071.0s]   err| Connection closed by UNKNOWN port 65535
+[00:44:35 t+0109.0s] attempt k003 -> rc=255 in 35.5s
+[00:44:35 t+0109.0s] branch: DEAD-PAIR (armed=False, ct=170)
+[00:44:35 t+0109.0s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[00:44:35 t+0109.0s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[00:44:35 t+0109.0s]   err| tunnel25w: no live kernel session within 600 s
+[00:44:35 t+0109.0s]   err| Connection closed by UNKNOWN port 65535
+[00:45:14 t+0147.5s] attempt k004 -> rc=255 in 36.0s
+[00:45:14 t+0147.5s] branch: DEAD-PAIR (armed=False, ct=170)
+[00:45:14 t+0147.5s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[00:45:14 t+0147.5s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[00:45:14 t+0147.5s]   err| tunnel25w: no live kernel session within 600 s
+[00:45:14 t+0147.5s]   err| Connection closed by UNKNOWN port 65535
+[00:45:52 t+0185.4s] attempt k005 -> rc=255 in 35.4s
+[00:45:52 t+0185.4s] branch: DEAD-PAIR (armed=False, ct=170)
+[00:45:52 t+0185.4s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[00:45:52 t+0185.4s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[00:45:52 t+0185.4s]   err| tunnel25w: no live kernel session within 600 s
+[00:45:52 t+0185.4s]   err| Connection closed by UNKNOWN port 65535
+[00:46:16 t+0209.4s] attempt k006 -> rc=255 in 21.5s
+[00:46:16 t+0209.5s] branch: DEAD-PAIR (armed=False, ct=170)
+[00:46:16 t+0209.5s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[00:46:16 t+0209.5s]   err| tunnel25w: addr 4: open failed (LIBUSB_ERROR_NOT_SUPPORTED)
+[00:46:16 t+0209.5s]   err| tunnel25w: no live kernel session within 600 s
+[00:46:16 t+0209.5s]   err| Connection closed by UNKNOWN port 65535
+[00:46:50 t+0244.0s] attempt k007 -> rc=255 in 32.0s
+[00:46:50 t+0244.0s] branch: DEAD-PAIR (armed=False, ct=170)
+[00:46:50 t+0244.0s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[00:46:50 t+0244.0s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[00:46:50 t+0244.0s]   err| tunnel25w: no live kernel session within 600 s
+[00:46:50 t+0244.0s]   err| Connection closed by UNKNOWN port 65535
+[00:46:53 t+0246.5s] bus: d00d addrs [] (was [4])
+[00:46:56 t+0249.6s] bus: d00d addrs [4] (was [])
+[00:46:56 t+0249.8s] attempt k008 -> rc=255 in 0.3s
+[00:46:56 t+0249.8s] branch: LOADER-PHASE (armed=True, ct=170)
+[00:46:56 t+0249.8s]   err| tunnel25w: round 0: d00d nodes at addr [4]
+[00:46:56 t+0249.8s]   err| tunnel25w: addr 4: LIVE (product b'xnuloader'); this is our loader
+[00:46:56 t+0249.8s]   err| tunnel25w: loader phase (raw b'FAILno recording'); exiting fast -- the CALLER owns the duty cycle: probing extends the loader's 240 s window forever, so the campaign must alternate active windows with
+[00:46:56 t+0249.8s]   err| Connection closed by UNKNOWN port 65535
+[00:46:56 t+0249.8s] loader answered: silence until +250 s (the exec clock)
+[00:48:27 t+0340.6s] bus: d00d addrs [] (was [4])
+[00:48:41 t+0354.5s] bus: d00d addrs [4] (was [])
+[00:48:52 t+0365.9s] attempt k009 -> rc=255 in 11.4s
+[00:48:52 t+0365.9s] branch: LOADER-PHASE (armed=True, ct=170)
+[00:48:52 t+0365.9s]   err| tunnel25w: round 0: d00d nodes at addr [4]
+[00:48:52 t+0365.9s]   err| tunnel25w: addr 4: LIVE (product b'xnuloader'); this is our loader
+[00:48:52 t+0365.9s]   err| tunnel25w: loader phase (raw b'FAILno recording'); exiting fast -- the CALLER owns the duty cycle: probing extends the loader's 240 s window forever, so the campaign must alternate active windows with
+[00:48:52 t+0365.9s]   err| Connection closed by UNKNOWN port 65535
+[00:48:52 t+0365.9s] loader answered: silence until +250 s (the exec clock)
+[00:49:10 t+0384.0s] bus: d00d addrs [] (was [4])
+[00:49:24 t+0398.0s] bus: d00d addrs [4] (was [])
+[00:49:25 t+0398.7s] attempt k010 -> rc=255 in 0.7s
+[00:49:25 t+0398.7s] branch: LOADER-PHASE (armed=True, ct=170)
+[00:49:25 t+0398.7s]   err| tunnel25w: round 0: d00d nodes at addr [4]
+[00:49:25 t+0398.7s]   err| tunnel25w: addr 4: LIVE (product b'xnuloader'); this is our loader
+[00:49:25 t+0398.7s]   err| tunnel25w: loader phase (raw b'FAILno recording'); exiting fast -- the CALLER owns the duty cycle: probing extends the loader's 240 s window forever, so the campaign must alternate active windows with
+[00:49:25 t+0398.7s]   err| Connection closed by UNKNOWN port 65535
+[00:49:25 t+0398.7s] loader answered: silence until +250 s (the exec clock)
+[00:53:27 t+0640.6s] bus: d00d addrs [] (was [4])
+[00:53:53 t+0666.6s] bus: d00d addrs [4] (was [])
+[00:54:29 t+0702.4s] attempt k011 -> rc=255 in 35.8s
+[00:54:29 t+0702.4s] branch: DEAD-PAIR (armed=False, ct=170)
+[00:54:29 t+0702.4s]   err| tunnel25w: round 5: d00d nodes at addr [4]
+[00:54:29 t+0702.4s]   err| tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+[00:54:29 t+0702.4s]   err| tunnel25w: no live kernel session within 600 s
+[00:54:29 t+0702.4s]   err| Connection closed by UNKNOWN port 65535
+[00:56:18 t+0811.9s] attempt k012 -> rc=0 in 107.1s
+[00:56:18 t+0811.9s] branch: HIT (armed=True, ct=170) HIT-CANDIDATE
+[00:56:18 t+0811.9s]   err| tunnel25w: pkt OUT 10.0.0.1:21662 -> 10.0.0.2:22 flags=ACK seq=268437742 ack=1728212299 win=16384 len=0 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1728212299 state=ESTABLISHED
+[00:56:18 t+0811.9s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:21662 flags=PSH|ACK seq=1728212299 ack=268437742 win=65535 len=76 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1728212299 state=ESTABLISHED
+[00:56:18 t+0811.9s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:21662 flags=PSH|ACK seq=1728212375 ack=268437742 win=65535 len=60 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1728212375 state=ESTABLISHED
+[00:56:18 t+0811.9s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:21662 flags=PSH|ACK seq=1728212435 ack=268437742 win=65535 len=176 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1728212435 state=ESTABLISHED
+[00:56:18 t+0811.9s] === ACCEPTANCE MODE (session must still be live) ===
+[00:56:41 t+0834.9s] attempt acc2 -> rc=255 in 22.9s
+[00:56:41 t+0834.9s] acceptance conn2 -> rc=255, marker MISSING, Darwin MISSING
+[00:57:19 t+0872.7s] attempt acc3 -> rc=255 in 35.3s
+[00:57:19 t+0872.7s] acceptance conn3 -> rc=255, marker MISSING, Darwin MISSING
+[00:57:57 t+0910.9s] attempt transfer -> rc=255 in 35.8s
+[00:57:57 t+0910.9s] acceptance transfer -> rc=255, phone counted ? of 262144 bytes in 35.8s
+[00:58:33 t+0946.4s] attempt sha-in -> rc=255 in 35.4s
+[00:58:33 t+0946.4s] sha host->device -> rc=255, device hash MISSING, MISMATCH in 35.4s
+[00:59:08 t+0981.7s] attempt sha-out -> rc=255 in 35.3s
+[00:59:08 t+0981.7s] sha device->host -> rc=255, MISMATCH in 35.3s (0 B round trip)
+[00:59:30 t+1003.9s] revive -> 0 getvar after drain: bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes) | drained 0 bytes total
+[00:59:30 t+1003.9s] verdict written: C:\Users\<host>\.zcode\workspace\9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7\hakios-phk110\wave27-scripts\verdict27-w42ssh2.txt (transfer FAIL, sha FAIL, mgmt UNVERIFIED)
+[00:59:30 t+1003.9s] report| HIT + acceptance: conn2/conn3 + transfer(FAIL) + sha(FAIL) + mgmt(UNVERIFIED); verdict verdict27-w42ssh2.txt
+[00:59:30 t+1003.9s] report| === WAVE21-SSH-OK on record: verdict27-w42ssh2.txt ===

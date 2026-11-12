@@ -86,11 +86,11 @@
 3. 显式清位（Linux 语义）后 **3/3 boot 首试武装、墙零复现**；
 4. 判决表"优先处理复位流程"行的设计意图（审阅 P1-1）正是此分支。
 
-**结论：墙的根因按判决表落在复位流程分支（H4 = GCTL CORESOFTRESET 未显式解除）；H1/H2/H3 无需再分辨**。3/3 是强相关不是数学证明（历史也有过一次带 bit11 置位武装成功的 Boot #36），但"修复后墙零复现 + 历史逐 boot 实锤置位态"已够下一波做单变量收敛（如需再证：把显式清除单变量摘除做对照轮——不在本波预算内）。
+**结论：墙的根因按判决表落在复位流程分支（H4 = GCTL CORESOFTRESET 未显式解除）；H1/H2/H3 无需再分辨**。3/3 是强相关不是数学证明（历史也有过一次带 bit11 置位武装成功的 Boot #36），但"修复后墙零复现 + 历史逐 boot 实锤置位态"已够下一阶段做单变量收敛（如需再证：把显式清除单变量摘除做对照轮——不在本阶段预算内）。
 
 ## 6. 诚实边界（不夸大）
 
-1. **vendor 门镜像未通**：gEfiHobListGuid 配置表在本 FD 不存在（Mu DxeCore 不发布，§1 附带事实 1）——镜像链第一步断，vendor 前导错误行（DEPSTARTCFG Fails 等）不在 log 里。本波它们不需要在场（墙零复现），但**若未来再遇墙，这条取证通道仍缺**；续作方案：HOB 直寻（内存扫描/BootShim 交接页）或 shim locator 的其它可达路径——均超出本波。
+1. **vendor 门镜像未通**：gEfiHobListGuid 配置表在本 FD 不存在（Mu DxeCore 不发布，§1 附带事实 1）——镜像链第一步断，vendor 前导错误行（DEPSTARTCFG Fails 等）不在 log 里。本阶段它们不需要在场（墙零复现），但**若未来再遇墙，这条取证通道仍缺**；续作方案：HOB 直寻（内存扫描/BootShim 交接页）或 shim locator 的其它可达路径——均超出本阶段。
 2. **vendor speed/phys 采样未激活**：`LocateProtocol(UsbfnIo)` 在 t+1.0 返回 NOT FOUND 且被一次性负缓存（"the UsbFn layer is not here" 行在 log）。机理未定案（FD 压缩节内晚解压 / FD 内构建的 GUID 与 ~/f12 副本不同皆可能）；'usbf' 签名门未被真实考验。寄存器采样（GCTL/DCTL/DSTS/DALEPENA）全程在场，判决已够。
 3. **checkpoint-3 的专属打印行未在 dump 留存**：CP3（完成事件到达 loader）由命令执行的因果链 + 主机侧应答功能性证实（§8），但专属打印行被后续 boot 的日志覆盖（最终会话无主机命令）——四检查点的设备侧持久证据为 CP1（checkpoint-1 行，logdump 在案）+ CP4 设备侧计数；CP3 留在 probe24.log 的会话期行为记录。
 4. 3/3 武装是相关不是证明；bit11 置位态的历史实锤（逐 boot "did not settle" 行）+ 修复后零复现，两件合起来够确定，但对照轮（摘除手清）未做。
@@ -108,7 +108,7 @@
 
 **logdump-v20.bin**（512MB，sha `455397e8a7cd519c`，04:00 拉取——Android 已由 ABL 自行回退到 slot a 回归，03:48:22 22d9:2769 在总线；无需人工 handback）：
 
-- **新鲜度纪律 ✓**：分区头部从 byte 0 就是本波会话（第一行 = console-mirror 行），全分区仅**一个**会话头（`loader.efi size 14600` × 1 = 83,456 = 阶段 24 构建验明正身）；其后段（@656121 END OF LOG 之后，含 @751830 的旧 END OF LOG）为更早年代陈旧字节，按纪律不混读。
+- **新鲜度纪律 ✓**：分区头部从 byte 0 就是本阶段会话（第一行 = console-mirror 行），全分区仅**一个**会话头（`loader.efi size 14600` × 1 = 83,456 = 阶段 24 构建验明正身）；其后段（@656121 END OF LOG 之后，含 @751830 的旧 END OF LOG）为更早年代陈旧字节，按纪律不混读。
 - **最终会话（自由循环的第 N 个）与前三循环逐行同形态**：mirror 行 → bring-up begins → **"soft reset did not settle in one second" + "cleared by hand (GCTL now 102000)"** → wake 采样（GCTL 102000）→ UsbFn 层未在位行 → start_ex (t+6.0) → present 采样（GCTL 102001，bit11=0）→ beat 0 首拒 7 → **first-host 采样（DCTL 90f00000 DSTS 1277 DALEPENA f）** → **checkpoint-1（gen 2, 511B, submit 0）** → armed 采样 → **armed at generation 0, beat 1** → usb: started → 内核会话（SpringBoard/backboardd/触摸事件全活）→ `--- loader_return_after expired ---` → 干净 END OF LOG。
 - **判读落点**：自 由循环到最后一个会话（连同主机侧实录的 cycles 1-3）**每个观测到的 boot 都是 gen 0 beat 1 首试武装、墙零复现、零 re-throw、零 kept-its-host**——复活节拍完全消失。
 - CP3 专项说明（诚实边界 3 的落实）：最终会话无主机命令（采样器已停）故无 CP3 行可 dump；CP3 的设备侧证据 = probe24 会话期的完成路由（主机侧 3,336 次 CP2 写全部得到命令执行与应答——完成事件到达是命令执行的唯一路径），专属打印行未能在 dump 留存（会话被后续 boot 覆盖）。

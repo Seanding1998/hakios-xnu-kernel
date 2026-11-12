@@ -6,7 +6,7 @@
 
 ## 0. 判定（当前）
 
-**WAVE21-SSH-OK 未到手；但本波改写了问题的版图，并定位到真正的收尾手柄：**
+**WAVE21-SSH-OK 未到手；但本阶段改写了问题的版图，并定位到真正的收尾手柄：**
 
 1. **v0.4 其余要件全部复验**（v21/v22 真机验证）：serving armed gen0 beat1 每 boot、en0 注册 10.0.0.2/30、ARP/SYN 帧双向流动、TCP 三路握手完成（SYN-ACK 主机收到）、**现场目击 iOS 桌面（SpringBoard 渲染上屏）**——logdump 行计数双源实证（§4）。
 2. **"K1"（en0 poll 停摆）真根因终定案，en0 驱动无罪，vnode 塌方论降级**：**cmdline `loader_return_after=180` 的 180s 硬会话帽**（`osfmk/arm64/loader_return.c:470-483`：boot 时一次性 thread_call，180s 无条件 `loader_return()`）。所有"冻结"证据重读后全部吻合：en0 心跳冻住/ring 16/16/lost 爬升 = 内核按期返回后**没人排环**，主机重传全弃；logdump 的"222.58s 停摆" = 180s 定时到 → `hakios_var_save_on_return()` 刷数据卷（~40s，= 现场拍照的 `ufs: 9504 writes…78233600 bytes`）→ 正常 return；wave25 的"established 后 30-60s 冻结" = established 在会话 ~120-150s + KEX 30-60s 撞线。SSHD 本身每 boot 都听（165.8s 在案）——只剩 ~14s 给它，SSH 是被 180s 帽饿死的（§3）。
@@ -102,7 +102,7 @@ sshd listen（T0+181）→ 塌方（T0+238）之间 ~56s。`wave26-scripts/timed
 ### 6.1 v23 真机验证实况（13:16 刷写后的实测，全部在案）
 
 - **1800s 帽验证通过**：13:55 的手动尝试在 v23 会话（kernel ~8-11 分钟龄）上跑了 3 分钟隧道——`oem netstat` 心跳 `en0` 26897→30533 一路爬升、`held 0 0`、`lost 0`——**远超 v20/v21 的 180s 帽死点**，长会话成立。
-- **sshd 启动竞态（新发现，23.y 域）**：sshd 在每 boot 都被 exec（`$ /var/jb/usr/sbin/sshd -D -e … &`，kernel ~49s，桌面会话与 v23 会话同位），但**只有部分 boot 真正到达 listen**（桌面会话：kernel 165.8s `tcp listen` + `so_gencnt… t_state: LISTEN process: sshd:42`；v23 的 13:47 boot：exec 在案、至 kernel ~331s+ 仍无 `tcp listen`，主机侧全部 RST）。竞态对象 = launchd/风暴下的调度（同镜像逐 boot 方差，与 wave25 的 RST/听窗两态完全吻合）。**这是剩余的唯一 SSH 阻塞，属 wave20 用户态/launchd 域，非本波可治**。
+- **sshd 启动竞态（新发现，23.y 域）**：sshd 在每 boot 都被 exec（`$ /var/jb/usr/sbin/sshd -D -e … &`，kernel ~49s，桌面会话与 v23 会话同位），但**只有部分 boot 真正到达 listen**（桌面会话：kernel 165.8s `tcp listen` + `so_gencnt… t_state: LISTEN process: sshd:42`；v23 的 13:47 boot：exec 在案、至 kernel ~331s+ 仍无 `tcp listen`，主机侧全部 RST）。竞态对象 = launchd/风暴下的调度（同镜像逐 boot 方差，与 wave25 的 RST/听窗两态完全吻合）。**这是剩余的唯一 SSH 阻塞，属 wave20 用户态/launchd 域，非本阶段可治**。
 - **播种器连捕**：continuous 模式（run9）19 连发全部 miss——当代 sshd 未听。 ~14:16 现场召回， hunting 停止。
 
 ### 6.2 召回时点状态（供续接时核对）
@@ -117,18 +117,18 @@ sshd listen（T0+181）→ 塌方（T0+238）之间 ~56s。`wave26-scripts/timed
 
 ## 7. 后续工作清单
 
-1. 判定与本波新器件 sha 全表：
+1. 判定与本阶段新器件 sha 全表：
    - v21：kernel `abecd557` / payload `eac9d989` / graft `c18689bc` / loader = v20 的 `b8a2150b` 字节
    - v22：loader.efi `0ade78b5`（maxvnodes hunk）/ payload `ea63aa4f` / graft `7a1e4811`
    - v23：cmdline `67f37524`（473B，=v18 字节仅 180→1800）/ payload `86c2fbaa` / graft `9e0609fb`
 2. 阶段预算结算：刷写 3/3（v21 09:58 / v22 12:08 / v23 13:16——第 3 轮追加刷写）。
 3. 证据包：logdump-v21-wave26-1.bin（sha256 `548597f3…`，桌面会话全日志）/ -2.bin（md5 5c08cb7d）/ -3.bin（md5 19ff87ef）；出画行计数（§4）；v23 判定日志（wave26-scripts/timed-ssh-v26.log）。
 4. 风暴本体未治理（commcenter/chronod/sleepd 客户端重试）：1800s 会话下的 vnode 速率留 23.y 观测。
-5. 本波新增工具（wave26-scripts/）：v21/v22/v23 四件套（payload/graft/verify/flash）+ timed-ssh-v26.py + freeze-hunt-v26.py + accept-v22.py + revive-v26.py（H4 恢复纪律的落地件）+ pull-log-v26.py + flash-when-android-v2x.sh + logdump-watch-v26.sh。
+5. 本阶段新增工具（wave26-scripts/）：v21/v22/v23 四件套（payload/graft/verify/flash）+ timed-ssh-v26.py + freeze-hunt-v26.py + accept-v22.py + revive-v26.py（H4 恢复纪律的落地件）+ pull-log-v26.py + flash-when-android-v2x.sh + logdump-watch-v26.sh。
 6. 事故登记：①取证期 download 中途失败致 loader 暗态（10:28，主机侧"USB 错误码墙"对应）；②三次孤儿 tunnel 代理均按 PID 清杀；③pull-log 的 transact 未排 OKAY 致 loader 反复楔死（已改 Pipe25 纪律）——均为工具层事故，设备无恙。
 7. 环境事件：12:31 前后的 USB 插拔（现场操作）——期间的总线闪断勿立案。14:16 后用户携手机外出，阶段按 §6 召回收尾。
 
-## 8. 23.y 预研：XPC 风暴的来源与治理候选（准备工作，基于本波日志实证）
+## 8. 23.y 预研：XPC 风暴的来源与治理候选（准备工作，基于本阶段日志实证）
 
 **来源定位**：风暴的 requestor 全部是 `SpringBoard[12]`（pid 12），查的是三个**不存在于本系统的服务**：
 - `com.apple.commcenter.xpc`（flags 0x8 lookup）——SpringBoard 的蜂窝/网络状态检查；

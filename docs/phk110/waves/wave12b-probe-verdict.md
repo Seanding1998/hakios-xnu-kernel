@@ -222,10 +222,10 @@ sync-drivers 入树），无 git reset/checkout/stash/clean，无 commit；失�
 
 | Artifact | Path | Size | SHA-256 |
 | --- | --- | --- | --- |
-| **本波镜像（现刷在 boot_b，Boot #18）** | `device-layer/udon-hakios-grafted-v10b.img` | 201,326,592 B (192 MiB) | `d08e54819d60596bdfad3426f31282a2a8e36305f4d92b0121c2e376bd8ba3eb` |
+| **本阶段镜像（现刷在 boot_b，Boot #18）** | `device-layer/udon-hakios-grafted-v10b.img` | 201,326,592 B (192 MiB) | `d08e54819d60596bdfad3426f31282a2a8e36305f4d92b0121c2e376bd8ba3eb` |
 | payload v10b（仅 kernel 换 v10b，cmdline = v10 字节） | `device-layer/udon-hakios-payload-v10b.bin` | 14,944,552 B | `4cf40c41e60dd8c9818af82d1ba012f4d0ff6f09bfe4b846a803faa8ad68d846` |
 | 内核交接件 v10b（= 真机验证件） | `device-layer/hakios-kernel-v10b.bin` | 14,859,856 B | `e56f989ba7546822bd78ef6aed369af1775cfa130fa35ca14ad3d1b5649427da` |
 | 打包报告 | `device-layer/udon-hakios-grafted-v10b.report.json` | — | `d3a91f3261863ccbb13f7230b059dbe9c4fdf2eec9b126893afabec48d5938bd` |
-| 本波脚本（fix/repack/verify + 修复后源码快照） | `wave12b-scripts/{fix1-spi-xfer.py, repack-payload-v10b.py, verify-udon-hakios-v10b.py, hakios.s3910.v10b.c}` | — | 源码快照 `6fef5d80…`；只新增，未动 v7/v10/v12a 任何文件 |
+| 本阶段脚本（fix/repack/verify + 修复后源码快照） | `wave12b-scripts/{fix1-spi-xfer.py, repack-payload-v10b.py, verify-udon-hakios-v10b.py, hakios.s3910.v10b.c}` | — | 源码快照 `6fef5d80…`；只新增，未动 v7/v10/v12a 任何文件 |
 | Boot #18 logdump | `logdump-v10b.bin`（仓库根） | 131,072 B | `6ea82f1ead1f9eb71eec4de01ebbb06dfc0e080e36eae3671788ae390f93e2bd` |
 | **Boot #18 内核日志（判定证据）** | `intel/m3-boot1/b18-kernel-log.txt` | 24,345 B | `44b4ac1d2576be7332f6de1d1da85e515ed2d9428c3213bbf049f88b78fcf9c9`（分段原文见 §3） |

@@ -52,7 +52,7 @@ python -I wave13-scripts/loader_talk.py log --out log.out   # oem log → DATA �
 
 - **dll 架构**：`intel/usb-driver/libusb-1.0.dll` 是 PE32+ x64（`file` 确认），
   与 x64 Python 匹配；`intel/usb-driver/libusb/` 下另有 MinGW64/VS2013-2022 整套
-  SDK（含 `include/libusb.h` 与 `libusb-1.0.def`，本波结构体布局以此头文件为准）。
+  SDK（含 `include/libusb.h` 与 `libusb-1.0.def`，本阶段结构体布局以此头文件为准）。
 - **加载**：`os.add_dll_directory(<dll 目录>)` + `ctypes.CDLL(绝对路径)`，依赖
   解析不外溢 PATH。
 - **结构体布局**：libusb.h 中 device/config/interface/endpoint descriptor 均
@@ -60,7 +60,7 @@ python -I wave13-scripts/loader_talk.py log --out log.out   # oem log → DATA �
   自然对齐恰好等于 MSVC x64 布局（Endpoint=32B、InterfaceDescriptor=40B、
   Config=40B、Interface=16B、DeviceDescriptor=18B）。遍历 active config 用
   `libusb_get_active_config_descriptor`，索引 `cfg.interface[i].altsetting[a]`
-  即得**实例**（不是指针——再取 `.contents` 会 AttributeError，本波踩过已修）。
+  即得**实例**（不是指针——再取 `.contents` 会 AttributeError，本阶段踩过已修）。
 - **argtypes 深度约定**：出参统一 `byref(c_void_p 实例)` 配 `POINTER(c_void_p)`
   一层；设备数组用 `POINTER(POINTER(c_void_p))` 实例 + 三层 POINTER 传 byref
   （libusb_get_device_list），free_list 直传两层实例。`libusb_set_option` 是
@@ -69,7 +69,7 @@ python -I wave13-scripts/loader_talk.py log --out log.out   # oem log → DATA �
 
 ### 1.2 协议解析器语义（`LoaderProto`）
 
-依据 loader.c:3960-4035 的协议面（本波不可达 WSL，按任务书转述实现，语义从宽）：
+依据 loader.c:3960-4035 的协议面（本阶段不可达 WSL，按任务书转述实现，语义从宽）：
 
 | 帧 | 解析 | 备注 |
 | --- | --- | --- |
@@ -137,7 +137,7 @@ python -I wave13-scripts/loader_talk.py log --out log.out   # oem log → DATA �
 **⚠ footgun**：`usbipd list` 显示一条 **Persisted 共享记录
 `b67ab332-4d35-4c04-9bb1-81abc1d63239 → xnuloader`**。若对 xnuloader 实例再
 做 `usbipd bind/attach`，会把 WinUSB 换成 VBoxUSB、毁掉 libusb 通道
-（attach 期间驱动被换走）。建议后续执行 `usbipd delete b67ab332-…`（本波未
+（attach 期间驱动被换走）。建议后续执行 `usbipd delete b67ab332-…`（本阶段未
 执行——属配置变更，只留结论）；usbipd 域内只允许动 `SERIAL_REDACTED`（fastboot）实例。
 
 ## 3. pyusb 导入 bug 诊断（次要，已闭环）
@@ -177,7 +177,7 @@ filter 冲突**——与"force 过仍 attach 失败"的实测吻合。
 1. 退出/卸载火绒（最彻底）；
 2. 把 `hrdevmon` 从上述 USB 类 `UpperFilters` 移除并重启（只解除 USB 类挂钩）；
 3. usbipd 侧无需动作——**loader 通道走 WinUSB/libusb，完全绕开 usbipd/VBoxUSB，
-   不受此冲突影响**（这正是本波选 ctypes-libusb 直连路线的额外好处）。
+   不受此冲突影响**（这正是本阶段选 ctypes-libusb 直连路线的额外好处）。
 
 ## 5. 真机联调清单（后续刷 usbmode 镜像后执行）
 

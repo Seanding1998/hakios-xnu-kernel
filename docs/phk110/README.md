@@ -7,13 +7,14 @@
 
 ## 阅读顺序
 
-1. **[STATUS.md](STATUS.md)** — 当前状态快照（续接工作先读）
-2. **[PLAN.md](PLAN.md)** — 版本计划 v0.1→v1.0
-3. **[READMAP.md](READMAP.md)** — 按主题分组的阅读地图
-4. **本页** — 文档目录
-5. **[M0-PROGRESS.md](M0-PROGRESS.md)** — 逐日记录（M0 情报期 → Boot #6，细节查找用）
+1. **[SYSTEM-REPORT-2026-11-12.md](SYSTEM-REPORT-2026-11-12.md)** — 系统能力快照（v0.5 真·首帧当日：刷入构成 / 已验证能力 / 修复史 / 已知边界，外部读者首选入口）
+2. **[STATUS.md](STATUS.md)** — 当前状态快照（续接工作先读）
+3. **[PLAN.md](PLAN.md)** — 版本计划 v0.1→v1.0
+4. **[READMAP.md](READMAP.md)** — 按主题分组的阅读地图
+5. **本页** — 文档目录
+6. **[M0-PROGRESS.md](M0-PROGRESS.md)** — 逐日记录（M0 情报期 → Boot #6，细节查找用）
 
-## 版本里程碑（截至 2026-11-10）
+## 版本里程碑（截至 2026-11-12）
 
 | 版本 | 状态 | 达成点 |
 |---|---|---|
@@ -22,10 +23,12 @@
 | v0.3 触感 | ✅ Boot #21 | 常驻 300 s / 8 核 / 按键 / S3910 触摸探针 |
 | iOS 桌面上屏 | ✅ 2026-11-09 | SpringBoard 渲染上屏（屏幕目视 + logdump 双源：MiniIOMFB 111 行/swap 20 次/backboardd 544/SpringBoard 1249）；CPU 渲染（卡顿符合"无 GPU"预期），MiniIOMFB+MiniIOSurface 假驱动链路全部实证 |
 | **SSH 进 Darwin shell** | **✅ 2026-11-10** | **WAVE21-SSH-OK + v0.4 SSH 门通过**（`verdict27-20261110-060630.txt`）：3 条独立 SSH 连接（uname Darwin 22.5.0 / uid=0 root / 各异随机标记 rc=0）+ 256KiB 校验传输 + 退出后管理通道 OKAY + boot_b=v23 绑定 |
-| v0.4 达尔文 | 🔄 只差 /var 复验门 | S0-S8 ✅ + 数据卷 ✅ + launchd 28 进程/sshd :22 ✅（Boot #25）+ USB 服务通道打通（Boot #38，复位流程缺陷修复）+ SSH 数据面全通 + 1800s 会话上限端到端实证；**剩余 = /var 重启持久复验 + 可重复步骤归档（阶段 28 进行中）** |
-| v0.5 GPU | ⏳ 计划 | freedreno 主路线；呈现通道已就绪（无 GPU 显示路线 = 桌面出画已实证） |
+| v0.4 达尔文 | ✅ 2026-11-11 | 三级验收门全绿：最小功能 ✅ + 稳定性 ✅（SSH 三连接 + 内容校验，`verdict27-20261110-060630.txt`）+ 项目门 ✅（/var 跨内核死亡持久 6/6，`verdict34-var.txt`；复验 `verdict42-var.txt`）；launchd 28 进程/sshd :22 + USB 服务通道 + 1800s 会话帽端到端 |
+| v0.5 GPU 内核侧首亮 | ✅ 2026-11-11 | 自研 Adreno 730（gen7/a7xx 形态）内核驱动：上电步进 21 步全绿（五代修复全以本机设备树/vendor 源锚定），GMU 固件装载运行，3D 核接受命令并写内存（步 21 读回 `0x600dc0de`） |
+| **v0.5 真·首帧** | **✅ 2026-11-12** | **GPU 硬件渲染上屏**：Mesa 25.0.7 freedreno（FD725）+ OpenGL ES 3.2，`RENDER backend=hw`，1080×2400 三角形 19 ms 出图，五采样点像素与几何真值逐字一致，面板呈现确认 + 人眼目击；v36 四门判定 = 步进回归 PASS / fence 探针 PASS / 硬件渲染 DONE / 电量 PARTIAL（`verdict45-gate{a,b,c,d}.txt`） |
+| v0.6 WiFi / 音频 | ⏳ 计划 | ath11k 工具链与蓝图已预备（阶段 30）；芯片身份勘误后 = WCN6750 hw1.0 |
 
-## 阶段日志（`waves/`，45 篇；`wave17-ssh-bootstrap.md` 在 docs 根）
+## 阶段日志（`waves/`，59 篇；`wave17-ssh-bootstrap.md` 在 docs 根）
 
 "Boot #N" 是历次刷写启动的编号。按主题找文件请看 [READMAP.md](READMAP.md)。
 
@@ -77,6 +80,20 @@
 | wave27-phaseB-wide-window | **宽窗 SSH 验证完成：WAVE21-SSH-OK**；八项主机侧修复（MSS≈160B 环上限/推序死锁/相位占空比/ACL）+ 代际钟 | **3 SSH 连接 + 256KiB 校验传输** |
 | wave28-var-persistence | /var 持久复验（结论未出，如实记录）：工具四件全交付 + loader 半启动新发现（bulk 无响应 165min，~3h15m 自发解体）+ 固定 240s 服务窗机制 | 结论 pending |
 | wave30-ath11k-tooling-prep | WiFi 工具链前置（不需要手机）：`mk-ath11k.py` 骨架 + 5 个检查器 + 上游缺口清单 | — |
+| wave31-var-verdict | /var 持久回归判定：REGRESSED——init 二次运行把内存盘遮蔽在真实挂载之上（源码行级定位），写侧全绿、读侧遮蔽 | #40 判定 = REGRESSED |
+| wave34-var-fix | /var 持久化修复：init 挂载重入守卫（三文件增量），写→内核死亡→读全存 | #41 **v0.4 项目门转绿**（镜像 v24） |
+| wave35-gpu-prestage | GPU 预置调研（零刷写）：MIX Fold 2 同 SoC 先例、a730 固件三件套双源核实、Mesa 25.0.7/FD725 身份裁决 | — |
+| wave36-gpu-firstlight | GPU 内核驱动首次上机：固件实拉 + gen7 参数层进内核 + 步 1 挂起取证 + cmdline NUL bug 修复 | 镜像 v25/v26 |
+| wave36-handoff | 阶段 36 交接：设备状态、第 1 步挂点已知事实、逐步定位协议 | — |
+| wave37-gpu-firstlight | **v0.5 GPU 内核侧首亮**：七刷七判五代修复（gcc/qfprom/gpucc/zap/address-mode 表全以本机 DTB/vendor 源锚定），21 步全绿 | 镜像 v27–v33 |
+| wave38-handoff | 阶段 38 交接：USB 修复四代完成后的设备状态、LLVM -O1 阻断分析、v34 判定任务单 | — |
+| wave38-usb-selfheal | USB 错误墙两个 loader 侧根因（IN 泄漏 + 服务窗热旋）与整对自愈修复（v34） | 离线完成 |
+| wave39-mesa-userland | Mesa 25.0.7 交叉构建本树首绿（ninja 1134/1134，FD725 身份在库）+ GL 首帧载体 + shim 零增量裁决 | — |
+| wave40-gpu-verify | GPU 外部评审报告四独立验证：P0 fence / P1 NC_MODE / P1 gl_test 假绿全部源码级确认 | — |
+| wave41-gpu-fix | GPU 修复四项落地：fence 事件字段化 `0x08000031` / NC_MODE vendor 公式 / gl_test 结构化验收 / 并发 binning 编译期门 | — |
+| wave43-battery | 电量显示驱动落地：PM8350B 观察器 + bq27541 位带，双模式（static/real）单 boot-arg 切换，62 项自检 | — |
+| wave44-adreno740-survey | UniXNU/Adreno740 原生驱动八仓只读对照：fence 字段逐位佐证、GMEM/binning 前置、14 行 hw_init 差异表 | — |
+| wave45-v36-firstframe | **v36 上机四门判定：GPU 真·首帧达成**（门 A 步进回归 PASS / 门 B fence 探针 PASS / 门 C 硬件渲染 DONE + 人眼目击 / 门 D 电量 PARTIAL） | 镜像 v36 **v0.5 真·首帧** |
 
 ## 调研（`research/`）
 
@@ -90,6 +107,9 @@
 | f13-virtual-display | 无 GPU 先见 iOS 桌面路线（Mini 驱动已在树 + ios-sweet 考古 + 23.x 任务单） |
 | f14-sd778g-zendot-survey | SD778G 同代驱动对照 + zendot 文章考古（固件提取工作流 + IPA 版本证伪 + PHK110 物料清单） |
 | f15-raphael-k20pro-survey | K20 Pro 进展核实：GPU GLES 证实有边界 / WiFi 部分证实带已知 bug / 4G 证伪；PHK110 迁移建议 |
+| f16-k60-sm8475-census | F16：K60（mondrian/SM8475）同 SoC 身份与移植线普查（Emilelu 线 GPU scanout 卡 -force_load；MIX Fold 2 = v0.5 参照） |
+| f17-battery-display | F17：电量显示两层根因（CONFIG_HAKIOS_BATTERY 未开 + 无数据源驱动）与 M1-M3 分期、S1-S7 验收行设计 |
+| ecosystem-census-2026-11-11 | 生态普查：K60 线当日进展、UniXNU org（SM8550 原生 Adreno740 驱动）发现、上游 mtk 线蓝牙进展、boomoodxf 线休眠确认 |
 
 ## 外部评审记录
 
@@ -97,6 +117,9 @@
 - **[review/gpt-review-report-2026-11-09.md](review/gpt-review-report-2026-11-09.md)** — 外部审阅第一轮（USB 核心：根因排序、缺陷清单、实验阶梯）
 - **[review/gpt-review-report-2-2026-11-09.md](review/gpt-review-report-2-2026-11-09.md)** — 外部审阅第二轮（USB 错误墙屏摄定案 + 六项取证指令）
 - **[review/gpt-review-report-3-2026-11-09.md](review/gpt-review-report-3-2026-11-09.md)** — 外部审阅第三轮
+- **[review/gpt-review-2026-11-11-usb-wall.md](review/gpt-review-2026-11-11-usb-wall.md)** — 外部评审导读（USB 专项）：问题史、修复清单、五问、文件地图与评审约束
+- **[review/gpt-review-report-3-2026-11-11-usb.md](review/gpt-review-report-3-2026-11-11-usb.md)** — 外部评审报告三·USB 专项（阶段 38 七 hunk 的 4 P0 + 6 P1 逐条审定与分代修复路线）
+- **[review/gpt-review-report-4-2026-11-11-gpu.md](review/gpt-review-report-4-2026-11-11-gpu.md)** — 外部评审报告四·GPU 专项（P0 fence 事件 a7xx 移植缺口 + NC_MODE 编码 + gl_test 假绿面）
 
 ## 外部关键参考
 

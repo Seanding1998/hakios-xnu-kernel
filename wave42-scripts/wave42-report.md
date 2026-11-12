@@ -1,0 +1,29 @@
+- 2026-11-11 23:54:17 | hunt armed, run-id w42ssh1, deadline 90 min, single-owner mode
+- 2026-11-12 00:23:24 | hunting: 4 attempts so far, last branch OTHER, bus [4]
+- 2026-11-12 00:40:59 | HIT + acceptance: conn2/conn3 + transfer(FAIL) + sha(FAIL) + mgmt(UNVERIFIED); verdict verdict27-w42ssh1.txt
+- 2026-11-12 00:40:59 | === WAVE21-SSH-OK on record: verdict27-w42ssh1.txt ===
+- 2026-11-12 00:42:46 | hunt armed, run-id w42ssh2, deadline 90 min, single-owner mode
+- 2026-11-12 00:59:30 | HIT + acceptance: conn2/conn3 + transfer(FAIL) + sha(FAIL) + mgmt(UNVERIFIED); verdict verdict27-w42ssh2.txt
+- 2026-11-12 00:59:30 | === WAVE21-SSH-OK on record: verdict27-w42ssh2.txt ===
+- 2026-11-12 01:03:52 | hunt armed, run-id w42ssh3, deadline 90 min, single-owner mode
+- 2026-11-12 01:15:02 | HIT + acceptance: conn2/conn3 + transfer(PASS) + sha(FAIL) + mgmt(OKAY); verdict verdict27-w42ssh3.txt
+- 2026-11-12 01:15:02 | === WAVE21-SSH-OK on record: verdict27-w42ssh3.txt ===
+- 2026-11-12 01:19:14 | hunt armed, run-id w42ssh4, deadline 90 min, single-owner mode
+- 2026-11-12 01:31:57 | HIT + acceptance: conn2/conn3 + transfer(PASS) + sha(FAIL) + mgmt(OKAY); verdict verdict42-w42ssh4.txt
+- 2026-11-12 01:31:57 | === WAVE21-SSH-OK on record: verdict42-w42ssh4.txt ===
+- 2026-11-12 01:32:37 | hunt armed, run-id w42ssh5, deadline 90 min, single-owner mode
+- 2026-11-12 01:35:12 | HIT + acceptance: conn2/conn3 + transfer(PASS) + sha(FAIL) + mgmt(OKAY); verdict verdict42-w42ssh5.txt
+- 2026-11-12 01:35:12 | === WAVE21-SSH-OK on record: verdict42-w42ssh5.txt ===
+- 2026-11-12 01:42:37 | hunt armed, run-id w42ssh6, deadline 90 min, single-owner mode
+- 2026-11-12 01:53:34 | hunt armed, run-id w42ssh7, deadline 90 min, single-owner mode
+- 2026-11-12 02:07:27 | hunting: 4 attempts so far, last branch OTHER, bus [4]
+- 2026-11-12 02:12:52 | HIT + acceptance: conn2/conn3 + transfer(PASS) + sha(FAIL) + mgmt(UNVERIFIED); verdict verdict42-w42ssh7.txt
+- 2026-11-12 02:12:52 | === WAVE21-SSH-OK on record: verdict42-w42ssh7.txt ===
+- 2026-11-12 02:16:48 | HIT + acceptance: conn2/conn3 + transfer(PASS) + sha(FAIL) + mgmt(OKAY); verdict verdict42-w42ssh6.txt
+- 2026-11-12 02:16:48 | === WAVE21-SSH-OK on record: verdict42-w42ssh6.txt ===
+- 2026-11-12 02:17:40 | hunt armed, run-id w42ssh8, deadline 90 min, single-owner mode
+- 2026-11-12 02:30:23 | HIT + acceptance: conn2/conn3 + transfer(PASS) + sha(FAIL) + mgmt(OKAY); verdict verdict42-w42ssh8.txt
+- 2026-11-12 02:30:23 | === WAVE21-SSH-OK on record: verdict42-w42ssh8.txt ===
+- 2026-11-12 02:37:08 | hunt armed, run-id w42ssh9, deadline 90 min, single-owner mode
+- 2026-11-12 02:42:38 | HIT + acceptance: conn2/conn3 + transfer(PASS) + sha(PASS) + mgmt(OKAY); verdict verdict42-w42ssh9.txt
+- 2026-11-12 02:42:38 | === WAVE21-SSH-OK on record: verdict42-w42ssh9.txt ===

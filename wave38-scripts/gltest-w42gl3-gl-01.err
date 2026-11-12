@@ -1,0 +1,88 @@
+tunnel25w: round 0: d00d nodes at addr [4]
+tunnel25w: addr 4: LIVE (product b'xnuloader'); this is our loader
+tunnel25w: phase: the kernel session is live -- tunneling
+tunnel25w: netmode on -> OKAY b'the pipes carry frames (oem netstat)'
+tunnel25w: pkt OUT 42 B non-IPv4
+tunnel25w: pkt OUT 42 B non-IPv4
+tunnel25w: pkt IN  42 B non-IPv4
+tunnel25w: arp learned: ['10.0.0.2']
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=24 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt IN  42 B non-IPv4
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=SYN|ACK seq=1597373890 ack=268435457 win=65535 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: established (10.0.0.1:27299 -> 10.0.0.2:22)
+tunnel25w: counts {'arp_in': 2, 'arp_out': 0, 'icmp_in': 0, 'icmp_out': 0, 'tcp_in': 1, 'tcp_out': 3, 'dropped': 0} | up=3 pushed=4 err=0 | pending=0 unacked=0 acked=0x0 | netstat tx 244 lost 0 rx 196 lost 0 held 0 0 en0 56150
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268435457 ack=1597373891 win=16384 len=0 cksum=ok | SND.UNA=268435457 SND.NXT=268435490 RCV.NXT=1597373891 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268435457 ack=1597373891 win=16384 len=33 cksum=ok | SND.UNA=268435457 SND.NXT=268435490 RCV.NXT=1597373891 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597373891 ack=268435490 win=65535 len=0 cksum=ok | SND.UNA=268435457 SND.NXT=268435490 RCV.NXT=1597373891 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=PSH|ACK seq=1597373891 ack=268435490 win=65535 len=21 cksum=ok | SND.UNA=268435490 SND.NXT=268435490 RCV.NXT=1597373891 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597373912 ack=268435490 win=65535 len=512 cksum=ok | SND.UNA=268435490 SND.NXT=268435490 RCV.NXT=1597373912 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597374424 ack=268435490 win=65535 len=512 cksum=ok | SND.UNA=268435490 SND.NXT=268435490 RCV.NXT=1597374424 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=PSH|ACK seq=1597374936 ack=268435490 win=65535 len=48 cksum=ok | SND.UNA=268435490 SND.NXT=268435490 RCV.NXT=1597374936 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268435490 ack=1597373912 win=16384 len=0 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268435490 ack=1597374424 win=16384 len=0 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268435490 ack=1597374936 win=16384 len=0 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268435490 ack=1597374984 win=16384 len=0 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268435490 ack=1597374984 win=16384 len=160 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268435650 ack=1597374984 win=16384 len=160 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268435810 ack=1597374984 win=16384 len=160 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268435970 ack=1597374984 win=16384 len=160 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268436130 ack=1597374984 win=16384 len=160 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268436290 ack=1597374984 win=16384 len=160 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268436450 ack=1597374984 win=16384 len=160 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268436610 ack=1597374984 win=16384 len=160 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268436770 ack=1597374984 win=16384 len=160 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268436930 ack=1597374984 win=16384 len=40 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597374984 ack=268435650 win=65535 len=0 cksum=ok | SND.UNA=268435490 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597374984 ack=268435810 win=65535 len=0 cksum=ok | SND.UNA=268435650 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597374984 ack=268435970 win=65535 len=0 cksum=ok | SND.UNA=268435810 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597374984 ack=268436130 win=65535 len=0 cksum=ok | SND.UNA=268435970 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597374984 ack=268436290 win=65535 len=0 cksum=ok | SND.UNA=268436130 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597374984 ack=268436450 win=65535 len=0 cksum=ok | SND.UNA=268436290 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597374984 ack=268436610 win=65535 len=0 cksum=ok | SND.UNA=268436450 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597374984 ack=268436770 win=65535 len=0 cksum=ok | SND.UNA=268436610 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597374984 ack=268436930 win=65535 len=0 cksum=ok | SND.UNA=268436770 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597374984 ack=268436970 win=65535 len=0 cksum=ok | SND.UNA=268436930 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=PSH|ACK seq=1597374984 ack=268436970 win=65535 len=492 cksum=ok | SND.UNA=268436970 SND.NXT=268436970 RCV.NXT=1597374984 state=ESTABLISHED
+Warning: Permanently added '10.0.0.2' (ED25519) to the list of known hosts.
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268436970 ack=1597375476 win=16384 len=0 cksum=ok | SND.UNA=268436970 SND.NXT=268436970 RCV.NXT=1597375476 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268436970 ack=1597375476 win=16384 len=60 cksum=ok | SND.UNA=268436970 SND.NXT=268437030 RCV.NXT=1597375476 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597375476 ack=268437030 win=65535 len=0 cksum=ok | SND.UNA=268436970 SND.NXT=268437030 RCV.NXT=1597375476 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=PSH|ACK seq=1597375476 ack=268437030 win=65535 len=44 cksum=ok | SND.UNA=268437030 SND.NXT=268437030 RCV.NXT=1597375476 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268437030 ack=1597375520 win=16384 len=0 cksum=ok | SND.UNA=268437030 SND.NXT=268437090 RCV.NXT=1597375520 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268437030 ack=1597375520 win=16384 len=60 cksum=ok | SND.UNA=268437030 SND.NXT=268437090 RCV.NXT=1597375520 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597375520 ack=268437090 win=65535 len=0 cksum=ok | SND.UNA=268437030 SND.NXT=268437090 RCV.NXT=1597375520 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=PSH|ACK seq=1597375520 ack=268437090 win=65535 len=68 cksum=ok | SND.UNA=268437090 SND.NXT=268437090 RCV.NXT=1597375520 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268437090 ack=1597375588 win=16384 len=0 cksum=ok | SND.UNA=268437090 SND.NXT=268437230 RCV.NXT=1597375588 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268437090 ack=1597375588 win=16384 len=140 cksum=ok | SND.UNA=268437090 SND.NXT=268437230 RCV.NXT=1597375588 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597375588 ack=268437230 win=65535 len=0 cksum=ok | SND.UNA=268437090 SND.NXT=268437230 RCV.NXT=1597375588 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=PSH|ACK seq=1597375588 ack=268437230 win=65535 len=100 cksum=ok | SND.UNA=268437230 SND.NXT=268437230 RCV.NXT=1597375588 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268437230 ack=1597375688 win=16384 len=0 cksum=ok | SND.UNA=268437230 SND.NXT=268437538 RCV.NXT=1597375688 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268437230 ack=1597375688 win=16384 len=160 cksum=ok | SND.UNA=268437230 SND.NXT=268437538 RCV.NXT=1597375688 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268437390 ack=1597375688 win=16384 len=148 cksum=ok | SND.UNA=268437230 SND.NXT=268437538 RCV.NXT=1597375688 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597375688 ack=268437390 win=65535 len=0 cksum=ok | SND.UNA=268437230 SND.NXT=268437538 RCV.NXT=1597375688 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597375688 ack=268437538 win=65535 len=0 cksum=ok | SND.UNA=268437390 SND.NXT=268437538 RCV.NXT=1597375688 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=PSH|ACK seq=1597375688 ack=268437538 win=65535 len=28 cksum=ok | SND.UNA=268437538 SND.NXT=268437538 RCV.NXT=1597375688 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268437538 ack=1597375716 win=16384 len=0 cksum=ok | SND.UNA=268437538 SND.NXT=268437650 RCV.NXT=1597375716 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268437538 ack=1597375716 win=16384 len=112 cksum=ok | SND.UNA=268437538 SND.NXT=268437650 RCV.NXT=1597375716 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=PSH|ACK seq=1597375716 ack=268437538 win=65535 len=412 cksum=ok | SND.UNA=268437538 SND.NXT=268437650 RCV.NXT=1597375716 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268437650 ack=1597376128 win=16384 len=0 cksum=ok | SND.UNA=268437538 SND.NXT=268437650 RCV.NXT=1597376128 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597376128 ack=268437650 win=65535 len=0 cksum=ok | SND.UNA=268437538 SND.NXT=268437650 RCV.NXT=1597376128 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=PSH|ACK seq=1597376128 ack=268437650 win=65535 len=44 cksum=ok | SND.UNA=268437650 SND.NXT=268437650 RCV.NXT=1597376128 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268437650 ack=1597376172 win=16384 len=0 cksum=ok | SND.UNA=268437650 SND.NXT=268437886 RCV.NXT=1597376172 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268437650 ack=1597376172 win=16384 len=160 cksum=ok | SND.UNA=268437650 SND.NXT=268437886 RCV.NXT=1597376172 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=PSH|ACK seq=268437810 ack=1597376172 win=16384 len=76 cksum=ok | SND.UNA=268437650 SND.NXT=268437886 RCV.NXT=1597376172 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=ACK seq=1597376172 ack=268437886 win=65535 len=0 cksum=ok | SND.UNA=268437650 SND.NXT=268437886 RCV.NXT=1597376172 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:27299 flags=PSH|ACK seq=1597376172 ack=268437886 win=65535 len=72 cksum=ok | SND.UNA=268437886 SND.NXT=268437886 RCV.NXT=1597376172 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:27299 -> 10.0.0.2:22 flags=ACK seq=268437886 ack=1597376244 win=16384 len=0 cksum=ok | SND.UNA=268437886 SND.NXT=268437886 RCV.NXT=1597376244 state=ESTABLISHED
+tunnel25w: counts {'arp_in': 2, 'arp_out': 0, 'icmp_in': 0, 'icmp_out': 0, 'tcp_in': 31, 'tcp_out': 34, 'dropped': 0} | up=33 pushed=36 err=0 | pending=0 unacked=0 acked=0x0 | netstat tx 274 lost 0 rx 228 lost 0 held 0 0 en0 56201
+tunnel25w: counts {'arp_in': 2, 'arp_out': 0, 'icmp_in': 0, 'icmp_out': 0, 'tcp_in': 31, 'tcp_out': 34, 'dropped': 0} | up=33 pushed=36 err=0 | pending=0 unacked=0 acked=0x0 | netstat tx 274 lost 0 rx 228 lost 0 held 0 0 en0 56201
+tunnel25w: counts {'arp_in': 2, 'arp_out': 0, 'icmp_in': 0, 'icmp_out': 0, 'tcp_in': 31, 'tcp_out': 34, 'dropped': 0} | up=33 pushed=36 err=0 | pending=0 unacked=0 acked=0x0 | netstat tx 274 lost 0 rx 228 lost 0 held 0 0 en0 56201
+tunnel25w: counts {'arp_in': 2, 'arp_out': 0, 'icmp_in': 0, 'icmp_out': 0, 'tcp_in': 31, 'tcp_out': 34, 'dropped': 0} | up=33 pushed=36 err=0 | pending=0 unacked=0 acked=0x0 | netstat tx 274 lost 0 rx 228 lost 0 held 0 0 en0 56201
+tunnel25w: counts {'arp_in': 2, 'arp_out': 0, 'icmp_in': 0, 'icmp_out': 0, 'tcp_in': 31, 'tcp_out': 34, 'dropped': 0} | up=33 pushed=36 err=0 | pending=0 unacked=0 acked=0x0 | netstat tx 274 lost 0 rx 228 lost 0 held 0 0 en0 56201
+tunnel25w: counts {'arp_in': 2, 'arp_out': 0, 'icmp_in': 0, 'icmp_out': 0, 'tcp_in': 31, 'tcp_out': 34, 'dropped': 0} | up=33 pushed=36 err=0 | pending=0 unacked=0 acked=0x0 | netstat tx 274 lost 0 rx 228 lost 0 held 0 0 en0 56201
+tunnel25w: counts {'arp_in': 2, 'arp_out': 0, 'icmp_in': 0, 'icmp_out': 0, 'tcp_in': 31, 'tcp_out': 34, 'dropped': 0} | up=33 pushed=36 err=0 | pending=0 unacked=0 acked=0x0 | netstat tx 274 lost 0 rx 228 lost 0 held 0 0 en0 56201
+tunnel25w: counts {'arp_in': 2, 'arp_out': 0, 'icmp_in': 0, 'icmp_out': 0, 'tcp_in': 31, 'tcp_out': 34, 'dropped': 0} | up=33 pushed=36 err=0 | pending=0 unacked=0 acked=0x0 | netstat tx 274 lost 0 rx 228 lost 0 held 0 0 en0 56201
+tunnel25w: counts {'arp_in': 2, 'arp_out': 0, 'icmp_in': 0, 'icmp_out': 0, 'tcp_in': 31, 'tcp_out': 34, 'dropped': 0} | up=33 pushed=36 err=0 | pending=0 unacked=0 acked=0x0 | netstat tx 274 lost 0 rx 228 lost 0 held 0 0 en0 56201
+tunnel25w: no progress for 45 s: leaving cleanly (netmode off)
+client_loop: send disconnect: Unknown error

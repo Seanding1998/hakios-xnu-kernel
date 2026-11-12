@@ -49,10 +49,10 @@
 
 | 路线 | 评估 | 裁定 |
 |---|---|---|
-| root.apfs ramdisk（upstream FLASHBOOT=1 CRYPTEXES=flash 链） | **在机 loader（66c6b342）已含 `resident` 条目解析与 RAMDisk/RAMDisk1 双 md 写 DT**（strings 取证 ×2/×1）；mkpayload.py 原生 `resident=FILE` 条目；init.c `mount_writable()` 在 main 中**无条件运行**（flash_root 失败也跑）；换根后 init→rc→`exec /sbin/launchd.darwin`（flash_root_mode=1 时改写为 /sbin/launchd） | **✅ 采用**（零 loader/内核字节改动、上游 redwood 实机验证） |
+| root.apfs ramdisk（upstream FLASHBOOT=1 CRYPTEXES=flash 链） | **机上 loader（66c6b342）已含 `resident` 条目解析与 RAMDisk/RAMDisk1 双 md 写 DT**（strings 取证 ×2/×1）；mkpayload.py 原生 `resident=FILE` 条目；init.c `mount_writable()` 在 main 中**无条件运行**（flash_root 失败也跑）；换根后 init→rc→`exec /sbin/launchd.darwin`（flash_root_mode=1 时改写为 /sbin/launchd） | **✅ 采用**（零 loader/内核字节改动、上游 redwood 实机验证） |
 | stub 扩展（给驻留 stub 加 mount 等价逻辑） | stub = 裸 syscall 程序，mockfs root 无 /private/var 且 mkdir=err，骨架/var.skel 通道全缺 | ❌（工作量大、非上游验证路径） |
 
-关键核验（全部落到文件:行，见 wave19-prep 引用 + 本波复核）：
+关键核验（全部落到文件:行，见 wave19-prep 引用 + 本阶段复核）：
 
 - **APFS 多容器步进**：内核 `apfs_mount_common`（apfs_vfsops.c:985-1075）"containers lie back to back, each saying in its superblock how big it is (nx_block_count)"——cryptex 紧跟 system.apfs **真实尺寸**之后即可，无需上游 1,374,208 固定边界。
 - **双 ramdisk 内存布局**：loader.c:2999-3012 resident 条目 memcpy 到 `phys_base+RESIDENT_RD_OFFSET`，"it is the root (md0), the payload ramdisk is md1"；DT `RAMDisk`/`RAMDisk1`（:3347-3358）。
@@ -132,7 +132,7 @@ logdump 的 console 段为**帧缓冲滚动环跨周期残留**：可见两个 i
 
 ---
 
-## 5. 风险登记（本波行使结果）
+## 5. 风险登记（本阶段行使结果）
 
 | # | 结果 |
 |---|---|

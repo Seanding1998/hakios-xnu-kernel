@@ -277,7 +277,7 @@ panic(cpu 1): Kernel data abort. at pc 0xfffffff007488904 ... esr 0x96000010 far
   修复 = GCC_SIZE 取 FDT 原值 0x1f4200（fix4）。
 - 8 核同起再次达成（10.403–10.410 s）。
 
-### 7.3 Boot #16（v9）——**零 panic 完整 300 s 会话 + 按键真机事件**（本波按键交付的验收证据）
+### 7.3 Boot #16（v9）——**零 panic 完整 300 s 会话 + 按键真机事件**（本阶段按键交付的验收证据）
 
 `logdump-v9.bin` 这次拉到的是 **loader 全量日志**（wave7b 心跳机制每 2 s 落盘），含最后一轮
 loader 日志 + 完整内核会话：
@@ -381,7 +381,7 @@ v9（`loader_return_after=300`）每轮 = 300 s 内核 + 引导开销 ≈ 5.2 mi
 2. **cape GCC 时钟表研究**（并行）：取 OnePlusOSS/android_kernel_oneplus_sm8475（branch
    oneplus/sm8475_s_12.1_oneplus_10t_5g）`drivers/clk/qcom/gcc-sm8450.c`（cape 版）或
    LineageOS/android_kernel_motorola_sm8475 同文件，把 wrap1 AHB/SE 族 CBCR/RCG/投票位换成 cape
-   权威值（注意本波已证：投票寄存器 0x62008 与 SE4 CBCR 0x284dc 行为正确，错误集中在 AHB 族）。
+   权威值（注意本阶段已证：投票寄存器 0x62008 与 SE4 CBCR 0x284dc 行为正确，错误集中在 AHB 族）。
 3. **点按上报验证**（probe 达成后）：300 s 窗口内真人点屏即可——`s3910: finger N at X, Y` 行 +
    每分钟状态行计数即证据；配合动作清单：① set_active b 重启后不按键等内核起来（~10 s）；
    ② 屏上滚动日志出现后指尖点/滑几次（慢、间隔 1 s）；③ 等 300 s 定时返回，随后切回安卓拉
@@ -397,7 +397,7 @@ v9（`loader_return_after=300`）每轮 = 300 s 内核 + 引导开销 ≈ 5.2 mi
   → `set_active b` → `reboot`（= Boot #13 行为：60 s 常驻 + 8 核上线）。
 - 回退红线未动：slot a 原厂安卓未刷过；`backups-slotb/` 原厂备份 + `set_active a` 回日常系统。
 
-## 10. 本波自检表
+## 10. 本阶段自检表
 
 | # | 项 | 结果 |
 | --- | --- | --- |

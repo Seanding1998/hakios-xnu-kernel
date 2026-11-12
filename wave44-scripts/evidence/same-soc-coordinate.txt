@@ -1,0 +1,88 @@
+=== Chengdong-Yu/UniXNU-pong
+{"archived":false,"default_branch":"main","description":"Based on UniXNU, build scripts and iOS 18.6.2(arm64e) asset fetcher for Nothing Phone (2)","fork":false,"license":"NOASSERTION","pushed_at":"2026-11-11T15:31:53Z","size":4009}
+--- /license endpoint
+{"path":"LICENSE","spdx":"NOASSERTION"}
+--- paths that name the GPU (tree of the default branch, first 25)
+7
+kits/PongPlatform24/build-support/merged-scripts/build-pong-adreno-platform.py
+kits/PongPlatform24/build-support/merged-scripts/build-pong-turnip.py
+patches/mesa/parity114/turnip-darwin-kmd.patch
+patches/mesa/parity114/turnip-render-mode-for-attachment-memory.patch
+scripts/build-pong-adreno-platform.py
+scripts/build-pong-turnip.py
+scripts/build-pong-turnip18e.py
+=== dddqmmx/UniXNU-diting
+{"archived":false,"default_branch":"main","description":"Redmi K50 Ultra (diting) - iOS 26 attempt","fork":true,"license":"NOASSERTION","pushed_at":"2026-11-11T02:04:16Z","size":46790}
+--- /license endpoint
+{"path":"LICENSE","spdx":"NOASSERTION"}
+--- paths that name the GPU (tree of the default branch, first 25)
+7
+kits/PongPlatform24/build-support/merged-scripts/build-pong-adreno-platform.py
+kits/PongPlatform24/build-support/merged-scripts/build-pong-turnip.py
+migration/ipados18/services150-adreno-freeze-ringer.md
+patches/mesa/parity114/turnip-darwin-kmd.patch
+patches/mesa/parity114/turnip-render-mode-for-attachment-memory.patch
+scripts/build-pong-adreno-platform.py
+scripts/build-pong-turnip.py
+=== qiumochen/UniXNU-zizhan
+{"archived":false,"default_branch":"main","description":"UniXNU device support for the Xiaomi MIX Fold 2 (zizhan, SM8475): iPadOS 18.7.10 on the inner screen with touch and Adreno 730 rendering. Derived from UniXNU-pong.","fork":false,"license":"NOASSERTION","pushed_at":"2026-11-09T01:46:45Z","size":2933}
+--- /license endpoint
+{"path":"LICENSE","spdx":"NOASSERTION"}
+--- paths that name the GPU (tree of the default branch, first 25)
+110
+drivers/PongAdreno/AdrenoFirmware.c
+drivers/PongAdreno/AdrenoFirmware.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4K.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4K.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KAudit.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KAudit.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KContext.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KContext.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KLive.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KLive.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KProgram.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KProgram.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KStreams.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KStreams.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KTableMemory.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KTableMemory.h
+drivers/PongAdreno/ArmSmmu4K/LICENSE
+drivers/PongAdreno/PongAdrenoAccelerator.cpp
+drivers/PongAdreno/PongAdrenoClient.cpp
+drivers/PongAdreno/PongAdrenoClocks.c
+drivers/PongAdreno/PongAdrenoClocks.h
+drivers/PongAdreno/PongAdrenoCp.cpp
+drivers/PongAdreno/PongAdrenoCp.h
+drivers/PongAdreno/PongAdrenoCpProfile.h
+drivers/PongAdreno/PongAdrenoGmu.c
+=== Emilelu/UniXNU-mondrian
+{"archived":false,"default_branch":"main","description":"UniXNU device support for Redmi K60 (mondrian / SM8475)","fork":false,"license":"NOASSERTION","pushed_at":"2026-11-11T16:25:21Z","size":56367}
+--- /license endpoint
+{"path":"LICENSE","spdx":"NOASSERTION"}
+--- paths that name the GPU (tree of the default branch, first 25)
+111
+drivers/PongAdreno/AdrenoFirmware.c
+drivers/PongAdreno/AdrenoFirmware.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4K.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4K.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KAudit.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KAudit.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KContext.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KContext.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KLive.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KLive.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KProgram.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KProgram.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KStreams.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KStreams.h
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KTableMemory.c
+drivers/PongAdreno/ArmSmmu4K/ArmSmmu4KTableMemory.h
+drivers/PongAdreno/ArmSmmu4K/LICENSE
+drivers/PongAdreno/PongAdrenoAccelerator.cpp
+drivers/PongAdreno/PongAdrenoClient.cpp
+drivers/PongAdreno/PongAdrenoClocks.c
+drivers/PongAdreno/PongAdrenoClocks.h
+drivers/PongAdreno/PongAdrenoCp.cpp
+drivers/PongAdreno/PongAdrenoCp.h
+drivers/PongAdreno/PongAdrenoCpProfile.h
+drivers/PongAdreno/PongAdrenoGmu.c

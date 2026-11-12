@@ -1,0 +1,3 @@
+[08:40:53] catcher armed: polling for a live ABL fastboot (12 min window)
+[08:41:01] LIVE ABL on 1-1 (getvar taro OK) -- launching the direct flash
+[08:41:14] flash script exited rc=0

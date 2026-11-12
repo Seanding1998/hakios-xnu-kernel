@@ -1,0 +1,11 @@
+tunnel25w: round 0: d00d nodes at addr [4]
+tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+tunnel25w: round 1: d00d nodes at addr [4]
+tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+tunnel25w: round 2: d00d nodes at addr [4]
+tunnel25w: addr 4: claim ok but the pair is dead (bulk-OUT failed: LIBUSB_ERROR_TIMEOUT (0/14 bytes))
+tunnel25w: no d00d on the bus (round 3)
+tunnel25w: no d00d on the bus (round 4)
+tunnel25w: no d00d on the bus (round 5)
+tunnel25w: no live kernel session within 600 s
+Connection closed by UNKNOWN port 65535

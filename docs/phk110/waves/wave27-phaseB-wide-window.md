@@ -2,7 +2,7 @@
 
 > 2026-11-10 00:50 → 06:20（完成：**v0.4 SSH 门 PASS**）· 阶段 27 执行记录
 > 任务书：v23 长会话（1800s）宽窗内捕获 WAVE21-SSH-OK；零刷写；接管 阶段 26 未竟工作
-> 红线执行：零刷写 ✓（全程无 fastboot write）；loader 相位禁 usbipd attach ✓（单一 Windows-libusb 所有者）；PID 精确 kill ✓（每次 taskkill 均按 PID，见日志）；boot_b 只读 ✓；进程树清杀仅限本波自启的 ssh/proxy 树
+> 红线执行：零刷写 ✓（全程无 fastboot write）；loader 相位禁 usbipd attach ✓（单一 Windows-libusb 所有者）；PID 精确 kill ✓（每次 taskkill 均按 PID，见日志）；boot_b 只读 ✓；进程树清杀仅限本阶段自启的 ssh/proxy 树
 
 ## 0. 判定（终局 → 详见 §7）
 
@@ -32,7 +32,7 @@
 | `probe-mss-v27.py` | MSS 尺寸阶梯（活会话实测 ACK 阈值） |
 | `logdump-pull-v27.sh` / `march-android-v27.sh` | Android 态 logdump 取证 + 零刷写回归槽 b 循环（taro 门+槽门） |
 
-## 3. 本波修复（全部主机侧，零刷写）
+## 3. 本阶段修复（全部主机侧，零刷写）
 
 ### 3.1 相位感知占空比（timed-ssh-v27）
 wave26 continuous 模式每 55s 探一次会把 loader 的 240s 服务窗永远顶住（内核永不 exec）。修复：loader 应答→真静默 250s→exec→ENTRY_GUARD 75s（en0 在 kernel+49s attach，早进的 upload 会楔死 loader 整个会话——k001 实证）→敲门。

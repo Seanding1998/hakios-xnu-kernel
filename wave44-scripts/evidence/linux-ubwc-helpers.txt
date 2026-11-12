@@ -1,0 +1,60 @@
+blob sha, bytes: b09ae05cbeae4f8e7d3e8f4e6faaa1592be2f4c0	3419
+lines: 133
+31:#define UBWC_1_0 0x10000000
+32:#define UBWC_2_0 0x20000000
+33:#define UBWC_3_0 0x30000000
+34:#define UBWC_3_1 0x30010000 /* UBWC 3.0 + Macrotile mode */
+35:#define UBWC_4_0 0x40000000
+36:#define UBWC_4_3 0x40030000
+37:#define UBWC_5_0 0x50000000
+38:#define UBWC_6_0 0x60000000
+39:#define UBWC_7_0 0x70000000
+52:	return cfg->ubwc_enc_version == UBWC_1_0;
+57:	return cfg->ubwc_enc_version == UBWC_1_0;
+69:	return cfg->ubwc_enc_version >= UBWC_3_1;
+77:#define UBWC_SWIZZLE_ENABLE_LVL1	BIT(0)
+78:#define UBWC_SWIZZLE_ENABLE_LVL2	BIT(1)
+79:#define UBWC_SWIZZLE_ENABLE_LVL3	BIT(2)
+93:	if (cfg->ubwc_enc_version == UBWC_1_0)
+94:		return UBWC_SWIZZLE_ENABLE_LVL1 |
+95:		       UBWC_SWIZZLE_ENABLE_LVL2 |
+96:		       UBWC_SWIZZLE_ENABLE_LVL3;
+98:	u32 ubwc_swizzle = UBWC_SWIZZLE_ENABLE_LVL2 |
+67:static inline bool qcom_ubwc_macrotile_mode(const struct qcom_ubwc_cfg_data *cfg)
+68-{
+69-	return cfg->ubwc_enc_version >= UBWC_3_1;
+70-}
+71-
+72:static inline bool qcom_ubwc_bank_spread(const struct qcom_ubwc_cfg_data *cfg)
+73-{
+74-	return true;
+75-}
+76-
+77-#define UBWC_SWIZZLE_ENABLE_LVL1	BIT(0)
+78-#define UBWC_SWIZZLE_ENABLE_LVL2	BIT(1)
+79-#define UBWC_SWIZZLE_ENABLE_LVL3	BIT(2)
+80-
+81-/**
+82- * @qcom_ubwc_swizzle: Whether to enable level 1, 2 & 3 bank swizzling.
+83- *
+84- * UBWC 1.0 always enables all three levels.
+85- * UBWC 2.0 removes level 1 bank swizzling, leaving levels 2 & 3.
+86- * UBWC 4.0 adds the optional ability to disable levels 2 & 3.
+87- */
+88:static inline u32 qcom_ubwc_swizzle(const struct qcom_ubwc_cfg_data *cfg)
+89-{
+90-	if (cfg->ubwc_enc_version == 0)
+91-		return 0;
+92-
+93-	if (cfg->ubwc_enc_version == UBWC_1_0)
+94-		return UBWC_SWIZZLE_ENABLE_LVL1 |
+95-		       UBWC_SWIZZLE_ENABLE_LVL2 |
+96-		       UBWC_SWIZZLE_ENABLE_LVL3;
+97-
+98-	u32 ubwc_swizzle = UBWC_SWIZZLE_ENABLE_LVL2 |
+99-			   UBWC_SWIZZLE_ENABLE_LVL3;
+100-
+101-	if (cfg->flags & UBWC_FLAG_DISABLE_SWIZZLE_LVL2)
+102-		ubwc_swizzle &= ~UBWC_SWIZZLE_ENABLE_LVL2;
+103-
+104-	if (cfg->flags & UBWC_FLAG_DISABLE_SWIZZLE_LVL3)

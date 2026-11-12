@@ -1,0 +1,8 @@
+[flash-v36-fast084101 08:41:02] graft pinned: e6ca0b43372634c8c8ab1a459d6c63902bcb77599415d8a9fa82696a3655b7de (payload 0a70ec0a, kernel 5b77b418 wave41 GPU fixes + wave43 fuelgauge, loader 5de055ea frozen v35 build, ramdisk 51a030c3 the wave41 GL=test carrier, verify 72/72)
+[flash-v36-fast084101 08:41:02] waiting for the d00d ABL fastboot gadget (serial/name must not be xnuloader)
+[flash-v36-fast084101 08:41:03] waking the distro first, then attach --wsl at 1-1
+[flash-v36-fast084101 08:41:04] identity gate (getvar product must be taro)
+[flash-v36-fast084101 08:41:05] slot gate (must be b)
+[flash-v36-fast084101 08:41:06] flashing boot_b (192 MiB) with v36 -- exit-checked, OKAY asserted
+[flash-v36-fast084101 08:41:12] set_active b + reboot into the v36 cycle
+[flash-v36-fast084101 08:41:14] FLASH CONFIRMED: boot_b = v36 e6ca0b43372634c8c8ab1a459d6c63902bcb77599415d8a9fa82696a3655b7de; the slot-b cycle restarts

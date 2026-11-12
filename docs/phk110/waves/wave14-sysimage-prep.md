@@ -54,7 +54,7 @@ WSL /（/dev/sdd，ext4 虚拟盘）: 1007G 总量
 2. `7z l -slt rootfs.dmg` 技术清单 → `select-system.py` 选出 **43,230 文件 / 2,881 MB**（manifest 59,644 条目，保留 owner/mode/symlink）→ `mkvarskel.py` 生成 `/private/var` 骨架
 3. `7z x` 批量解出 → `font_trim.py` 现场裁两个巨型字体（emoji 130→59MB，PingFang 74→26MB）
 4. cryptex 同法解出，dyld shared cache 单独搬到 `20F66__iPhone10,3_6/`（43 文件校验），`.symbols`（0.6GB）有意丢弃
-5. 7z 解不动的 LZBITMAP 文件由 `unzbm` 补刀，最后校验零残留
+5. 7z 解不动的 LZBITMAP 文件由 `unzbm` 处理，最后校验零残留
 
 ### 3.2 独立运行布局（红线适配）
 

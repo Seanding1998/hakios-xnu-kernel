@@ -52,13 +52,13 @@ STATUS.md Boot 表在案 **24 次（#1–#24，截至 2026-11-04 快照）**；�
 | E4 | 我们构建树的 `xnuloader/identity.h` = **`mkidentity.py --placeholder` 占位版**：`/* placeholder: no properties (built without an IPSW) */`，`identity_root[] = { { "hakios-placeholder", 0, 0 } }`，四张身份表（root/product/haptics/camera）全为空，`grep -ac 'target-type'` = 0 | WSL `~/hakios/kernel/xnuloader/identity.h`（全文读过） |
 | E5 | `mkidentity.sh` 用法注释：正常模式 = 从 IPSW 的 `DeviceTree.d22ap.im4p`（或整个 IPSW）生成 identity.h；**`--placeholder` 语义 = "an Apple-free user space, not Darwin"**——即占位版官方明示不支持 Darwin 用户空间 | WSL `~/hakios/kernel/xnuloader/mkidentity.sh` 头注释 |
 | E6 | loader 侧意图存在但数据缺位：`loader.c:3283` 注释"identity is the iPhone's (model, compatible, target-type …)"，`dt_identity(&w, identity_root, …)` 在 3287/3380/3388/3398 行调用——写入的是 E4 的空表；`chosen` 侧 random-seed/dram-base/size/display-scale=3/chip-id 0x8015(A11)/board-id 6/unique-chip-id/boot-manifest-hash（"redwood" 占位 48B）等常量另有写入 | WSL `~/hakios/kernel/xnuloader/loader.c`（3265–3340 逐行读过） |
-| E7 | 在机 loader.efi 血统：v13 = v11 提取件 = v10e = … = **v6 时代构建（2026-11-02）**；IPSW 20F66 入库 = 2026-11-03（阶段 14）。即：**loader 构建时 IPSW 尚不在库，identity.h 只能是占位版**（STATUS.md 关键镜像清单各行"提取件原样"链） | STATUS.md Boot 表 + 镜像清单；阶段 14 记录 |
+| E7 | 机上 loader.efi 血统：v13 = v11 提取件 = v10e = … = **v6 时代构建（2026-11-02）**；IPSW 20F66 入库 = 2026-11-03（阶段 14）。即：**loader 构建时 IPSW 尚不在库，identity.h 只能是占位版**（STATUS.md 关键镜像清单各行"提取件原样"链） | STATUS.md Boot 表 + 镜像清单；阶段 14 记录 |
 | E8 | 生态同构证据：UniXNU 官方文档 **`target-type`（ADT 根属性）→ sysctl `hw.target`**、`model` → `hw.product`/`hw.machine`（MobileGestalt identity 表）；UniXNU ADT 契约要求 `/chosen` 的 random-seed/unique-chip-id/chip-id/boot-manifest-hash 等，缺失的后果各有专述（chip-id 缺 → `gethostuuid(0)` 永久等待——与我们 b24 未卡此步一致） | unixnu.com/guide/mobilegestalt、unixnu.com/porting/device-tree |
 | E9 | vphone 研究文档独立佐证："**hardware target reports as vphone600ap**"（= DT `target-type`/`compatible` 身份链的运行时读数），并给出 DT 身份属性改写的风险分级（`compatible[0]` 动不得——IOKit 平台专家绑定第一项，改名必 panic） | lakr233/vphone-cli research/firmware_manifest_and_origins.md |
 
 ### 2.2 根因定性
 
-**在机 loader.efi 内嵌的 identity.h 是占位版 → ADT 根节点没有任何 Apple 身份属性（含 `target-type`）→ 内核 `pe_init.c` 初始化时 `gTargetTypeBuffer` 保持空 → pid-1 引导家族（dyld/launchd 侧）查询 `sysctl hw.target` → kern_mib.c handler 对空串返回 EINVAL(22) → "failed to query hardware target: 22" → 进程退场 → `panic: initproc failed to start`。**
+**机上 loader.efi 内嵌的 identity.h 是占位版 → ADT 根节点没有任何 Apple 身份属性（含 `target-type`）→ 内核 `pe_init.c` 初始化时 `gTargetTypeBuffer` 保持空 → pid-1 引导家族（dyld/launchd 侧）查询 `sysctl hw.target` → kern_mib.c handler 对空串返回 EINVAL(22) → "failed to query hardware target: 22" → 进程退场 → `panic: initproc failed to start`。**
 
 - 归因注记（诚实边界）：E1+E2 只证明字符串载体在 dyld 侧而非 sbin/launchd，**发起查询的确切用户态二进制未逐帧证明**（需 launchd 段日志/崩溃帧）；但 E3 的内核机制（空串→EINVAL）与 E8/E9 的生态契约共同锁死因果链，修复路径不依赖该归因细节。
 - 与 b24 日志完全吻合：0.6 s = launchd 起来 + ignition 完成 cryptex graft（c=1 @2361 MB / c=2 @4961 MB 均成功，说明 dyld/共享缓存/信任链工作正常）→ 首次触发 `hw.target` 查询即退场。
@@ -159,7 +159,7 @@ cd ~/hakios/kernel && xnuloader/mkidentity.sh     # 四张表（root/product/hap
 
 **#1 UniXNU MobileGestalt identity + ADT 身份契约 → 阶段 20（launchd）**
 - 内容：unixnu.com/guide/mobilegestalt 的属性表（`model`→hw.product/hw.machine、`target-type`→hw.target、product-name/artwork-*/button-names/home-button-type/certificate-production-status/display-scale）+ /porting/device-tree 的 `/chosen` 契约（random-seed/unique-chip-id/chip-id/osenvironment/root-matching/boot-manifest-hash）。
-- 用法：作为 §2.3 修复的**验收对照表**——mkidentity.sh 重生成后逐项核对 identity.h 四张表 vs UniXNU 属性表；对拍差异即下一波 launchd 卡点的排查清单。
+- 用法：作为 §2.3 修复的**验收对照表**——mkidentity.sh 重生成后逐项核对 identity.h 四张表 vs UniXNU 属性表；对拍差异即下一阶段 launchd 卡点的排查清单。
 - 预期收益：launchd EINVAL 直击（§2 根因）；工作量 0.5–1 天（含重编 loader + repack + 自检）。
 - 出处：unixnu.com/guide/mobilegestalt、unixnu.com/porting/device-tree、lakr233/vphone-cli。
 

@@ -1,0 +1,509 @@
+--- a/drivers/gpu/hakios.adreno.c
++++ b/drivers/gpu/hakios.adreno.c
+@@ -33,16 +33,16 @@
+  *              and which firmware images it says it authenticates
+  *  12  asks    TrustZone to check the signature of the GPU's "zap shader", the signed image
+  *              without which the 3D core stays locked in secure mode: its header goes from the
+- *              small image (fw/a660_zap.mdt) into memory of ours that TrustZone is pointed at
++ *              small image (fw/a730_zap.mdt) into memory of ours that TrustZone is pointed at
+  *  13  writes  page tables for the memory the GMU's firmware asks for, and the SMMU: a
+  *              translation context with those tables, and the GMU's requests sent through it
+- *  14  writes  the GMU's firmware (fw/a660_gmu.bin) into its own memory and into that memory
++ *  14  writes  the GMU's firmware (fw/gmu_gen70000.bin) into its own memory and into that memory
+  *  15  writes  the GMU's configuration, and lets its processor out of reset: the firmware runs
+  *  16  writes  the GMU's connection to RPMh; starts its message queues ("HFI")
+  *  17  talks   to the GMU: the tables it needs, and the request to power the 3D core, whose
+  *              registers are then read
+  *  18  writes  the 3D core's translation context, with its ring and its microcode
+- *              (fw/a660_sqe.fw) in it
++ *              (fw/a730_sqe.fw) in it
+  *  19  asks    TrustZone to load the zap shader (and first to give up the one a kernel before
+  *              this one may have left; the stop at the end of a run asks for that too)
+  *  20  writes  the 3D core's registers; starts its command processor and gives it its first
+@@ -441,8 +441,10 @@
+ 	bin = bin >> 5 & 0xff;
+ 	speed_bin = bin;
+ 	gaming = get8(&qfprom, "gaming bin", QFPROM_CORRECTED + QFPROM_GPU_GAMING_BIN) >> 5 & 1;
+-	/* dt: qcom,gpu-models: 0xac and 0xbe are sold as Adreno 643, anything else is the 642L */
+-	printf("adreno: %u: speed bin %u: an Adreno %s; gaming bin %u\n", step, bin, bin == 0xac || bin == 0xbe ? "643" : "642L",
++	/* the cell of cape's QFPROM that holds the GPU speed bin is not the reference's [TODO-DEV]:
++	 * both reads stay (they print what the fuses say), nothing is gated on the bin (the
++	 * reference gates nothing either), and the chip id's own name is what the log shows */
++	printf("adreno: %u: speed bin %u: an Adreno 730v3 (chip id %#llx); gaming bin %u\n", step, bin, GPU_CHIP_ID,
+ 	    gaming);
+ 
+ 	announce("read the same fuses where the phone's device tree has them (0x780000)");
+@@ -885,27 +887,36 @@
+ /* ---- step 6: the first words from the GPU block ------------------------------------------------------- */
+ 
+ /*
+- * dt: qcom,gmu "kgsl_gmu_reg" at 0x3d6a000, 0x34000 long. Offsets in a6xx_gmu.xml are in words.
+- */
+-static struct block gmu = { "gmu", 0x03d6a000, 0x34000 };
++ * dt: qcom,gmu@3d69000 reg[0] "gmu" at 0x3d68000, 0x37000 long (phk110.dts:20301; the node's
++ * unit address is 3d69000, the window begins one page earlier: the vendor numbering). Words
++ * again -- and the vendor gen7 map (refs/kernel_oneplus_sm8475 drivers/gpu/msm gen7_reg.h)
++ * carries every register of the a6xx layout 0x800 words further into this window; more than
++ * twenty of its word addresses check out as a6xx + 0x800 (CM3 0x50xx->0x58xx, HFI 0x518x->
++ * 0x598x, GENERAL 0x51cc->0x59cc, AO/RSCC-ctrl 0x93xx->0x9bxx, ICACHE 0x4c00->0x5400), which
++ * is how the offsets below were moved.
++ */
++static struct block gmu = { "gmu", 0x03d68000, 0x37000 };
+ #define GMU_WORD(n)             (4u * (n))
+-#define GMU_DTCM                GMU_WORD(0x1c00)        /* the processor's 16K of data memory (its code: 0x0c00) */
+-#define GMU_DTCM_VERSIONS       GMU_WORD(0x1c00 + 0xff8) /* five words where loaded firmware carries its versions */
+-#define GMU_CM3_SYSRESET        GMU_WORD(0x5000)        /* 1: the processor is held in reset */
+-#define GMU_CM3_BOOT_CONFIG     GMU_WORD(0x5001)
+-#define GMU_CM3_FW_INIT_RESULT  GMU_WORD(0x501c)        /* 0xbabeface once firmware has started */
+-#define GMU_CM3_CFG             GMU_WORD(0x502d)
+-#define GMU_ALWAYS_ON_COUNTER_L GMU_WORD(0x5088)        /* counts the 19.2 MHz crystal */
+-#define GMU_ALWAYS_ON_COUNTER_H GMU_WORD(0x5089)
+-#define GMU_SPTPRAC_PWR_CLK_STATUS GMU_WORD(0x50d0)     /* bit 6: the 3D core has no power, bit 7: no clock */
+-#define GMU_RPMH_POWER_STATE    GMU_WORD(0x50ec)
+-#define GMU_HFI_CTRL_STATUS     GMU_WORD(0x5180)
+-#define GMU_HFI_VERSION_INFO    GMU_WORD(0x5181)
+-#define GMU_GENERAL_7           GMU_WORD(0x51cc)
+-#define GMU_AO_HOST_INTERRUPT_STATUS GMU_WORD(0x9305)
+-#define GMU_RSCC_CONTROL_ACK    GMU_WORD(0x9308)
+-#define GMU_AO_GPU_CX_BUSY_STATUS GMU_WORD(0x930c)
+-#define GMU_AHB_FENCE_STATUS    GMU_WORD(0x9313)
++#define GMU_DTCM                GMU_WORD(0x2400)        /* the processor's 16K of data memory (its code: 0x1400) */
++#define GMU_DTCM_VERSIONS       GMU_WORD(0x2400 + 0xff8) /* five words where loaded firmware carries its versions */
++#define GMU_CM3_SYSRESET        GMU_WORD(0x5800)        /* 1: the processor is held in reset */
++#define GMU_CM3_BOOT_CONFIG     GMU_WORD(0x5801)
++#define GMU_CM3_FW_INIT_RESULT  GMU_WORD(0x581c)        /* 0xbabeface once firmware has started */
++#define GMU_CM3_CFG             GMU_WORD(0x582d)
++#define GMU_ALWAYS_ON_COUNTER_L GMU_WORD(0x5888)        /* counts the 19.2 MHz crystal */
++#define GMU_ALWAYS_ON_COUNTER_H GMU_WORD(0x5889)
++#define GMU_SPTPRAC_PWR_CLK_STATUS GMU_WORD(0x58d0)     /* bit 6: the 3D core has no power, bit 7: no clock */
++#define GMU_RPMH_POWER_STATE    GMU_WORD(0x58ec)
++#define GMU_HFI_CTRL_STATUS     GMU_WORD(0x5980)
++#define GMU_HFI_VERSION_INFO    GMU_WORD(0x5981)
++#define GMU_GENERAL_7           GMU_WORD(0x59cc)
++#define GMU_GENERAL_8           GMU_WORD(0x59cd)        /* at start: where the GMU's log is, its pages - 1 */
++#define GMU_GENERAL_9           GMU_WORD(0x59ce)        /* how far the log had been written before (the wptr retention) */
++#define GMU_GENERAL_10          GMU_WORD(0x59cf)        /* at start: which GPU this is (the chip id) */
++#define GMU_AO_HOST_INTERRUPT_STATUS GMU_WORD(0x9b05)
++#define GMU_RSCC_CONTROL_ACK    GMU_WORD(0x9b08)
++#define GMU_AO_GPU_CX_BUSY_STATUS GMU_WORD(0x9b0c)
++#define GMU_AHB_FENCE_STATUS    GMU_WORD(0x9b13)
+ 
+ /*
+  * dt: qcom,kgsl-3d0 "kgsl_3d0_reg_memory" at 0x3d00000 is the 3D core, and without power (the GMU
+@@ -920,6 +931,7 @@
+ static struct block cx_misc = { "cx_misc", 0x03d9e000, 0x1000 };
+ #define CX_MISC_SYSTEM_CACHE_CNTL_0 (4 * 1)
+ #define CX_MISC_SYSTEM_CACHE_CNTL_1 (4 * 2)
++#define CX_MISC_TCM_RET_CNTL    (4 * 0x39)      /* gen7 keeps the TCMs on through the CX manager (a6xx voted GENERAL_7) [VENDOR] */
+ 
+ static bool
+ step_first_words(void)
+@@ -930,7 +942,7 @@
+ 	if (!cx_ready()) {
+ 		return false;
+ 	}
+-	announce("read registers of the GMU (0x3d6a000): the first words from the GPU block itself");
++	announce("read registers of the GMU (0x3d68000): the first words from the GPU block itself");
+ 	get(&gmu, "cm3_sysreset", GMU_CM3_SYSRESET);
+ 	get(&gmu, "cm3_boot_config", GMU_CM3_BOOT_CONFIG);
+ 	get(&gmu, "cm3_fw_init_result", GMU_CM3_FW_INIT_RESULT);
+@@ -969,11 +981,16 @@
+ /* ---- step 7: the GMU's channel to RPMh ----------------------------------------------------------------- */
+ 
+ /*
+- * dt: qcom,kgsl-3d0 "rscc" at 0x3de0000: the same kind of command slots through which this
+- * kernel asks RPMh for the touch screen's supply, but the GMU's own; through them its firmware
+- * raises the 3D core's rail. Offsets in words: a6xx_gmu.xml, domain A6XX_RSCC.
+- */
+-static struct block rscc = { "rscc", 0x03de0000, 0x2000 };
++ * dt: kgsl reg[2] "rscc" at 0x3d50000, 0x10000 long (phk110.dts:20055; redwood said 0x3de0000):
++ * the same kind of command slots through which this kernel asks RPMh for the touch screen's
++ * supply, but the GMU's own; through them its firmware raises the 3D core's rail. Offsets in
++ * words, unchanged from a6xx: every RSCC offset the vendor gen7_reg.h lists (PDC slave id 0xb,
++ * seq busy 0x101, seq memory 0x180, TCS status 0x346) is the a6xx number. So is the program
++ * the GMU's side loads (gen7_load_rsc_ucode: the same five words, the same PDC start/match
++ * 0x4520/0x4510/0x4514, slave id 1) -- the only difference found is hidden_tcs_cmd2_data
++ * 0x80000000 where a650-and-later wrote 0x80000021 (step 16).
++ */
++static struct block rscc = { "rscc", 0x03d50000, 0x10000 };
+ #define RSCC_RSC_STATUS0_DRV0   (4 * 0x004)
+ #define RSCC_PDC_SLAVE_ID_DRV0  (4 * 0x00b)
+ #define RSCC_SEQ_BUSY_DRV0      (4 * 0x101)
+@@ -1030,10 +1047,11 @@
+ /*
+  * dt: kgsl-smmu@3da0000 (qcom,qsmmu-v500: an Arm MMU-500), 0x20000 long, with "qcom,skip-init":
+  * the vendor's driver leaves its stream table as it finds it. Its streams (dt: qcom,kgsl-iommu
+- * and qcom,gmu, "iommus"): 0 the GPU, 1 its low-priority twin, 2 secure content, 5 the GMU.
++ * and qcom,gmu, "iommus"): 0 the GPU, 1 its low-priority twin (gen7's LPAC), 2 secure content,
++ * 5 the GMU. The window is 0x40000 on this phone (phk110.dts kgsl-smmu; redwood said 0x20000).
+  * The global registers here are the ones the hypervisor imitates; offsets: arm-smmu.h.
+  */
+-static struct block smmu = { "smmu", 0x03da0000, 0x20000 };
++static struct block smmu = { "smmu", 0x03da0000, 0x40000 };
+ #define SMMU_SCR0               0x000
+ #define SMMU_IDR0               0x020           /* [7:0] stream match registers */
+ #define SMMU_IDR1               0x024           /* bit 31: 64K pages, [30:28] log2(pages)-1, [7:0] translation contexts */
+@@ -1062,8 +1080,8 @@
+ 	smmu_matches = idr0 & 0xff;
+ 	printf("adreno: %u: SMMU: %u stream match registers, %u contexts, %u pages of %#x before the contexts' own\n", step,
+ 	    smmu_matches, smmu_contexts, smmu_pages, smmu_page);
+-	if (2 * smmu_pages * smmu_page != smmu.size) {
+-		printf("adreno: %u: that makes %#x of registers, the device tree says %#x: not reading further\n", step,
++	if (2 * smmu_pages * smmu_page > smmu.size) {
++		printf("adreno: %u: that makes %#x of registers, more than the device tree's %#x window: not reading further\n", step,
+ 		    2 * smmu_pages * smmu_page, smmu.size);
+ 		return false;
+ 	}
+@@ -1630,7 +1648,7 @@
+ /*
+  * The first of the three calls with which Linux has a zap shader loaded (mdt_loader.c:
+  * qcom_mdt_pas_init, qcom_scm.c: qcom_scm_pas_init_image): TrustZone is given the image's header --
+- * the ELF header and the block of hashes and certificates, which is all of the file a660_zap.mdt
++ * the ELF header and the block of hashes and certificates, which is all of the file a730_zap.mdt
+  * -- and checks the signature. Nothing of the GPU is involved, so it can be asked now. The other
+  * two (where the image will be, and "authenticate and start") need the 3D core powered.
+  *
+@@ -1648,7 +1666,7 @@
+ 	uint64_t size = 0;
+ 	uint32_t segments, hashes;
+ 
+-	header = image_file("fw", "a660_zap.mdt", &size);
++	header = image_file("fw", "a730_zap.mdt", &size);
+ 	if (header == NULL) {
+ 		return false;
+ 	}
+@@ -1682,7 +1700,7 @@
+ 	uint64_t header = 0, answer = ~0ull;
+ 	int32_t result;
+ 
+-	announce("find the zap shader's header, fw/a660_zap.mdt, in the small image that came with the kernel");
++	announce("find the zap shader's header, fw/a730_zap.mdt, in the small image that came with the kernel");
+ 	if (!zap_header(&header)) {
+ 		return false;
+ 	}
+@@ -1743,8 +1761,8 @@
+ 	if (!cx_ready()) {
+ 		return false;
+ 	}
+-	announce("find the GMU's firmware, fw/a660_gmu.bin, in the small image, and make the memory it asks for");
+-	gmu_firmware = image_file("fw", "a660_gmu.bin", &gmu_firmware_size);
++	announce("find the GMU's firmware, fw/gmu_gen70000.bin, in the small image, and make the memory it asks for");
++	gmu_firmware = image_file("fw", "gmu_gen70000.bin", &gmu_firmware_size);
+ 	if (gmu_firmware == NULL) {
+ 		return false;
+ 	}
+@@ -1784,7 +1802,7 @@
+ 
+ /* ---- step 14: the GMU's firmware ----------------------------------------------------------------------- */
+ 
+-#define GMU_ITCM                GMU_WORD(0x0c00)
++#define GMU_ITCM                GMU_WORD(0x1400)
+ 
+ static bool
+ step_gmu_firmware(void)
+@@ -1858,27 +1876,28 @@
+ 
+ /* ---- step 15: start the GMU ---------------------------------------------------------------------------- */
+ 
+-#define GMU_ICACHE_CONFIG       GMU_WORD(0x4c00)
+-#define GMU_DCACHE_CONFIG       GMU_WORD(0x4c01)
+-#define GMU_SYS_BUS_CONFIG      GMU_WORD(0x4c0f)
+-#define GMU_PWR_COL_INTER_FRAME_CTRL GMU_WORD(0x50c0)
+-#define GMU_RPMH_CTRL           GMU_WORD(0x50e8)
++/* gen7: the a6xx words + 0x800 (see the GMU block's comment). The log and the chip id moved
++ * off the PWR_COL/HFI_SFR names onto GENERAL_8/9/10 (vendor gen7_gmu_register_config). */
++#define GMU_ICACHE_CONFIG       GMU_WORD(0x5400)
++#define GMU_DCACHE_CONFIG       GMU_WORD(0x5401)
++#define GMU_SYS_BUS_CONFIG      GMU_WORD(0x540f)
++#define GMU_PWR_COL_INTER_FRAME_CTRL GMU_WORD(0x58c0)
++#define GMU_RPMH_CTRL           GMU_WORD(0x58e8)
+ #define GMU_RPMH_CTRL_ALL       0xf11           /* the RPMh interface, and every vote the firmware may cast */
+-#define GMU_CX_FAL_INTF         GMU_WORD(0x50f0)
+-#define GMU_CX_FALNEXT_INTF     GMU_WORD(0x50f1)
+-#define GMU_PWR_COL_CP_MSG      GMU_WORD(0x5100)        /* at start: where the log is, and its pages - 1 */
+-#define GMU_PWR_COL_CP_RESP     GMU_WORD(0x5101)        /* ... and how far it was written before */
+-#define GMU_HFI_SFR_ADDR        GMU_WORD(0x5182)        /* at start: which GPU this is */
+-#define GMU_HFI_QTBL_INFO       GMU_WORD(0x5184)
+-#define GMU_HFI_QTBL_ADDR       GMU_WORD(0x5185)
+-#define GMU_HFI_CTRL_INIT       GMU_WORD(0x5186)
+-#define GMU_GMU2HOST_INTR_CLR   GMU_WORD(0x5191)
+-#define GMU_GMU2HOST_INTR_INFO  GMU_WORD(0x5192)        /* bit 0: a message for us; bit 31: the 3D core is ours */
+-#define GMU_HOST2GMU_INTR_SET   GMU_WORD(0x5194)        /* bit 0: a message for the GMU; bit 30, 31: see step 17 */
+-#define GMU_RSCC_CONTROL_REQ    GMU_WORD(0x9307)
+-#define GMU_AO_AHB_FENCE_CTRL   GMU_WORD(0x9310)
+-#define GMU_AHB_FENCE_RANGE_0   GMU_WORD(0x9311)
+-#define GMU_CHIP                0x06035000      /* dt qcom,chipid 0x06030500 the way the firmware wants it */
++#define GMU_CX_FAL_INTF         GMU_WORD(0x58f0)
++#define GMU_CX_FALNEXT_INTF     GMU_WORD(0x58f1)
++#define GMU_HFI_QTBL_INFO       GMU_WORD(0x5984)
++#define GMU_HFI_QTBL_ADDR       GMU_WORD(0x5985)
++#define GMU_HFI_CTRL_INIT       GMU_WORD(0x5986)
++#define GMU_GMU2HOST_INTR_CLR   GMU_WORD(0x5991)
++#define GMU_GMU2HOST_INTR_INFO  GMU_WORD(0x5992)        /* bit 0: a message for us; bit 31: the 3D core is ours */
++#define GMU_HOST2GMU_INTR_SET   GMU_WORD(0x5994)        /* bit 0: a message for the GMU; bit 30, 31: see step 17 */
++#define GMU_RSCC_CONTROL_REQ    GMU_WORD(0x9b07)
++#define GMU_AO_AHB_FENCE_CTRL   GMU_WORD(0x9b10)
++#define GMU_AHB_FENCE_RANGE_0   GMU_WORD(0x9b11)
++/* gen7 packs the chip id minor and patch into the low nibbles: 0x07030002 -> 0x07030200
++ * (mainline a6xx_gmu.c's gen7 formula; the pong bring-up reached the same number) [UP][PONG] */
++#define GMU_CHIP                0x07030200      /* dt qcom,chipid 0x07030002 the way the firmware wants it */
+ #define GMU_STARTED_MASK        0x1ff           /* of fw_init_result, for firmware newer than core 0x20010004 */
+ #define GMU_STARTED             0x100
+ #define GMU_FAILED              0xe00
+@@ -1891,6 +1910,7 @@
+ 	uint32_t version, words, first_queue, queue_words, queues, active_queues;
+ 	struct hfi_queue queue[17];
+ };
++#define HFI_QUEUE_SLOTS         17              /* header slots reserved in the table (gen7; 3 carry queues) */
+ #define HFI_QUEUES              3               /* 0: ours to the GMU; 1: its answers; 2: its debugging messages */
+ #define HFI_QUEUE_WORDS         1024
+ #define HFI_QUEUE_AT(n)         (((uint32_t)sizeof(struct hfi_table) + 15) / 16 * 16 + 4096 * (n))
+@@ -1915,10 +1935,11 @@
+ 		printf("adreno: %u: the page for the messages is not in one piece\n", step);
+ 		return false;
+ 	}
+-	hfi->words = sizeof(struct hfi_table) / 4;
++	hfi->version = 0;
++	hfi->words = sizeof(struct hfi_table) / 4;      /* 210: the head 6 + 17 headers of 12 */
+ 	hfi->first_queue = 6;
+ 	hfi->queue_words = sizeof(struct hfi_queue) / 4;
+-	hfi->queues = hfi->active_queues = HFI_QUEUES;
++	hfi->queues = hfi->active_queues = HFI_QUEUE_SLOTS;     /* gen7 counts all 17 slots (vendor init_queues) */
+ 	for (unsigned i = 0; i < HFI_QUEUES; i++) {
+ 		hfi->queue[i].start = GMU_HFI_ADDRESS + HFI_QUEUE_AT(i);
+ 		hfi->queue[i].type = i | (uint32_t)priority[i] << 8;
+@@ -1951,17 +1972,17 @@
+ 	rsc_awake = true;
+ 	put(&gmu, "cx_falnext_intf", GMU_CX_FALNEXT_INTF, 1);
+ 	put(&gmu, "cx_fal_intf", GMU_CX_FAL_INTF, 1);
+-	put(&gmu, "general_7", GMU_GENERAL_7, 1);
++	put(&cx_misc, "tcm_ret_cntl", CX_MISC_TCM_RET_CNTL, 1);         /* gen7's TCM retention (a6xx voted GENERAL_7) */
+ 	put(&gmu, "cm3_fw_init_result", GMU_CM3_FW_INIT_RESULT, 0);
+ 	put(&gmu, "cm3_boot_config", GMU_CM3_BOOT_CONFIG, 2);
+ 	put(&gmu, "hfi_qtbl_addr", GMU_HFI_QTBL_ADDR, GMU_HFI_ADDRESS);
+ 	put(&gmu, "hfi_qtbl_info", GMU_HFI_QTBL_INFO, 1);
+-	put(&gmu, "ahb_fence_range_0", GMU_AHB_FENCE_RANGE_0, 1u << 31 | (0xa << 2) << 18 | 0x8a0);
++	put(&gmu, "ahb_fence_range_0", GMU_AHB_FENCE_RANGE_0, 1u << 31 | 0x32 << 18 | 0x8a0);   /* gen7 fence range [VENDOR][UP] */
+ 	put(&gmu, "cm3_cfg", GMU_CM3_CFG, 0x4052);
+ 	put(&gbif, "halt", GBIF_HALT, 0);
+-	put(&gmu, "pwr_col_cp_resp", GMU_PWR_COL_CP_RESP, 0);
+-	put(&gmu, "hfi_sfr_addr", GMU_HFI_SFR_ADDR, GMU_CHIP);
+-	put(&gmu, "pwr_col_cp_msg", GMU_PWR_COL_CP_MSG, GMU_LOG_ADDRESS | (GMU_LOG_SIZE / 4096 - 1));
++	put(&gmu, "general_9", GMU_GENERAL_9, 0);       /* the log's wptr retention (gen7 moved it here) */
++	put(&gmu, "general_10", GMU_GENERAL_10, GMU_CHIP);      /* which GPU this is: before the processor runs */
++	put(&gmu, "general_8", GMU_GENERAL_8, GMU_LOG_ADDRESS | (GMU_LOG_SIZE / 4096 - 1));
+ 	put(&gmu, "sys_bus_config", GMU_SYS_BUS_CONFIG, 1);
+ 	put(&gmu, "icache_config", GMU_ICACHE_CONFIG, 1);
+ 	put(&gmu, "dcache_config", GMU_DCACHE_CONFIG, 1);
+@@ -2023,9 +2044,9 @@
+ 	put(&pdc, "gpu_enable", PDC_GPU_ENABLE, 0x80000001);
+ 	get(&pdc, "gpu_enable", PDC_GPU_ENABLE);
+ 
+-	announce("give the GMU's RPMh channel its sleep and wake program (rscc, 0x3de0000), unless it has it");
++	announce("give the GMU's RPMh channel its sleep and wake program (rscc, 0x3d50000), unless it has it");
+ 	if (get(&rscc, "seq_mem_0_drv0", RSCC_SEQ_MEM_0_DRV0) == program[0] &&
+-	    get(&rscc, "hidden_tcs_cmd2_data", RSCC_HIDDEN_TCS_CMD0_DATA + 4 * 4) == 0x80000021) {
++	    get(&rscc, "hidden_tcs_cmd2_data", RSCC_HIDDEN_TCS_CMD0_DATA + 4 * 4) == 0x80000000) {
+ 		goto programmed;
+ 	}
+ 	put(&rscc, "rsc_status0_drv0", RSCC_RSC_STATUS0_DRV0, 1u << 24);
+@@ -2034,7 +2055,7 @@
+ 	put(&rscc, "hidden_tcs_cmd0_addr", RSCC_HIDDEN_TCS_CMD0_ADDR, 0);
+ 	put(&rscc, "hidden_tcs_cmd1_data", RSCC_HIDDEN_TCS_CMD0_DATA + 4 * 2, 0);
+ 	put(&rscc, "hidden_tcs_cmd1_addr", RSCC_HIDDEN_TCS_CMD0_ADDR + 4 * 2, 0);
+-	put(&rscc, "hidden_tcs_cmd2_data", RSCC_HIDDEN_TCS_CMD0_DATA + 4 * 4, 0x80000021);    /* a650 and later */
++	put(&rscc, "hidden_tcs_cmd2_data", RSCC_HIDDEN_TCS_CMD0_DATA + 4 * 4, 0x80000000);    /* gen7 [VENDOR]; a650 and later wrote 0x80000021 */
+ 	put(&rscc, "hidden_tcs_cmd2_addr", RSCC_HIDDEN_TCS_CMD0_ADDR + 4 * 4, 0);
+ 	put(&rscc, "override_start_addr", RSCC_OVERRIDE_START_ADDR, 0);
+ 	put(&rscc, "pdc_seq_start_addr", RSCC_PDC_SEQ_START_ADDR, 0x4520);
+@@ -2156,12 +2177,12 @@
+  * 1.8's data at 0x108454: +0x28 is what is in flight, +0x40.. what is in force), its RPMh
+  * channel, and the 3D core's switch and PLLs, which only the GMU's firmware writes.
+  */
+-#define GMU_STATE_ADDRESS       0x108454
++#define GMU_STATE_ADDRESS       0x108454        /* [TODO-DEV] the a6xx firmware's data; on gen7 it may read 0xdeadbeef */
+ 
+ static void
+ gmu_post_mortem(void)
+ {
+-	uint32_t next = rd(gmu.base + GMU_PWR_COL_CP_RESP) & 0xffff, entries = GMU_LOG_SIZE / 16;
++	uint32_t next = rd(gmu.base + GMU_GENERAL_9) & 0xffff, entries = GMU_LOG_SIZE / 16;
+ 	const volatile uint32_t *log = (const volatile uint32_t *)gmu_log.memory;
+ 
+ 	to_memory(gmu_log.memory, GMU_LOG_SIZE);
+@@ -2262,6 +2283,19 @@
+ 	return true;
+ }
+ 
++/* gen7's to_cx_hlvl: the place in the cx rail of the first level at or above `level`;
++ * 0xffffffff: none (the vendor returns the same to say "no cx vote"). */
++static uint32_t
++cx_hlvl(uint32_t level, const uint16_t *cx, unsigned cx_levels)
++{
++	for (unsigned i = 0; i < cx_levels; i++) {
++		if (cx[i] >= level) {
++			return i;
++		}
++	}
++	return 0xffffffff;
++}
++
+ /* dt: kgsl_3d0_reg_memory: the 3D core's registers; a6xx.xml counts in words */
+ static struct block gpu = { "gpu", 0x03d00000, 0x40000 };
+ #define GPU_WORD(n)             (4u * (n))
+@@ -2285,12 +2319,23 @@
+ static bool
+ step_core_power(void)
+ {
++	/* the cape table: dt qcom,gpu-pwrlevels, 13 levels (phk110.dts:20081-20230); `level` is
++	 * qcom,level (the 3D rail's vote), `cx` the qcom,cx-level floor beside it. Index 0 stays
++	 * "off". dt qcom,initial-pwrlevel = <0x0b> (283 MHz) is the level to ask for first. */
+ 	static const struct {
+-		uint32_t khz, level;
+-	} speeds[] = { { 0, 0 }, { 315000, 64 }, { 450000, 128 }, { 550000, 192 } };
++		uint32_t khz, level, cx;
++	} speeds[] = {
++		{ 0, 0, 0 },
++		{ 900000, 0x1a0, 0x1a0 }, { 860000, 0x180, 0x180 }, { 810000, 0x140, 0x140 },
++		{ 760000, 0x100, 0x100 }, { 710000, 0xe0, 0x100 }, { 645000, 0xc0, 0xc0 },
++		{ 580000, 0x90, 0xc0 }, { 510000, 0x80, 0x80 }, { 440000, 0x60, 0x80 },
++		{ 370000, 0x50, 0x80 }, { 325000, 0x40, 0x40 }, { 283000, 0x38, 0x40 },
++		{ 220000, 0x30, 0x40 },
++	};
+ 	static struct hfi_perf_table perf;
+ 	static struct hfi_bw_table bw;
+-	uint32_t core_start[2] = { 0, 0 }, start[1] = { 0 }, vote[4] = { 0, 1, 3, HFI_NO_INDEX }, granted = 0, speed = 0;
++	uint32_t core_start[2] = { 0, 0 }, start[1] = { 0 }, vote[4] = { 0, 1, 12, HFI_NO_INDEX }, granted = 0, speed = 0;
++	/* (12: dt qcom,initial-pwrlevel <0x0b>, 283 MHz, at this table's +1 for the "off" level) */
+ 	uint16_t gfx[16], cx[16], mx[16];
+ 	unsigned gfx_levels, cx_levels, mx_levels;
+ 
+@@ -2305,16 +2350,20 @@
+ 	perf.gpu_levels = sizeof(speeds) / sizeof(speeds[0]);
+ 	for (unsigned i = 0; i < perf.gpu_levels; i++) {
+ 		perf.gpu[i].khz = speeds[i].khz;
+-		perf.gpu[i].acd = 0xffffffff;           /* no adaptive clocking */
+ 		if (!rail_vote(speeds[i].level, gfx, gfx_levels, mx, mx_levels, &perf.gpu[i].vote)) {
+ 			printf("adreno: %u: RPMh has no level %u for the 3D core's rail\n", step, speeds[i].level);
+ 			return false;
+ 		}
+-	}
+-	perf.gmu_levels = 2;
+-	perf.gmu[1].khz = 200000;
++		/* gen7 reads this table's second word of a GPU level as the CX level the speed stands
++		 * on (the vendor repurposed the a6xx "acd" field; to_cx_hlvl gives the place) */
++		perf.gpu[i].acd = cx_hlvl(speeds[i].cx, cx, cx_levels);
++	}
++	perf.gmu_levels = 3;    /* gen7: off, the crystal, 200 MHz (vendor setup_cx_arc_votes) */
++	perf.gmu[1].khz = 19200;        /* the crystal */
++	perf.gmu[2].khz = 200000;
+ 	if (!rail_vote(0, cx, cx_levels, mx, mx_levels, &perf.gmu[0].vote) ||
+-	    !rail_vote(48, cx, cx_levels, mx, mx_levels, &perf.gmu[1].vote)) {  /* "minimum SVS", the vendor's choice */
++	    !rail_vote(0x40, cx, cx_levels, mx, mx_levels, &perf.gmu[1].vote) ||
++	    !rail_vote(0xc0, cx, cx_levels, mx, mx_levels, &perf.gmu[2].vote)) {
+ 		return false;
+ 	}
+ 	printf("adreno: %u: votes: 3D core %#x %#x %#x %#x, GMU %#x %#x\n", step, perf.gpu[0].vote, perf.gpu[1].vote,
+@@ -2390,7 +2439,7 @@
+ 
+ /*
+  * The 3D core takes its orders as words in a ring of memory, which a small processor inside it
+- * ("SQE", with microcode of its own: a660_sqe.fw) reads up to where a register says we have
++ * ("SQE", with microcode of its own: a730_sqe.fw) reads up to where a register says we have
+  * written. Like the GMU it reaches memory through the SMMU: stream 0, to which this gives
+  * context 0, with tables of ours that hold the ring, the microcode and later what is drawn into.
+  * What is written to the core's registers before its processor is started, and in what order,
+@@ -2566,8 +2615,8 @@
+ 		return false;
+ 	}
+ 	PE_parse_boot_argn("adreno_stream1", &stream1, sizeof(stream1));
+-	announce("make the 3D core's memory: its ring, its microcode (fw/a660_sqe.fw), a page to try writing to");
+-	microcode = image_file("fw", "a660_sqe.fw", &size);
++	announce("make the 3D core's memory: its ring, its microcode (fw/a730_sqe.fw), a page to try writing to");
++	microcode = image_file("fw", "a730_sqe.fw", &size);
+ 	if (microcode == NULL || size < 8 || size > 0x40000 ||
+ 	    !block_new(&core_space, &core_ring, CORE_RING_ADDRESS, CORE_RING_SIZE, PTE_CORE) ||
+ 	    !block_new(&core_space, &core_sqe, CORE_SQE_ADDRESS, (uint32_t)size - 4, PTE_CORE | PTE_READ_ONLY) ||
+@@ -2607,7 +2656,7 @@
+  * qcom_mdt_load; adreno_gpu.c: zap_shader_load_mdt): after the header (step 12), TrustZone is
+  * told where the image will be -- the two pages the device tree reserves for it
+  * (reserved-memory gpu_micro_code@8b71a000, the zap-shader node's memory-region) --, the image's
+- * one segment (the file a660_zap.b02, relocatable: at the start of that memory) is put there,
++ * one segment (gen7: the file a730_zap.b01, relocatable: at the start of that memory) is put there,
+  * and TrustZone is asked to authenticate it and run it. The vendor's driver does this before it
+  * starts the 3D core's command processor (a6xx_rb_start: a6xx_microcode_load), Linux after;
+  * this phone's own order is kept. Once that is done the memory is TrustZone's, and nothing
+@@ -2623,7 +2672,7 @@
+  * (Step 21 is what tells whether the 3D core gets out of secure mode with it.) There was a
+  * boot-arg adreno_zap=0 for the second and later runs of a started phone; nothing reads it now.
+  */
+-#define ZAP_MEMORY              0x8b71a000ull
++#define ZAP_MEMORY              0x8b91a000ull   /* dt reserved-memory gpu_microcode (phk110.dts:150; redwood: 0x8b71a000) */
+ #define ZAP_MEMORY_SIZE         0x2000u
+ #define SCM_PAS_MEM_SETUP       SCM_CALL(2, 2)
+ #define SCM_THREE_VALUES        3
+@@ -2651,7 +2700,10 @@
+ 	announce("ask TrustZone to give up a zap shader that a kernel before this one may have left");
+ 	printf("adreno: %u: %s\n", step, zap_unload() ? "TrustZone has given up what it had (it says so with none, too)" :
+ 	    "TRUSTZONE DOES NOT GIVE IT UP: the next answers tell whether it keeps one");
+-	segment = image_file("fw", "a660_zap.b02", &size);
++	/* gen7: the code segment is a730_zap.b01 -- the pulled .mdt's own ELF says so: seg1
++	 * PT_LOAD rwx, 0x8bc bytes (b01: 2236), while seg0/b00 and seg2/b02 are PT_NULL metadata
++	 * [W36 forensic on the ColorOS files; the vendor loader picks b01 the same way] */
++	segment = image_file("fw", "a730_zap.b01", &size);
+ 	if (segment == NULL || size == 0 || size > 0x1000) {
+ 		return false;
+ 	}
+@@ -2789,8 +2841,8 @@
+ 	}
+ 
+ 	announce("give the 3D core its first command, \"initialize\"");
+-	ring_command(CP_ME_INIT, 8);            /* a6xx_cp_init */
+-	ring(0x0000002f);
++	ring_command(CP_ME_INIT, 8);            /* a6xx_cp_init; gen7 turns DMS off with bit 11 [PONG] */
++	ring(0x0000082f);
+ 	ring(0x00000003);                       /* several hardware contexts */
+ 	ring(0x20000000);                       /* error detection */
+ 	ring(0);
+@@ -3168,7 +3220,9 @@
+  * far it has got (a "fence": a submission's number, written by the core when it is through
+  * with it). The caller holds one lock around all of these.
+  */
+-#define GPU_CHIP_ID             0x06030500ull   /* dt: qcom,chipid */
++/* PHK110: dt qcom,chipid = <0x7030002> (phk110.dts:20063); Mesa's freedreno table names it
++ * FD725 / "Adreno730v3" (mesa 25.0.7 freedreno_devices.py:1047) */
++#define GPU_CHIP_ID             0x07030002ull   /* dt: qcom,chipid */
+ #define GPU_ADDRESSES_START     0x20000000ull   /* above everything the steps use; below 4 GB, as Linux keeps them */
+ #define GPU_ADDRESSES_SIZE      0xe0000000ull
+ #define GPU_FENCE_AT            0x40            /* in the scratch page */
+@@ -3266,7 +3320,7 @@
+ 		*value = 0;
+ 		return true;
+ 	case 0x02:                              /* GMEM_SIZE */
+-		*value = 512 * 1024;
++		*value = 2 * 1024 * 1024;       /* 2 MiB [VENDOR gpulist gmem_size][UP a730 gmem] */
+ 		return true;
+ 	case 0x03:                              /* CHIP_ID, with the speed bin above it */
+ 		*value = GPU_CHIP_ID | (uint64_t)speed_bin << 32;
+@@ -3281,10 +3335,10 @@
+ 		*value = 1;
+ 		return true;
+ 	case 0x10:                              /* HIGHEST_BANK_BIT */
+-		*value = 14;
++		*value = 16;                    /* [VENDOR highest_bank_bit] = Mesa's FD725 (16) */
+ 		return true;
+ 	case 0x12:                              /* UBWC_SWIZZLE */
+-		*value = 6;
++		*value = 6;                     /* [TODO-DEV] the reference's 6; this phone's dt says ubwc-mode <0x04> */
+ 		return true;
+ 	case 0x13:                              /* MACROTILE_MODE */
+ 		*value = 1;
+@@ -3725,7 +3779,7 @@
+ static bool
+ start_by_itself(void)
+ {
+-	static const char *const files[] = { "a660_gmu.bin", "a660_sqe.fw", "a660_zap.mdt", "a660_zap.b02" };
++	static const char *const files[] = { "gmu_gen70000.bin", "a730_sqe.fw", "a730_zap.mdt", "a730_zap.b01" };
+ 	const char *missing = NULL;
+ 	uint64_t size;
+ 

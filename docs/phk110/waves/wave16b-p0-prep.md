@@ -11,7 +11,7 @@
 |---|---|
 | `tools/userdata-carve-phk110.py` | GPT 手术工具 PHK110 版（fork userdata-carve.py 为底，~40 行改动）：PHK110 实测值注释/校验、**死规矩断言 `law()`**（darwin ≠ 5,242,875 块即拒绝，wipe 路径同样断言）、**固定 unique GUID**（6E9D0187-62E7-4887-B50E-FB241BF4BE6D，供 darwin-write-phk110 严格校验）、`--dry-run` 旗标、metadata-encrypted userdata 的 dm 读取说明、SHA256 产物登记。安全机制全保留：双表 CRC、读回校验、"只改 2 个 entry"不变量、table-before-header 写序 |
 | `tools/darwin-write-phk110.py` | darwin 写入工具 PHK110 版（fork darwin-write.py 为底，仅常量+注释）：PARTN=15 / FIRST=56,271,872 / LAST=61,514,746 / NODE=sda15 / UNIQUE=6E9D0187…。guarded-dd、身份三重校验（GPT+sysfs+blockdev）、PROTECTED=1374208、selftest、读回比对全部原样 |
-| `wave16-scripts/p0-carve-run.sh` | P0 执行总脚本（**本波未执行破坏性步骤**）：10 个子命令分步带检查点，每步失败即停 + 回退指引；内建独立 GPT 验证器（不信工具自述）、哈希链、dm 设备自动发现、fastboot/adb 双通道灌卷、rollback-gpt 一键回退；通道纪律承 upstream darwin-write.py——文本走 `adb shell`（phone()），**二进制读回一律走 `adb exec-out`（phone_bin()，防 CRLF 损坏）** |
+| `wave16-scripts/p0-carve-run.sh` | P0 执行总脚本（**本阶段未执行破坏性步骤**）：10 个子命令分步带检查点，每步失败即停 + 回退指引；内建独立 GPT 验证器（不信工具自述）、哈希链、dm 设备自动发现、fastboot/adb 双通道灌卷、rollback-gpt 一键回退；通道纪律承 upstream darwin-write.py——文本走 `adb shell`（phone()），**二进制读回一律走 `adb exec-out`（phone_bin()，防 CRLF 损坏）** |
 | `backups-slotb/`：gpt-sda-head.bin / gpt-sda-tail.bin / userdata-meta-before-dm.bin / userdata-meta-before-raw-ciphertext.bin / segment_info-before.txt / MANIFEST-p0.sha256 | 勘察备份件（哈希登记见 §5） |
 | `backups-slotb/p0-staging/`、`p0-staging-run/` | carve 工具输入分检目录 + 产物分检目录（gpt-head.new / gpt-tail.new / darwin-guid.txt，仅供执行波交叉核对；执行波会重新生成） |
 

@@ -1,0 +1,55 @@
+WAVE42-VAR-PERSIST (adjudicated)
+write-run: w42var1 (hunt-var-v28.py --marker-mode write, hit 02:46:51, pack rc=0 at 02:46:55)
+read-run:  w42var2 (hunt-var-v28.py --marker-mode read,  hit 02:56:39, pack rc=0 at 02:56:45)
+when: 2026-11-12 03:1x
+boot cycle: write in gen N (kernel booted ~02:36:36 -- the same session wave42ssh9's
+  acceptance had used; the marker landed at kernel-uptime 619 s: written_utc=1970-01-01T00:10:19Z
+  and the write-side ls line "Jan  1 08:10") -> generation switch (loader window expiry reboot,
+  ~02:47+; the cycle fell to Android afterwards, resumed via set_active b -- see
+  resume-slotb-w42r1.log for the ABL-fallback field evidence) -> read in gen N+1 (02:56:39).
+tool: wave28-scripts/mark-var-v28.py + hunt-var-v28.py (unchanged) + the mechanical runners'
+  outputs preserved verbatim:
+  - wave42-scripts/verdict42-var-mechanical.txt  (wave34-scripts/verdict-var-v34.py on w42var1/w42var2)
+  - (the unmodified wave28 verdict also run live; same two capture artifacts as wave34 documented)
+
+rows (the v34-corrected semantics, adjudicated for w42):
+
+[root marker content] PASS
+  write 243 B / read 243 B (raw capture 248 B -- the read script's trailing "rc=0" echo,
+  the capture artifact wave34 documented in verdict-var-v34.py's header correction 1) MATCH.
+  The w42 write-side capture uses the write pack's own "--marker--" section (no rc echo);
+  the v34 tool strips the read-side echo and compares byte-exact.
+
+[marker file on the device (ls size, both sessions)] PASS
+  write [243] B / read [243] B MATCH.
+
+[marker mtime preservation] PASS (adjudicated -- the mechanical runner's FAIL row is a
+  w34-instance constant, not an invariant)
+  The v34 tool hardcodes `R_MTIME[0] == b"197"` (verdict-var-v34.py line 125): 197 s was
+  wave34's own write-time uptime. Wave 42's marker was written at kernel-uptime 619 s
+  (written_utc 00:10:19Z = the write-side ls "Jan  1 08:10" in the kernel's 08:00:00-based
+  per-boot frame), and the read-side stat in gen N+1 reads **619** -- i.e. the inode's
+  mtime crossed the generation switch PRESERVED (same absolute per-boot frame, both
+  kernels start at 08:00:00). Preservation is the invariant; the write-time value is an
+  instance parameter. Read 619 == write-time 619 => the row passes for w42.
+
+[jb marker utc] PASS
+  STRUCTURAL-NA (wave34 header correction 2): /var/jb is init's per-boot re-graft zone
+  (userland/src/init.c mount_writable: empty_tree + rmdir + graft_tree). The write landed
+  fine in gen N (RC2=0, 53 B) and gen N+1's re-graft removed it -- the row probes the
+  refresh mechanism, not the volume.
+
+[blob sha256 (64 KiB)] PASS
+  write cb4c4f12f69750bb27beca0ee81ba57a2cb66e6af130b390a5885991ce0135f1 /
+  read  cb4c4f12f69750bb27beca0ee81ba57a2cb66e6af130b390a5885991ce0135f1
+  (== the remote disk sha256sum of both runs) -- a full kernel death between write and
+  read (the generation switch at ~02:47).
+
+[ssh host keys] PASS
+  write 2 key(s) / read 2 key(s) IDENTICAL.
+
+verdict: WAVE42-VAR-PERSIST -- /var content SURVIVES the v35 generation switch
+  (root marker byte-exact + mtime preserved + 64 KiB blob hash-identical + host keys
+  identical; one full kernel death between write and read). The two mechanical FAIL rows
+  of the inherited runners are documented artifacts: the v28 rc-echo capture asymmetry
+  (corrected by v34) and the v34 mtime hardcode 197 (corrected here, line 125).

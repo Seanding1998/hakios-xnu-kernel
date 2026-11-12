@@ -1,0 +1,62 @@
+[09:11:26 t+0000.0s] wave45 gates hunt armed (run-id gates0907, deadline 150 min)
+[09:11:26 t+0000.0s] gates on record: A=None B=PASS C=hardware-DONE D=None
+[09:11:26 t+0000.0s] bus: d00d addrs [1] (was None)
+[09:11:26 t+0000.2s] attempt k001 -> rc=255 in 0.2s (out 0 B)
+[09:11:26 t+0000.2s] branch: LOADER-PHASE
+[09:11:26 t+0000.2s] loader answered: silence until +250 s (the exec clock)
+[09:15:27 t+0241.3s] bus: d00d addrs [] (was [1])
+[09:15:59 t+0273.0s] bus: d00d addrs [1] (was [])
+[09:18:12 t+0406.0s] attempt k002 -> rc=0 in 133.0s (out 257 B)
+[09:18:12 t+0406.0s] branch: HIT
+[09:18:12 t+0406.0s] === HIT: entering the gates ladder (open: a,d) ===
+[09:18:15 t+0409.1s] attempt klog -> rc=0 in 3.0s (out 47179 B)
+[09:18:15 t+0409.1s] klog pull: 47165 B in 3.0s
+[09:18:15 t+0409.1s] gate A -> PASS (steps 18, magic True, stays-on True)
+[09:18:23 t+0417.4s] attempt batt-xfer -> rc=0 in 8.4s (out 91 B)
+[09:18:23 t+0417.4s] gate D: battery_probe staged (65944 B, sha 325c24d8f03a)
+[09:18:30 t+0423.8s] attempt battery -> rc=0 in 6.3s (out 1210 B)
+[09:18:30 t+0423.8s] gate D -> PASS (fuelgauge lines 14)
+[09:18:48 t+0441.9s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[09:18:51 t+0444.7s] attempt k003 -> rc=0 in 0.3s (out 257 B)
+[09:18:51 t+0444.7s] branch: HIT
+[09:18:51 t+0444.7s] === HIT: entering the gates ladder (open: d) ===
+[09:18:54 t+0447.7s] attempt klog -> rc=0 in 3.0s (out 47179 B)
+[09:18:54 t+0447.7s] klog pull: 47165 B in 3.0s
+[09:19:04 t+0457.5s] attempt batt-xfer -> rc=0 in 9.8s (out 91 B)
+[09:19:04 t+0457.5s] gate D: battery_probe staged (65944 B, sha 325c24d8f03a)
+[09:19:10 t+0463.8s] attempt battery -> rc=0 in 6.3s (out 1210 B)
+[09:19:10 t+0463.8s] gate D -> PASS (fuelgauge lines 14)
+[09:19:28 t+0482.0s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[09:19:31 t+0484.8s] attempt k004 -> rc=0 in 0.3s (out 257 B)
+[09:19:31 t+0484.8s] branch: HIT
+[09:19:31 t+0484.8s] === HIT: entering the gates ladder (open: d) ===
+[09:19:34 t+0488.0s] attempt klog -> rc=0 in 3.2s (out 47179 B)
+[09:19:34 t+0488.0s] klog pull: 47165 B in 3.2s
+[09:19:44 t+0497.7s] attempt batt-xfer -> rc=0 in 9.7s (out 91 B)
+[09:19:44 t+0497.7s] gate D: battery_probe staged (65944 B, sha 325c24d8f03a)
+[09:19:50 t+0504.0s] attempt battery -> rc=0 in 6.3s (out 1210 B)
+[09:19:50 t+0504.0s] gate D -> PASS (fuelgauge lines 14)
+[09:20:08 t+0522.1s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[09:20:11 t+0524.9s] attempt k005 -> rc=0 in 0.3s (out 257 B)
+[09:20:11 t+0524.9s] branch: HIT
+[09:20:11 t+0524.9s] === HIT: entering the gates ladder (open: d) ===
+[09:20:14 t+0527.9s] attempt klog -> rc=0 in 3.0s (out 47179 B)
+[09:20:14 t+0527.9s] klog pull: 47165 B in 3.0s
+[09:20:22 t+0536.3s] attempt batt-xfer -> rc=0 in 8.3s (out 91 B)
+[09:20:22 t+0536.3s] gate D: battery_probe staged (65944 B, sha 325c24d8f03a)
+[09:20:29 t+0542.6s] attempt battery -> rc=0 in 6.3s (out 1210 B)
+[09:20:29 t+0542.6s] gate D -> PASS (fuelgauge lines 14)
+[09:20:47 t+0560.8s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[09:20:50 t+0563.6s] attempt k006 -> rc=0 in 0.3s (out 257 B)
+[09:20:50 t+0563.6s] branch: HIT
+[09:20:50 t+0563.6s] === HIT: entering the gates ladder (open: d) ===
+[09:20:53 t+0566.6s] attempt klog -> rc=0 in 3.0s (out 47179 B)
+[09:20:53 t+0566.6s] klog pull: 47165 B in 3.0s
+[09:21:02 t+0576.2s] attempt batt-xfer -> rc=0 in 9.7s (out 91 B)
+[09:21:02 t+0576.2s] gate D: battery_probe staged (65944 B, sha 325c24d8f03a)
+[09:21:09 t+0582.5s] attempt battery -> rc=0 in 6.3s (out 1210 B)
+[09:21:09 t+0582.5s] gate D -> PASS (fuelgauge lines 14)
+[09:21:27 t+0600.7s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[09:21:30 t+0604.3s] attempt k007 -> rc=0 in 1.1s (out 257 B)
+[09:21:30 t+0604.3s] branch: HIT
+[09:21:30 t+0604.3s] === HIT: entering the gates ladder (open: d) ===

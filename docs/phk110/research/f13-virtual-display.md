@@ -98,7 +98,7 @@
 
 ### B.1 显示身份（施工单 1）
 
-**结论：loader 侧已就绪，只差 identity.h 重生成（F5 项，非本波新增）。**
+**结论：loader 侧已就绪，只差 identity.h 重生成（F5 项，非本阶段新增）。**
 
 | 项 | 状态 | 出处 |
 |---|---|---|
@@ -165,7 +165,7 @@ redwood upstream 先例：`MiniIOMobileFramebuffer.cpp` 本身 + `docs/ru/notes.
 ### B.6 分波方案（施工单 6）
 
 **阶段 23.x — 虚拟显示环境确认 + 出画取证（一刷，几乎零代码）**
-- 内容：①（可选前置/并行）F5 identity.h 重生成 + loader 重编（不计入本波行数，属既有 F5）；②payload cmdline 追加 `rec_secs=280 rec_ring=1 rec_mb=256 surftrace=24 surftrace_of=backboardd fb_hz=30 loader_return_after=300`（预算余 228 字符，实测增量 ≈ 105 字符，余 ≈123，够；超则去 surftrace_of）；③payload 双 ramdisk/镜像不动；④刷一次，收 logdump + `oem recording`，跑 §B.4 协议。
+- 内容：①（可选前置/并行）F5 identity.h 重生成 + loader 重编（不计入本阶段行数，属既有 F5）；②payload cmdline 追加 `rec_secs=280 rec_ring=1 rec_mb=256 surftrace=24 surftrace_of=backboardd fb_hz=30 loader_return_after=300`（预算余 228 字符，实测增量 ≈ 105 字符，余 ≈123，够；超则去 surftrace_of）；③payload 双 ramdisk/镜像不动；④刷一次，收 logdump + `oem recording`，跑 §B.4 协议。
 - 验收：A 级 = 录屏帧含锁屏或主屏内容且 SpringBoard/backboardd 各 exec 一次；B 级 = swap/CA 行较 b25 增多且无新 crash-loop（进 23.y）；F 级 = 同 b25 无进展 → 转 23.y 逐坑修。
 - 风险：驻留 300 s 内 vnode 满（预存 F6 218 s 教训，cmdline `loader_return_after=300` 与 F6 阈值关系需在波内先核对 v17 的 vnode 参数）；rec_mb 挤内存（用 256）；面板背光/用户观感不在验收内。
 - 行数：cmdline/脚本 ≈ 60-100（mkpayload 侧 + 取证脚本），内核 0，loader 0。

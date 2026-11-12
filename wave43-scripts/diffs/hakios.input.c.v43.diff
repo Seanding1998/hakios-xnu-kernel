@@ -1,0 +1,10 @@
+--- drivers/input/hakios.input.c.v43-orig	2026-11-08 02:02:45.504017450 +0800
++++ drivers/input/hakios.input.c	2026-11-12 00:00:36.250537320 +0800
+@@ -231,6 +231,7 @@
+ 	hakios_s3910_init();
+ 	hakios_buttons_init();
+ 	hakios_battery_init();
++	hakios_fuelgauge_init();      /* the pipeline's source on this phone: the fuel gauge */
+ 	hakios_ufs_init();
+ 	hakios_net_init();
+ 	hakios_adreno_init();

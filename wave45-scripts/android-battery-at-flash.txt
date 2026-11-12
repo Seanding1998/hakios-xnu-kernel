@@ -1,0 +1,8 @@
+when: 2026-11-12 05:47:50 (flash time, NOT same-instant with Hakios)
+capacity:      
+voltage_now:   
+current_now:   
+status:        
+usb_type:      
+temp:          
+cycle_count:   

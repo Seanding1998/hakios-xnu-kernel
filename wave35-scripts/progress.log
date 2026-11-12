@@ -1,0 +1,46 @@
+Wave 35 progress log — GPU prestage (zero-phone, build tree read-only)
+======================================================================
+
+[phase 1] local read-only evidence pass
+- WSL ~/hakios/ listing: kernel/drivers/gpu/{hakios.adreno.c 167033B, hakios.gpu.cpp 43055B}, devices/{phk110,qemu}, refs/{kernel_oneplus_sm8475,modules_dt_sm8475,ios-sweet}
+- hakios.adreno.c header: 22-step wake method, a660 firmware names, chipid-from-DT-only rule, adreno_* boot-arg family
+- hakios.gpu.cpp header: HakiosGPU IOUserClient speaks Linux msm DRM interface verbatim; userland shim tools/mesa/hakios-drm stands in for libdrm
+- hakios_gpu_parameter (adreno.c:3257): params 0x01..0x13 read (GMEM_SIZE 512K, CHIP_ID, HIGHEST_BANK_BIT 14, UBWC_SWIZZLE 6, MACROTILE 1)
+- tools/mk-mesa.sh: Mesa pin 25.0.7, SHA256 592272df..., DRIVERS=softpipe,freedreno, tools/mesa/*.patch set
+- phk110.dts GPU facts: qcom,kgsl-3d0@3d00000 "qcom,adreno-gpu-gen7-4-0" chipid 0x7030002 Adreno730v3 (dts:20051-20063); rscc reg 0x3d50000+0x10000; kgsl-smmu@3da0000 qsmmu-v500 actlr 0x32b 21 banks/24 SMR (dts:19756); gpucc cape @3d90000 (dts:838); gmu qcom,gmu@3d69000 reg 0x3d68000+0x37000 + gmu_pdc 0xb290000 + mbox "aop" (dts:20301); zap reserved 0x8b91a000+0x2000 (dts:150)
+- vendor refs on disk: OnePlusOSS sm8475 drivers/gpu/msm has full gen7 kgsl family (adreno_gen7*.c, gen7_reg.h, adreno-gpulist.h); gpulist gen7_4_0 entry (compatible "qcom,adreno-gpu-gen7-4-0") = gmem 2M, highest_bank_bit 16, a730_sqe.fw/gmu_gen70000.bin/a730_zap, GMU_VERSION(4,0,7)
+- TASK-INPUT CORRECTION: task brief said gen7-gmu@3d6a000; this phone's DTB says qcom,gmu@3d69000 with reg window 0x3d68000 (0x3d6a000 is mainline sm8450 numbering)
+
+[phase 2] MIX Fold 2 (zizhan) case study
+- qiumochen/UniXNU-zizhan: repo metadata + full root listing + drivers/{PongAdreno,PongMetal} listings + README_EN.md + proprietary-files.txt + docs/progress/STATUS.md
+- GPU verdict: Adreno 730 via Turnip + metal2vulkan; custom XNU kernel driver (NativeAdreno MIT core + PongAdreno SM8475 adaptation layers sourced from NothingOSS sm8475 gen7 kgsl); NOT hakios.adreno adaptation, NOT freedreno GL, NOT ios-sweet fake driver
+- zizhan GPU status: GPU-01 DEVICE_VERIFIED, 95.3 fps synthetic moving scroll vs 56.7-58.4 baseline, wallpaper GPU disabled, cold-start canvas failure (g342) unresolved [self-reported]
+- lineage: derived from Chengdong-Yu/UniXNU-pong (Nothing Phone 2, SM8450 = Adreno 730 too); pong is the first Adreno-730 UniXNU machine
+- extracted SM8475 GPU facts: chipid->GMU 0x07030200, GMU timer 0x16220/24, HFI 17 header slots/210 dwords/queues@848/3 queues, RSCC seq mem dword 0x180, GMEM 2MiB, PAS13, zap b01=code b02=cert/hash, SQE skip header dword, CP_ME_INIT DMS bit11, LPAC SID1/0x401, ACTLR 0x32b, GMU SID5/0x405, SPI300/INTID332, cape GPUCC PLL0 0x1d/0xb000 PLL1 0x34/0x1555, PERF 58-word/BW 159-word payloads
+
+[phase 3] mainline + vendor + Mesa references
+- torvalds/linux drivers/gpu/drm/msm/adreno/ fetched (a7xx_catalog.c, a6xx_catalog.c, a6xx_gmu.c, a6xx_gpu.c, adreno_device.c, adreno_gpu.c, a6xx_gmu.h, sm8450.dtsi)
+- mainline a730 entry: chip_ids 0x07030001 ONLY; fw a730_sqe.fw + gmu_gen70000.bin, gmem SZ_2M, zapfw a730_zap.mdt, gmu_cgc_mode 0x00020000; 0x07030002 NOT in catalog (mainline would not match this chip)
+- mainline gen7 GMU chipid formula (a6xx_gmu.c:1012-1036): (chip & 0xffff0000)|((chip<<4)&0xf000)|((chip<<8)&0x0f00) -> 0x07030002 becomes 0x07030200; written to REG_A7XX_GMU_GENERAL_10 (+GENERAL_8 log); gen7 TCM retention via CX_MISC_TCM_RET_CNTL; fence range lower 0x8a0/upper 0x32
+- Mesa 25.0.7 freedreno_devices.py:1047: GPUId(chip_id=0x07030002, name="FD725") "named as Adreno730v3 or Adreno725v1", CHIP.A7XX a7xx_gen1, highest_bank_bit 16 — identity confirmed in the pinned Mesa
+- Mesa 26.0.0 relnotes read directly: a7xx batch (GRAS_LRZ_CB_CNTL, LRZ metadata, BV ROQ status regs, concurrent binning)
+
+[phase 4] deliverables
+- scratch/wave35/patches/{README.md, 0001-a730-identity.patch, 0002-a730-address-map.patch, 0003-a730-firmware-names.patch, 0004-a730-gmu-rscc.patch, 0005-a730-smmu-cp-params.patch} — skeletons only, repo-external, not applied (Wave 34 builds v24 in the same tree)
+- wave35-scripts/pull-firmware-root.sh written (Magisk root staging; scope GPU+WiFi+audio; modem left to v0.7; BDF discipline points at wave30 check gate)
+- pull-firmware-root.sh self-test: bash -n PASS; --dry-run PASS with zero adb calls (manifest + 6-step plan + host-side follow-ups printed)
+- .gitignore: wave35-scripts/fw-stage/ + fw-phk110/ added (never commit firmware)
+- docs/waves/wave35-gpu-prestage.md written (verdicts / case study / adaptation design + diff table / work orders / honest boundaries)
+
+[phase 5] red lines
+- zero adb/fastboot/phone calls this wave: PASS (grep of log = none; dry-run never calls adb)
+- ~/hakios/ written = zero (only ls/wc/head/grep/sed read-only) : PASS
+- upstream-manifest.txt untouched : PASS
+
+[open items -> next wave]
+- real firmware pull + a730 real names (needs device idle)
+- TODO-DEV items listed in scratch patches README and wave35 doc §5/§6
+[phase 6] done
+- commit 724e8e4 on main (4 files, 366 insertions): .gitignore + docs/waves/wave35-gpu-prestage.md + wave35-scripts/{pull-firmware-root.sh,progress.log}
+- other agents working-tree changes (docs/STATUS.md, wave34-scripts/, f17-scripts/, wave28 progress.log, device-layer report) left untouched by design
+- scratch/wave35/patches verified on disk: README + 0001..0005

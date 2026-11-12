@@ -1,0 +1,7 @@
+[resume-w42r2 03:59:56] waiting for the Android state (22d9:2765/2769)...
+[resume-w42r2 03:59:57] adb reboot bootloader
+[resume-w42r2 04:00:02] waiting for the ABL fastboot gadget
+usbipd: info: Using IP address 127.0.0.1 to reach the host.
+[resume-w42r2 04:00:31] FIELD EVIDENCE: current-slot at resume = a (the fall-to-Android flipped the active slot off b)
+[resume-w42r2 04:00:31] set_active b done
+[resume-w42r2 04:00:32] STOP: slot did not take (still (Success)))

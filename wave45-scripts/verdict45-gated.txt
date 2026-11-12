@@ -1,0 +1,53 @@
+wave45 gate D -- the battery (wave43 S1-S3 device side)
+when: 2026-11-12 09:21:09
+tool: /var/battery_probe (sha256 325c24d8f03acf7ad1090ba4061261713045efc06297e86edc56411ec9fc6c47), sysctlbyname of the wave43 oids, two samples spaced 6 s
+verdict: PARTIAL -- S1 bus PASS (arbiter 0x70000000/768 channels, verbatim vs wave43 s7), S2 archive recorded NEGATIVE (none of the four PM8350B blocks is in this arbiter's table), S3 gauge FAIL (bq27541 does not answer -> nothing fed, by the wave43 honest-boundary design: no service instead of a fake 0%). The sysctl read chain itself is proven: 10/10 kern.hakios.battery_* oids readable, two spaced samples identical, battery_soc = -1 (the unfed sentinel). The runner's initial PASS line judged only the read chain; the wave43 s7 gate is PARTIAL.
+
+==SYSCTL-1==
+BATTERY_PROBE: kern.hakios.battery_soc = -1
+BATTERY_PROBE: kern.hakios.battery_voltage_mv = -1
+BATTERY_PROBE: kern.hakios.battery_current_ma = 0
+BATTERY_PROBE: kern.hakios.battery_temperature_c = -273
+BATTERY_PROBE: kern.hakios.battery_present = 0
+BATTERY_PROBE: kern.hakios.battery_charger_present = 0
+BATTERY_PROBE: kern.hakios.battery_charging = 0
+BATTERY_PROBE: kern.hakios.battery_soc_estimated = 0
+BATTERY_PROBE: kern.hakios.battery_charger_action = -1
+BATTERY_PROBE: kern.hakios.battery_full_uah = 0
+BATTERY_PROBE: readable 10 of 10 oids
+==SYSCTL-2==
+BATTERY_PROBE: kern.hakios.battery_soc = -1
+BATTERY_PROBE: kern.hakios.battery_voltage_mv = -1
+BATTERY_PROBE: kern.hakios.battery_current_ma = 0
+BATTERY_PROBE: kern.hakios.battery_temperature_c = -273
+BATTERY_PROBE: kern.hakios.battery_present = 0
+BATTERY_PROBE: kern.hakios.battery_charger_present = 0
+BATTERY_PROBE: kern.hakios.battery_charging = 0
+BATTERY_PROBE: kern.hakios.battery_soc_estimated = 0
+BATTERY_PROBE: kern.hakios.battery_charger_action = -1
+BATTERY_PROBE: kern.hakios.battery_full_uah = 0
+BATTERY_PROBE: readable 10 of 10 oids
+==SYSEXIST==
+ls: cannot access '/sys/class/power_supply': No such file or directory
+==D==DONE
+
+fuelgauge / HakiosBattery lines from the pulled log text:
+  fuelgauge: the fuel gauge of the battery, mode 2 (the readings of the gauge and of the charger)
+  fuelgauge: step 1: map the PMIC arbiter (0xc400000, 0xc42d000, 0xc440000) and read its version
+  fuelgauge: the PMIC arbiter is version 0x70000000, 768 channels
+  fuelgauge: step 2: look through the arbiter's table for the channels of the charger's four blocks
+  fuelgauge: no channel of the arbiter is the PM8350B's charger block (slave 3, peripheral 0x10)
+  fuelgauge: no channel of the arbiter is the PM8350B's battery interface (slave 3, peripheral 0x12)
+  fuelgauge: no channel of the arbiter is the PM8350B's USB input block (slave 3, peripheral 0x13)
+  fuelgauge: no channel of the arbiter is the PM8350B's Type-C block (slave 3, peripheral 0x15)
+  fuelgauge: none of the charger's blocks is in the arbiter's table: no charger readings (the gauge does not need the arbiter, and is tried regardless)
+  fuelgauge: step 3: ask each block what it is (registers 0x04 and 0x05). No table of the SMB5 types and subtypes is authoritative in the GPL tree, so what they say is recorded, not judged
+  fuelgauge: step 4: map the pin controller and ask the gauge at 0x55 (GPIO 26 data, 27 clock) for its four main registers
+  fuelgauge: the gauge does not answer, or answers nonsense: nothing is fed to the battery (the status bar keeps whatever it shows without a battery)
+  fuelgauge: stopping here (fuelgauge_steps=5)
+  com.apple.xpc.launchd|1970-01-01 08:00:52.621427 <Notice>: boot-args = debug=0x8 rd=md0 ufs_shared_pa=0x00000000fa5ad000 hakios_kver=2.1.13-hakios-darwin22.5-sm8475-g96ffbc53-dirty serial=0 loader_return_after=600 small_cores_after=0 touchscreen=1 buttons=1 buttons_map=1 buttons_core=0xc400000 buttons_cnfg=0xc42d000 buttons_obs=0xc440000 cpus=8 bootcpu=7 soc_ipa_base=0x3e40000 soc_gsi_base=0x3e04000 soc_ipcc=0xed18000 soc_rsc=0x17a20000 soc_mpss_mem=0x8bc00000 modem_ipa_fw_at=0x8b910000 soc_ipa_stream=0x5c0 soc_ipa_stream_uc=0x5c2 soc_ipa_fw=ipa_fws ufs=2 ufs_write=1 var_hfs=ufs_darwin_data root_apfs=ufs_darwin hw_target=D22ap en0_addr=10.0.0.2 gpu=1 fuelgauge=2
+
+note: /sys/class/power_supply is the ANDROID-side path; on Hakios the readout
+is the kern.hakios.battery_* sysctls above (wave43 s7), read here through
+sysctlbyname because the carrier ships no /usr/sbin/sysctl. The same-instant
+Android pairing stays with the user.

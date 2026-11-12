@@ -1,0 +1,25 @@
+=== AdrenoPM4: repos API license field ===
+{"default_branch":"main","license":{"key":"mit","name":"MIT License","node_id":"MDc6TGljZW5zZTEz","spdx_id":"MIT","url":"https://api.github.com/licenses/mit"},"pushed_at":"2026-10-24T18:04:55Z","size":29}
+=== AdrenoPM4: /license endpoint ===
+{"name":"MIT License","path":"LICENSE","sha":"9bcaf670ca29916983de09d9659d5fa8c7895660","size":1079,"spdx":"MIT"}
+=== AdrenoPM4: root listing ===
+file	AGENTS.md	2132
+file	AdrenoConstants.c	3590
+file	AdrenoConstants.h	2391
+file	AdrenoPM4.c	2939
+file	AdrenoPM4.h	1630
+file	AdrenoRaster.c	3320
+file	AdrenoRaster.h	2014
+file	AdrenoShader.c	4250
+file	AdrenoShader.h	2008
+file	AdrenoVPC.c	6543
+file	AdrenoVPC.h	1920
+file	LICENSE	1079
+file	README.md	281
+file	test_constants.c	7473
+file	test_pm4.c	5137
+file	test_raster.c	5653
+file	test_shader.c	9202
+file	test_vpc.c	9539
+=== AdrenoPM4: HEAD ===
+282606b528b2595bc4274ea7490b62b323f35a5f	2026-10-24T18:03:54Z	docs: document component scope and shared porting workflow

@@ -1,0 +1,14 @@
+[03:21:25 t+0000.0s] gltest runner armed (run-id w42gl2, deadline 60 min, size 'default'; wave41-s6 criteria)
+[03:21:45 t+0020.1s] attempt klog#1 -> rc=255 in 20.1s (out 0 B -> gltest-w42gl2-klog-01.out)
+[03:22:05 t+0040.1s] attempt gl#1 -> rc=255 in 20.1s (out 0 B -> gltest-w42gl2-gl-01.out)
+[03:22:05 t+0040.1s] gl attempt state=no-session: no remote output (connect/session phase failed; ssh rc=255)
+[03:22:05 t+0040.1s] no verdict yet (connect phase, ssh rc=255); LOADER SILENCE for 260 s -- the failed attempts' netmode on/off commands keep refreshing the service window (each command pushes usb_service_mark out), so a fast retry livelocks the loader in the window phase and the kernel never returns (the wave27 LOADER_SILENCE lesson)
+[03:26:26 t+0300.6s] attempt klog#2 -> rc=1 in 0.5s (out 51 B -> gltest-w42gl2-klog-02.out)
+[03:26:26 t+0301.1s] attempt gl#2 -> rc=0 in 0.5s (out 15 B -> gltest-w42gl2-gl-02.out)
+[03:26:26 t+0301.1s] gl attempt state=remote-fail: gl_test exited 1 (context or program failure)
+[03:26:26 t+0301.1s]   | GL_RC=1
+[03:26:26 t+0301.4s] attempt fill#1 -> rc=0 in 0.3s (out 46 B -> gltest-w42gl2-fill-01.out)
+[03:26:26 t+0301.4s] fill profile rc=0 (46 B captured)
+[03:26:27 t+0301.8s] attempt u2f#1 -> rc=0 in 0.4s (out 46 B -> gltest-w42gl2-u2f-01.out)
+[03:26:27 t+0301.8s] u2f_test rc=0 (46 B captured)
+[03:26:27 t+0301.8s] DONE (state=remote-fail): the GL evidence set is in wave38-scripts/gltest-w42gl2-*.{{out,err}}

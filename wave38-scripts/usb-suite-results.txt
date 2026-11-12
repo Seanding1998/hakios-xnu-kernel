@@ -1,0 +1,56 @@
+== wave38 isolation harness (P0-2 + P0-1/P1-2 + P0-3/P1-1 generations) ==
+  PASS P0-2 sends stopped by the gate (21 beats over 500 s, not 1000)
+    [dbg T1] send_calls=21 send_fail=21 total=21 code=8000000b stale=0 expect=0 refused=979 lines=21\n  PASS P0-2 the episode counter holds first+beats
+  PASS P0-2 the refusal code is kept
+  PASS P0-2 the reader-death ledger stays clean (not lumped in)
+  PASS P0-2 the refusal print exists and is bounded
+  PASS P0-2 success ends the episode (r == 4)
+  PASS P0-2 the episode counters reset on success
+  PASS P0-2 a fresh episode announces as the first (x1)
+    [dbg T3] stale=1 aborts=0 state=0
+  PASS stale: the unread reply is counted (the wait consumed the queued tail)
+  PASS stale: the state machine is back to idle after the tail
+  PASS stale: the gate engages by the third unread
+  PASS stale: the gate lifts with a clean backoff on success
+  PASS wall gate: the first refusal is announced
+  PASS wall gate: the beat holds the submit
+  PASS wall gate: the probe goes per beat
+  PASS TC1 A's cleanup left the endpoint faulted (bounded, not assumed)
+  PASS TC1 B cannot submit while A is retiring
+  PASS TC1 the Connected lifted the fault and retired the tail
+  PASS TC1 B then submits cleanly and gets its own length
+  PASS TC2 A's short reply is not credited
+  PASS TC2 B's own 17-byte reply is credited in full
+  PASS TC3 A retired clean before the batch
+  PASS TC3 the bus reset fails the wait (A's bytes NOT credited as B's reply)
+    [dbg TC3] r=-1 state=0 fault=0 resets=1
+  PASS TC3 the cleanup drained the state back to idle
+  PASS TC3 the next reply after the reset works in full
+  PASS TC4 the wait reports the disconnect
+    [dbg TC4] r=4 state=0 stale=0 fault=0
+  PASS TC4 the next request is answered by its own completion only
+  PASS TC4 no stray OUT noise was invented
+  PASS TC5 the timed-out receive keeps its identity
+  PASS TC5 the standing transfer completed for the new consumer (no second submit)
+  PASS TC6 the done slot holds the standing receive's completion
+  PASS TC6 the serve ran the fastboot handler
+  PASS TC6 the serve submitted the IN reply
+  PASS TC6 no OUT re-arm happened before the serve (the old order's race is gone)
+  PASS TC7 the state machine drained to idle (or faulted honestly)
+  PASS TC7 the Connected retired the lingering cancel
+  PASS TC7 the next receive works after the timeout's cleanup
+    [dbg TD1] zombified: wall_last=1900000000 last_progress=100000000 born=100000000 now=2000000000
+    [dbg TD1] rebuild returned: rebuilds=1 fault=0 ready=1 start_ex=1
+  PASS TD1 the pure-0xC zombie (stale=0) FIRES the bounded recovery
+  PASS TD1 the recovery retired both endpoints through the drains (aborts issued)
+  PASS TD1 the recovery re-threw the bring-up (start_ex called)
+  PASS TD1 the recovery's success line says SET_CONFIG is still owed
+  PASS TD2 recent progress vetoes the recovery
+  PASS TD3 the bring-up's 150 s grace vetoes a young generation
+  PASS TD4 a recent enumeration vetoes the recovery
+  PASS TD5 an ancient wall refusal is not failure evidence now
+  PASS TD6 the first recovery fired
+  PASS TD6 the cap of two holds
+  PASS TD6 the per-window reset lets a fresh window recover again
+  PASS TD7 the session's hard gate blocks any recovery
+== 49 passed, 0 failed ==

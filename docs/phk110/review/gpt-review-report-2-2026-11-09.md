@@ -21,7 +21,7 @@ UsbDeviceSend: Failed to submit data transfer: Device Error
 
 按项目已有的指令级分析，`physical endpoint[2]` 对应 **逻辑 EP1-OUT，端点地址 `0x01`，也就是电脑向手机发送命令和数据的入口**。
 
-`DwcPrepareURB` 在准备传输时读取 vendor 的软件端点状态，发现它为 `0`，于是返回 `0x8000000C`。这次请求在传输准备阶段就被拒绝，随后错误沿调用链逐层打印。因此，一组四行通常对应一次失败提交。照片上的大量重复，说明上层一直在重新提交。[端点映射与错误判据](docs/research/f12-ep2-not-configured.md)
+`DwcPrepareURB` 在准备传输时读取 vendor 的软件端点状态，发现它为 `0`，于是返回 `0x8000000C`。这次请求在传输准备阶段就被拒绝，随后错误沿调用链逐层打印。因此，一组四行通常对应一次失败提交。照片上的大量重复，说明上层一直在重新提交。[端点映射与错误判据](../research/f12-ep2-not-configured.md)
 
 **我需要据此收紧上一份报告的判断。对于照片中这些提交，"只是没有排入接收请求"的解释已经不够，直接原因已经明确为 vendor 软件端点状态未配置。**
 

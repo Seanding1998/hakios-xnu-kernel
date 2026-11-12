@@ -1,13 +1,13 @@
 # HakiOS → PHK110（一加 Ace 2 / SM8475 "Cape"）移植项目 · 总体规划
 
-> 版本：1.1（2026-11-10：吸收 F14/F15/阶段 30 情报——WCN6750 口径勘误、IPA v5.1 勘误、MHI GPL 工作项、情报节奏入协议）· 维护者：PHK110 移植团队
+> 版本：1.2（2026-11-12：v0.4 达尔文 / v0.5 GPU 真·首帧达成入册；当前前线 = 电量显示 + 桌面 GPU 接入；v1.1 的 F14/F15/阶段 30 情报口径不变）· 维护者：PHK110 移植团队
 > 技术基线事实见 `M0-PROGRESS.md`，本文件只管"怎么走、谁来做、何时算完成"
 
 ---
 
 ## 1. 愿景与范围
 
-**目标**：在一加 Ace 2（PHK110，骁龙 8+ Gen 1 / SM8475 / BL 已解锁）上，把 HakiOS 从"POCO X5 Pro 专属研究平台"扩展为可日常使用的第二系统（`fastboot boot` RAM 启动，不碰分区，重启回 ColorOS）。
+**目标**：在一加 Ace 2（PHK110，骁龙 8+ Gen 1 / SM8475 / BL 已解锁）上，把 HakiOS 从"POCO X5 Pro 专属研究平台"扩展为可日常使用的第二系统（运行形态：`boot_b` 槽位刷写 + 常驻循环，日常安卓在 `boot_a` 由 A/B 回退保障，重启回 ColorOS）。
 
 **终点定义（v1.0）**：功能状态等效于上游 `docs/devices/redwood.md` 设备页 —— 显示/触摸/按钮/8 核/GPU(OpenGL ES)/Wi-Fi/存储(/var 持久化)/音频/电池/振动/热管理可用，蜂窝半通，蓝牙缺失步一。
 
@@ -40,12 +40,13 @@
 - **验收**：屏幕可见 HakiOS logo；XNU banner 上屏
 - **🎯 实际达成（路线转向红利）**：udonPkg 底座自带本机原生显示栈——厂商 DisplayDxe（含 NT37705 init）+ splash fb @0xB8000000 1240×2772 32bpp。Boot #6 UniXNU 菜单出画（现场拍照实证）→ Boot #7/8 XNU banner + 内核日志上屏滚动 → Boot #12 同链验证。GPL panel init 序列副本（intel/wave1b-scripts/）保留作后续内核态显示驱动（v0.5+ GPU 路线）参考
 
-### v0.3 「触感」— XNU 真机常驻 + 输入（**进行中，前半已达成 2026-11-03 Boot #13**）
+### v0.3 「触感」— XNU 真机常驻 + 输入 ✅ **达成（2026-11-03，Boot #13→#21）**
 - **内容**：XNU 真机验证常驻运行；**新写 Synaptics S3910 触摸驱动**（参照 drivers/*/hakios.goodix 骨架 + Linux synaptics_tcm 协议）；电源/音量键（PMIC）；8 核全开
 - **验收**：8 核在线（bootcpu=7）、屏幕触摸可点、电源键响应
-- **🎯 全部达成（2026-11-03，Boot #13→#21 三波）**：✅ XNU 常驻（stub launchd + 300s 长会话零 panic）；✅ 8 核全开（`small_cores_after=0` 同起，7 AP 8ms 内上线）；✅ 电源/音量键（SPMI v7 仲裁器适配，**真人按键毫秒级取证**）；✅ S3910 触摸（Boot #21：`TouchComm v1 firmware: mode 0x1, S3910PA0B0-15.2` + `touch screen ready`，probe 链 identify→app-info→config→enable 全通，max x/y 与 1240×2772 面板吻合；集中修复第三次刷写 v10c→d→e，root cause = 续读分帧 9B/CS 帧 + 20ms 重武装节拍）。**已知边界**：坐标流（真人点屏上报）待下一次会话验证——驱动已 ready，boot-arg 可选触发
+- **🎯 全部达成（2026-11-03，Boot #13→#21 三刷）**：✅ XNU 常驻（stub launchd + 300s 长会话零 panic）；✅ 8 核全开（`small_cores_after=0` 同起，7 AP 8ms 内上线）；✅ 电源/音量键（SPMI v7 仲裁器适配，**真人按键毫秒级取证**）；✅ S3910 触摸（Boot #21：`TouchComm v1 firmware: mode 0x1, S3910PA0B0-15.2` + `touch screen ready`，probe 链 identify→app-info→config→enable 全通，max x/y 与 1240×2772 面板吻合；集中修复第三次刷写 v10c→d→e，root cause = 续读分帧 9B/CS 帧 + 20ms 重武装节拍）。**已知边界**：坐标流（真人点屏上报）待下一次会话验证——驱动已 ready，boot-arg 可选触发
 
-### v0.4 「达尔文」— 用户空间可用（**方案定稿 2026-11-03，外援咨询 + upstream 验证**）
+### v0.4 「达尔文」— 用户空间可用 ✅ **达成（2026-11-11 正式宣告）**
+- **🎯 最终验收（三级门全绿）**：最小功能门 ✅ + 稳定性门 ✅（3 独立 SSH 连接 + 256 KiB 校验传输 + 退出后管理通道 OKAY，`verdict27-20261110-060630.txt`）+ 项目门 ✅（/var 跨内核死亡持久 6/6：`verdict34-var.txt`；v35 复验 `verdict42-var.txt`）。构成 = 存储 S0-S8（Boot #22-24）+ launchd 28 进程（Boot #25）+ 桌面出画（2026-11-09）+ USB 服务通道（Boot #38）+ SSH 数据面（阶段 27）+ 1800s 会话帽端到端。越狱体验（root SSH + Sileo + 签名强制关闭）同期天然达成。
 - **🎯 实际进展（2026-11-10 晨，详 docs/STATUS.md 更新㉖）**：存储六步 S0-S8 ✅（Boot #22-24）+ P0 carve 12G HFS+ ✅ + **Apple launchd 真身 28 进程全跑（Boot #25，hw_target EINVAL 双修复）** + **iOS 桌面真机出画（2026-11-09，屏幕目视 + logdump 双源）** + USB serving 打通（H4 = 复位流程缺陷已修，v20 后墙零复现）+ **🏆 SSH 进 Darwin shell 达成（2026-11-10，阶段 27：3 独立连接 uname Darwin/uid=0 root/各异标记 rc=0 + 256KiB 校验传输 + 退出后管理通道 OKAY，verdict27-20261110-060630.txt）** + v23 1800s 会话帽端到端实证；**验收剩余 = /var 重启持久复验 + 可重复步骤归档（阶段 28 进行中），达标即宣告 v0.4**。技术史注：SSH 曾被三个主机侧确定性协议缺陷阻塞（ARP 字段写反/握手 ACK 序号差一/跨端口 RST 误杀，外部审阅定位）+ MSS≈160B 环上限（wave21 ping 只验过 100B）——全部主机侧修复，零刷写达成。原"难点 UFS+SMMU"被 阶段 15 预研削平（vendor UFSDxe 沿用 + 只读/有界写路径，R1 数据面 FNV 清白）。
 - **物料矩阵（锁定，不得混装）**：IPSW = `iPhone10,3,iPhone10,6_16.5_20F66_Restore.ipsw`（iPhone X / A11 / **arm64** 切片，禁碰 arm64e——CPU_SUBTYPE 不同 + shared cache AUTH 区需 PAC，本机 PAC 未验证）；dyld = 同 IPSW 的 `dyld_shared_cache_arm64`（不重建、不拆 loose dylib）；trust/identity/SystemOS 全取同一 20F66 set。**upstream qemu.md 用的正是这一份**（已核验）。
 - **安全策略（⚠ 关键认知修正）**：DEVELOPMENT ≠ 安全机制自动关闭——`config_enforce_signed_code` 仍在 KERNEL_BASE，AMFI/MACF/Sandbox 照常编译。v0.4 显式处理：`cs_enforcement_disable=1` boot-arg（DEVELOPMENT 非 SECURE_KERNEL 可用）+ HakiOS 式最小 policy stub（miniamfi/kern_minimac 类，upstream 同版本实测可行）；stock 信任链（AMFI/trust cache）后置到 fidelity 阶段。
@@ -54,16 +55,18 @@
 - **依赖**：20F66 IPSW 自备（约 7.4GB+，ipsw.me 或 Apple 官方渠道均可）。
 - 参考：UniXNU-udon（takasugl，本机同款 udon）已走通 native UFS → iPadOS 用户空间（117 进程）——路径先例强度高。
 
-### v0.5 「图形」— GPU（Adreno 730 / a7xx）（**路线裁决 2026-11-03**）
-- **主路线（低风险，upstream 已实机证明）**：跟随 upstream 架构——hakios.adreno.c 内核 GPU 驱动的 a6xx→a7xx 适配 + Mesa freedreno 对接。**upstream CHANGELOG 已核验：Mesa 25.0.7 freedreno，GL=1 流畅绘制、壁纸上屏（参考机实机 GPU 渲染达成）**。我们的工作 = 驱动适配 + Mesa 版本跟进（freedreno 已有 a7xx 支持）。**F15 佐证（2026-11-10）**：第三方 raphael fork（SD855 / Adreno 640）freedreno GLES 3.2 真机绘制达成 = freedreno-on-XNU 第三台机先例，主路线信心上调（同时其 Metal 缺席佐证 Metal 移植非平凡，维持 upstream"metal 先行 buffers/libraries"策略）。
-- **前置物料（F14 Top3 勘定，2026-11-09；详情 docs/research/f14-sd778g-zendot-survey.md）**：①**pull-firmware-root.sh 模板化 = v0.5 开工第一步**（从我们安卓拉 GPU/WiFi/音频固件：Magisk root + vfat fmask=0337 root 暂存法，上游同族实测 837 文件 313MB/10.7s）；②选择性版本落差同步（gpu.cpp +4KB / fb_beam sc7280 门控陷阱 / metal.args 范式）；③工具先例 = 阶段 30 已把固定源码管线范式跑通（`wave30-scripts/mk-ath11k.py` 源码就绪，03310d7）。PHK110 固件物料清单已勘定：a730_zap.mbn 主线同族在案（GPU 侧固件仅 ~137KB 级）。
+### v0.5 「图形」— GPU（Adreno 730 / a7xx）✅ **真·首帧达成（2026-11-12 宣告）**
+- **🎯 实际达成**：内核侧首亮（2026-11-11，镜像 v27–v33 七刷七判：自研 Adreno 730 驱动上电步进 21 步全绿，3D 核接受命令并写内存）→ 下半场 Mesa 25.0.7 freedreno 本树构建绿（阶段 39）→ 外部评审四三缺陷独立验证确认 + 四项修复（阶段 40/41：fence 事件字段化 `0x08000031` / NC_MODE vendor 公式 / gl_test 结构化验收 / 并发 binning 编译期门）→ **v36 上机四门判定（阶段 45）：步进回归 PASS / fence 探针 PASS / 硬件渲染 DONE（`backend=hw renderer=FD725`，OpenGL ES 3.2，1080×2400 出图 19 ms + 人眼目击）/ 电量 PARTIAL**。boot_b = v36 `e6ca0b43…`。
+- **剩余（转入 v0.5 后续）**：电量门 PARTIAL（S2 通道表布局证伪 + S3 bq27541 无应答，输入已记录）；桌面窗口服务器（WindowServer/CoreAnimation）接入 GPU。
+- **主路线（已验证）**：跟随 upstream 架构——hakios.adreno.c 内核 GPU 驱动的 a6xx→a7xx 适配 + Mesa freedreno 对接。**upstream CHANGELOG 已核验：Mesa 25.0.7 freedreno，GL=1 流畅绘制、壁纸上屏（参考机实机 GPU 渲染达成）**。**F15 佐证（2026-11-10）**：第三方 raphael fork（SD855 / Adreno 640）freedreno GLES 3.2 真机绘制达成 = freedreno-on-XNU 第三台机先例。**阶段 44 佐证（2026-11-12）**：UniXNU/Adreno740 同代原生驱动八仓对照，fence 事件字段逐位佐证我们的修复。
+- **前置物料（F14 Top3 勘定，2026-11-09；详情 docs/research/f14-sd778g-zendot-survey.md）**：①**pull-firmware-root.sh 模板化 = v0.5 的第一步**（从我们安卓拉 GPU/WiFi/音频固件：Magisk root + vfat fmask=0337 root 暂存法，上游同族实测 837 文件 313MB/10.7s）；②选择性版本落差同步（gpu.cpp +4KB / fb_beam sc7280 门控陷阱 / metal.args 范式）；③工具先例 = 阶段 30 已把固定源码管线范式跑通（`wave30-scripts/mk-ath11k.py` 源码就绪，03310d7）。PHK110 固件物料清单已勘定：a730_zap.mbn 主线同族在案（GPU 侧固件仅 ~137KB 级）。
 - **实验备选（外援建议，待实测）**：最小 KGSL 兼容 ABI → Turnip-KGSL → Vulkan → Zink → GL。Mesa 官方立场：freedreno Gallium 不支持 KGSL，KGSL 系统应用 Zink+Turnip。**止损条件**：若 KGSL shim 开始大量模拟 dma-buf/sync_file/Linux fd 语义 → 停止兼容，改走 `tu_knl_darwin.cc` 原生 IOKit UserClient 路线（UniXNU 在 Nothing Phone 2/SM8475 已证）。已知无第三个项目证明"原版 Turnip-KGSL 在 Darwin ABI 下无修改运行"。
 - **Metal**：buffers/libraries 先行（对齐 hakios-metal 现状）。
 - **验收**：OpenGL ES 应用渲染；桌面可交互帧率。
 - 分步（若走备选路线）：G0 电源/GMU/SMMU+单命令流 → G1 最小 KGSL ABI → G2 Vulkan 烟测 → G3 Zink/GL → G4 WSI/IOSurface/显示集成。
 
 ### v0.6 「连接」— Wi-Fi + 音频
-- **内容**：Wi-Fi = **WCN6750 hw1.0**（⚠ 阶段 30 勘误 2026-11-10：主线 ath11k **无 QCA6490 hw_rev**，勿按 qca6490 形态开工；固件目录 `WCN6750/hw1.0/`、IPCR 通道 20/21 复用 qca6390 表）走 PCIe/MHI——redwood 的 WPSS PIL 路线作废；ath11k_pci 补 **2 个一行级补丁**（pci.c 设备 ID 表 + mhi.c hw_rev case；`check-phk110-wifi-mhi.py` 自动检测缺口）；**GPL 边界（新增工作项）：drivers/bus/mhi = GPL-2.0 不可链 → MHI 协议须在 wifi/lx 层自实现**（raphael fork lx_bus.c 手写总线先例在证；ath11k 本体 BSD/ISC 可链，阶段 30 许可门 22/22 已验）；工具链已就位 = 阶段 30（mk-ath11k.py 固定源码管线源码就绪 + check-phk110-wifi-{dtb,fw,mhi,wlfw,e2e} 五门，03310d7；施工单 docs/waves/wave30-ath11k-tooling-prep.md）；音频：TFA9874×2 扬声器（非 redwood 的 AW88261/TDM），经 ADSP TERT_MI2S
+- **内容**：Wi-Fi = **WCN6750 hw1.0**（⚠ 阶段 30 勘误 2026-11-10：主线 ath11k **无 QCA6490 hw_rev**，勿按 qca6490 形态实施；固件目录 `WCN6750/hw1.0/`、IPCR 通道 20/21 复用 qca6390 表）走 PCIe/MHI——redwood 的 WPSS PIL 路线作废；ath11k_pci 补 **2 个一行级补丁**（pci.c 设备 ID 表 + mhi.c hw_rev case；`check-phk110-wifi-mhi.py` 自动检测缺口）；**GPL 边界（新增工作项）：drivers/bus/mhi = GPL-2.0 不可链 → MHI 协议须在 wifi/lx 层自实现**（raphael fork lx_bus.c 手写总线先例在证；ath11k 本体 BSD/ISC 可链，阶段 30 许可门 22/22 已验）；工具链已就位 = 阶段 30（mk-ath11k.py 固定源码管线源码就绪 + check-phk110-wifi-{dtb,fw,mhi,wlfw,e2e} 五门，03310d7；施工单 docs/waves/wave30-ath11k-tooling-prep.md）；音频：TFA9874×2 扬声器（非 redwood 的 AW88261/TDM），经 ADSP TERT_MI2S
 - **验收**：加入 Wi-Fi 热点；播放声音
 
 ### v0.7 「全网」— 蜂窝（IPA v5.1）
@@ -139,7 +142,7 @@ WS-F 连接线         WiFi→音频→IPA v5                         → v0.6, 
 
 1. 每个版本门 = 可重复的验收命令 + 日志证据存 `docs/vX.Y-evidence/`
 2. 真机操作前：确认 adb 在线 → 执行 → 重启回安卓 → **手动解锁** → logfs 回读 → 存档
-3. 一切手机内提取物放 `intel/`（git 外），源码改动放 WSL 工作树，逐波同步回工作区 `device-layer/`
+3. 一切手机内提取物放 `intel/`（git 外），源码改动放 WSL 工作树，逐阶段同步回工作区 `device-layer/`
 4. 每次续接先读 `M0-PROGRESS.md` + 本文件对齐状态
 5. **生态情报节奏（F15 后新设，2026-11-10）**：每周双扫（上游官方 org + 主仓 forks?sort=newest）+ unixnu.com 双周 + **中文短视频平台（抖音/B站）事件驱动**——F14 教训 = 只扫官方 org 漏掉整个 fork 网络/私人构建层；调研报告间相互勘误直接改源头文件头部（F14/F15 勘误先例）
 
@@ -147,4 +150,4 @@ WS-F 连接线         WiFi→音频→IPA v5                         → v0.6, 
 
 - 阶段 1 ≈ 3 并行调查代理，产出 3 份规格书
 - 阶段 2 ≈ 3 并行实现代理 + 集成验收
-- 每个版本目标 2-4 波完成；R1/R3/R4 是长杆，允许跨多波
+- 每个版本目标 2-4 个阶段完成；R1/R3/R4 是长杆，允许跨多个阶段

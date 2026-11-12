@@ -1,0 +1,13 @@
+--- drivers/core/hakios.stubs.c.v43-orig	2026-11-08 03:46:03.862265500 +0800
++++ drivers/core/hakios.stubs.c	2026-11-12 00:00:36.250374411 +0800
+@@ -69,6 +69,10 @@
+ void hakios_battery_report(__unused const struct hakios_battery_state *state) {}
+ #endif
+ 
++#ifndef HAKIOS_FUELGAUGE
++void hakios_fuelgauge_init(void) {}
++#endif
++
+ #ifndef HAKIOS_CPUFREQ
+ void hakios_cpufreq_init(void) {}
+ void hakios_ddr_quiesce(void) {}

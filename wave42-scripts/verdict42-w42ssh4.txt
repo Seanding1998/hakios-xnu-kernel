@@ -1,0 +1,58 @@
+WAVE21-SSH-OK
+run-id: w42ssh4
+when: 2026-11-12 01:31:57
+tool: wave42-scripts/timed-ssh-v42.py (v27 protocol + the wave42 bidirectional content-SHA round trip)
+tunnel: wave25-scripts/tunnel25w.py + B3 frame traces (pseudo-header fix)
+boot: boot_b = v35 graft 6558d303ac792e6e0536b0b80deb3efcaa8195abaa4f398254ae869d7705f0a0 (kernel 55a8d40f + loader 5de055ea the wave42 root-fixed GEN-1..4 build + ramdisk c2780842 the GL=test carrier; loader_return_after=600, maxvnodes=8192)
+
+[conn1] cmd: uname -a && id && echo WAVE21-SSH-OK W27-w42ssh4
+[conn1] rc: 0
+[conn1] stdout:
+Darwin localhost 22.5.0 Darwin Kernel Version 22.5.0: Wed Nov 11 07:06:53 PM CST 2026; cyrux:xnu-8796.121.2[xnu-8796.121.2-dirty]/BUILD/obj/DEVELOPMENT_ARM64_BCM2837 iPhone10,3 arm Darwin
+uid=0(root) gid=0(wheel) groups=0(wheel)
+WAVE21-SSH-OK W27-w42ssh4
+
+[conn2] cmd: uname -a && id && echo W27-w42ssh4-acc2
+[conn2] rc: 0
+[conn2] stdout:
+Darwin localhost 22.5.0 Darwin Kernel Version 22.5.0: Wed Nov 11 07:06:53 PM CST 2026; cyrux:xnu-8796.121.2[xnu-8796.121.2-dirty]/BUILD/obj/DEVELOPMENT_ARM64_BCM2837 iPhone10,3 arm Darwin
+uid=0(root) gid=0(wheel) groups=0(wheel)
+W27-w42ssh4-acc2
+
+[conn3] cmd: uname -a && id && echo W27-w42ssh4-acc3
+[conn3] rc: 0
+[conn3] stdout:
+Darwin localhost 22.5.0 Darwin Kernel Version 22.5.0: Wed Nov 11 07:06:53 PM CST 2026; cyrux:xnu-8796.121.2[xnu-8796.121.2-dirty]/BUILD/obj/DEVELOPMENT_ARM64_BCM2837 iPhone10,3 arm Darwin
+uid=0(root) gid=0(wheel) groups=0(wheel)
+W27-w42ssh4-acc3
+
+[transfer 262144 B] cmd: wc -c
+[transfer 262144 B] rc: 0
+[transfer 262144 B] stdout:
+count=262144 want=262144
+
+[content sha round trip 524288 B (one connection, both directions)] cmd: T=/var/w42blob.bin; cat > $T; sha256sum $T; wc -c < $T; cat $T; rm -f $T
+[content sha round trip 524288 B (one connection, both directions)] rc: 0
+[content sha round trip 524288 B (one connection, both directions)] stdout:
+dev=b78dca928e0019b9.. host=b78dca928e0019b9.. payload=1f27a7634bc1a004.. bytes=950143/524288
+
+transfer verdict: PASS
+content sha host->device: MATCH
+content sha device->host: FAIL
+content sha verdict: FAIL
+management channel after exits: OKAY (alive)
+device evidence (tunnel stderr, hit attempt excerpt):
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:25469 flags=ACK seq=2971858776 ack=268437650 win=65535 len=0 cksum=ok | SND.UNA=268437538 SND.NXT=268437650 RCV.NXT=2971858776 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:25469 flags=PSH|ACK seq=2971858776 ack=268437650 win=65535 len=44 cksum=ok | SND.UNA=268437650 SND.NXT=268437650 RCV.NXT=2971858776 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:25469 -> 10.0.0.2:22 flags=ACK seq=268437650 ack=2971858820 win=16384 len=0 cksum=ok | SND.UNA=268437650 SND.NXT=268437742 RCV.NXT=2971858820 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:25469 -> 10.0.0.2:22 flags=PSH|ACK seq=268437650 ack=2971858820 win=16384 len=92 cksum=ok | SND.UNA=268437650 SND.NXT=268437742 RCV.NXT=2971858820 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:25469 flags=ACK seq=2971858820 ack=268437742 win=65535 len=0 cksum=ok | SND.UNA=268437650 SND.NXT=268437742 RCV.NXT=2971858820 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:25469 flags=PSH|ACK seq=2971858820 ack=268437742 win=65535 len=72 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=2971858820 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:25469 -> 10.0.0.2:22 flags=ACK seq=268437742 ack=2971858892 win=16384 len=0 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=2971858892 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:25469 flags=PSH|ACK seq=2971858892 ack=268437742 win=65535 len=228 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=2971858892 state=ESTABLISHED
+tunnel25w: pkt OUT 10.0.0.1:25469 -> 10.0.0.2:22 flags=ACK seq=268437742 ack=2971859120 win=16384 len=0 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=2971859120 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:25469 flags=PSH|ACK seq=2971859120 ack=268437742 win=65535 len=76 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=2971859120 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:25469 flags=PSH|ACK seq=2971859196 ack=268437742 win=65535 len=60 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=2971859196 state=ESTABLISHED
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:25469 flags=PSH|ACK seq=2971859256 ack=268437742 win=65535 len=176 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=2971859256 state=ESTABLISHED
+
+Darwin session evidence above: uname=Darwin confirmed

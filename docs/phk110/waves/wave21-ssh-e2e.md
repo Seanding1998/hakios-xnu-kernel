@@ -32,7 +32,7 @@
 | N3 | `ssh 10.0.0.2` Darwin shell | sshd 就绪（v14 遗产，b25 实证监听 :22）；数据面未接通 | ☐ 未闭环 |
 | **前置** | loader USB 服务器可用 | **间歇成功**（logdump 实证 `usb: started`；但 ~9/10 boot `start_ex` 失败）| ✗ 病根 |
 
-## 3. 真机实证（本波拿到手的硬证据）
+## 3. 真机实证（本阶段拿到手的硬证据）
 
 1. **en0 数据面全链真机验证**（v15 会话，logdump `logdump-v15.bin`）：
    - `[37.614063]: ifnet_attach: All kernel threads created for interface en0 …`
@@ -44,20 +44,20 @@
 4. **v15 会话本身**：S6/S7/S8 回归全绿（`/private/var: HFS Plus … kept between boots` + `112 directories, 22 files`）、clean PSCI return。
 5. **loader USB 服务器可用性已被单点证明**：05:02 窗口，`getvar:product`=xnuloader、`getvar:result`=idle、`oem netstat`、`oem run`（会话内 serving）、`oem stop`/`reboot` 语义——**整个协议栈（含 serving 中的 netmode）在该窗口全部工作**。
 
-## 4. 没有达成的根因链（给下一波的施工单）
+## 4. 没有达成的根因链（给下一阶段的施工单）
 
-### 4.1 主因：`UsbConfigDxe start_ex` 间歇失败（Boot #9 遗案，非本波引入）
+### 4.1 主因：`UsbConfigDxe start_ex` 间歇失败（Boot #9 遗案，非本阶段引入）
 - 证据：`logdump` 里有 `usb: started`（成功 boot）；其余 boot 的 `start_ex` 在 10s 重试窗内全部失败 → loader 走 one-shot（会话跑但 USB 服务器缺席）。
 - v15.0 门控（usb_connected 从未置位 → post-session wedge）是**第二个**坑，v15.1 已去除。
 - v15.2 懒重试（250ms）反而造成 DWC3 永续复位 → 主机永远无法完成枚举（**每个 start_ex 都重置控制器**）；v15.3 改 20s 退避 + boot loop 1s，20 轮 fresh-attach 纪律化探测仍未抓到 serving 窗（样本不足）。
-- **第三个坑（收尾时定位，未及验证）**：**usbipd 的 stale export**——手机侧每次复位重枚举后，WSL 侧旧导出仍显示 `Attached`/`lsusb d00d=1`，但底层管道已死（写入静默丢失）。唯一一次 serving 窗（05:02）恰逢一次**新鲜的** detach→attach。下一波探测纪律：**每轮探测前强制 detach→attach→lsusb 复核**（final-e2e.sh 的 fresh() 已实现，但只有 20 轮机会，未撞上 serving boot）。
-- **下一波第一件事**：Android 回退后拉 `logdump`（本波已留 `logdump-v15.bin` 基线方法），读 `usb: start failed %x` 的**具体 status**；对照 vendor UsbConfigDxe 判定是 RPM/DAL 时钟未就绪还是 PHY 路径；候选修复 = ①boot 前先 signal init event 后**sleep 5-10s** 再首次 start_ex（给平台 init 独立完成窗）②彻底去掉 boot-time 重试、只留 session 内 20s 退避 ③UsbConfigDxe 的 start 回调参数审计（loader.c:3984 注释路径）。
+- **第三个坑（收尾时定位，未及验证）**：**usbipd 的 stale export**——手机侧每次复位重枚举后，WSL 侧旧导出仍显示 `Attached`/`lsusb d00d=1`，但底层管道已死（写入静默丢失）。唯一一次 serving 窗（05:02）恰逢一次**新鲜的** detach→attach。下一阶段探测纪律：**每轮探测前强制 detach→attach→lsusb 复核**（final-e2e.sh 的 fresh() 已实现，但只有 20 轮机会，未撞上 serving boot）。
+- **下一阶段第一件事**：Android 回退后拉 `logdump`（本阶段已留 `logdump-v15.bin` 基线方法），读 `usb: start failed %x` 的**具体 status**；对照 vendor UsbConfigDxe 判定是 RPM/DAL 时钟未就绪还是 PHY 路径；候选修复 = ①boot 前先 signal init event 后**sleep 5-10s** 再首次 start_ex（给平台 init 独立完成窗）②彻底去掉 boot-time 重试、只留 session 内 20s 退避 ③UsbConfigDxe 的 start 回调参数审计（loader.c:3984 注释路径）。
 - 佐证数据点：成功的 04:57 boot 发生在手机经历 ~50min 静置 wedge 之后——**平台侧某个慢时钟/电源域最终就绪**的假设与数据吻合。
 
 ### 4.2 新发现（非阻塞但记账）：`panic: vnode table is full @vfs_subr.c:5705`（~218s）
 - v15 的 300s cmdline 让会话跑过了 218s，暴露**vnode 表耗尽**（`1024 desired, 1024 numvnodes, 0 free`）→ pid 1 (launchd) panic → stackshot → clean return。
-- v14 的 120s 会话从未到达该点（**预存问题，非本波引入**）。
-- 处置：下一波要么调回 `loader_return_after=180`，要么查 vnode 泄漏（launchd 域 28 进程的 vnode 消耗，b25 120s 内健康；218s 恰为临界）。**在修复前，SSH E2E 必须压缩在 180s 内完成**（N1~N3 预算 150s，可行）。
+- v14 的 120s 会话从未到达该点（**预存问题，非本阶段引入**）。
+- 处置：下一阶段要么调回 `loader_return_after=180`，要么查 vnode 泄漏（launchd 域 28 进程的 vnode 消耗，b25 120s 内健康；218s 恰为临界）。**在修复前，SSH E2E 必须压缩在 180s 内完成**（N1~N3 预算 150s，可行）。
 
 ### 4.3 次因记录（均已修但过程烧时）
 - 阶段 13 `connect()` 的 `free_device_list` 后指针复用：Windows 容忍、Linux 必崩 → wave21 loader_talk 重排（修复确认有效，probe/cmd 全通）。
@@ -72,16 +72,16 @@
 - `wave21-scripts/handback.sh` watcher 在安卓回归后自动 `adb reboot bootloader → fastboot set_active a → reboot`，手机稳定交还（**若 watcher 已死，人工路径：强关 → 电源+音量下 → `fastboot set_active a && fastboot reboot`**）。截至收稿，手机已在安卓（slot a）。
 - 回退链完整：v14（`1932412a…`）可随时重刷。
 
-## 6. 下一波施工单（阶段 21.1 建议，按序）
+## 6. 下一阶段施工单（阶段 21.1 建议，按序）
 
-1. **取status**：安卓回退后 `su -c dd logdump`，grep `usb:`——拿到 `start failed %x` 的具体 EFI status（本波 logdump-v15.bin 只有成功 boot 的日志）。
+1. **取status**：安卓回退后 `su -c dd logdump`，grep `usb:`——拿到 `start failed %x` 的具体 EFI status（本阶段 logdump-v15.bin 只有成功 boot 的日志）。
 2. **修 start_ex**：按 §4.1 候选①（init event → 延迟首试）最可能；loader 单点改动 ~20 行。
 3. **刷 v15.4** 后：`catch-and-run.sh`（已备）自动跑 N1→N2→N3（E2E 全套已写好，成功率只差 USB 服务器在线）。
 4. **vnode panic**：`loader_return_after=180`（cmdline 一行）先绕过；泄漏调查另开。
-5. N3 通过后：`logdump` + `set_active a` 交还（本波脚本全可复用）。
+5. N3 通过后：`logdump` + `set_active a` 交还（本阶段脚本全可复用）。
 
-## 7. 本波教训（方法论）
+## 7. 本阶段教训（方法论）
 
-- **vendor UEFI bring-up 的间歇性要在第一轮就做懒重试**（Boot #9 的教训写在 loader.c:3984 注释里，但「重试成功」与「重试搅局」的界线——churn 会杀死主机枚举——是本波用第三次刷写换来的新知识：**start_ex 每 20s ≤1 次**是安全节拍）。
+- **vendor UEFI bring-up 的间歇性要在第一轮就做懒重试**（Boot #9 的教训写在 loader.c:3984 注释里，但「重试成功」与「重试搅局」的界线——churn 会杀死主机枚举——是本阶段用第三次刷写换来的新知识：**start_ex 每 20s ≤1 次**是安全节拍）。
 - **logdump 是唯一可信的 loader 侧叙事**：USB 层的任何推断（stale export、wedge、state machine）都应尽早用 logdump 落地，而不是用 host 侧行为反推。
-- **跨 WSL/Windows 的 USB 编排**（usbipd attach/detach + persisted binding + WSL keepalive）本身就是不稳定源：下一波把 watcher+keepalive 固化为脚本首部（本波已备 watch-attach.sh，但 WSL keepalive 反复死亡造成多次误诊）。
+- **跨 WSL/Windows 的 USB 编排**（usbipd attach/detach + persisted binding + WSL keepalive）本身就是不稳定源：下一阶段把 watcher+keepalive 固化为脚本首部（本阶段已备 watch-attach.sh，但 WSL keepalive 反复死亡造成多次误诊）。

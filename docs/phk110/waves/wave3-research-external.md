@@ -101,12 +101,12 @@ PHK110 上存在一个**已公开验证能跑通 Mu-Silicium UEFI 的完整外�
 **[确证] PHK110 也有 hyp 区且不妨碍 UEFI**：udon 的 PHK110 内存映射里赫然有 `HYP 0x80000000, 6 MiB` 与 `HYP Reserved 0x830000000, 256 MiB`，而其 UEFI（flashed 路径）照常运行——说明"设备带 QHEE"本身并不杀死自定义 UEFI：
 - https://github.com/takasugl/uefi-udon/blob/main/Platforms/OnePlus/udonPkg/Library/MemoryMapLib/MemoryMapLib.c
 
-**[确证] Mu-Silicium/udon 的 SEC 不做 EL 迁移**：WaipioPkg PlatformSecLib 仅做 GIC 唤醒 + MDP SMMU detach，`PlatformHelper.S` 是空实现——该固件不主动退 hyp/切 EL，运行在 ABL 移交的任何状态：
+**[确证] Mu-Silicium/udon 的 SEC 不做 EL 迁移**：WaipioPkg PlatformSecLib 仅做 GIC 唤醒 + MDP SMMU detach，`PlatformHelper.S` 是空实现——该固件不主动退 hyp/切 EL，运行在 ABL 交出的任何状态：
 - https://github.com/takasugl/uefi-udon/blob/main/Silicon/Qualcomm/WaipioPkg/Library/PlatformSecLib/PlatformSec.c
 - https://github.com/takasugl/uefi-udon/blob/main/Silicon/Qualcomm/WaipioPkg/Library/PlatformSecLib/AArch64/PlatformHelper.S
 - （Renegade 定位即"boot any fuOS at EL1"：https://renegade-doc.readthedocs.io/en/latest/edk2/Overview.html ）
 
-**[推测] 若 OPPO ABL 的 fastboot boot 移交状态与 flash boot 移交状态不同（如不同 EL/不同 MMU/sidestate），可以造成"flash 能进 UEFI、fastboot boot 秒死"。目前没有任何外部文档直接描述该差异**——检索 "kvm-arm.mode=protected" 与 "fastboot boot 自定义 UEFI 秒死" 的关联案例：**[未找到]**，无公开案例把 QHEE/kvm-arm.mode 与 fastboot boot UEFI 即死直接挂钩。
+**[推测] 若 OPPO ABL 的 fastboot boot 交入状态与 flash boot 交入状态不同（如不同 EL/不同 MMU/sidestate），可以造成"flash 能进 UEFI、fastboot boot 秒死"。目前没有任何外部文档直接描述该差异**——检索 "kvm-arm.mode=protected" 与 "fastboot boot 自定义 UEFI 秒死" 的关联案例：**[未找到]**，无公开案例把 QHEE/kvm-arm.mode 与 fastboot boot UEFI 即死直接挂钩。
 
 **[推测] 小米 vs OPPO hyp 差异**：marble（小米，Gunyah）与 PHK110（OPPO，QHEE + pKVM cmdline）都带平台 hyp；公开证据只能说明两者 hyp 都存在且都能让 UEFI 跑（marble 走 fastboot boot，PHK110 走 flash），差异点更可能落在 ABL 对 fastboot boot 镜像的校验/格式要求（见 Q4），而非 hyp 本身。
 

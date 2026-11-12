@@ -1,0 +1,11 @@
+u2f_test: context made; freedreno; FD725; OpenGL ES 3.2 Mesa 25.0.7
+u2f_test: 0xffffffff -> 0x4f800000 4.2949673e+09     C says 0x4f800000 4.2949673e+09     same
+u2f_test: 0xffffff80 -> 0x4f800000 4.2949673e+09     C says 0x4f800000 4.2949673e+09     same
+u2f_test: 0x01000001 -> 0x4b800000 16777216          C says 0x4b800000 16777216          same
+u2f_test: 0x01000003 -> 0x4b800002 16777220          C says 0x4b800002 16777220          same
+u2f_test: 0x7fffffff -> 0x4f000000 2.14748365e+09    C says 0x4f000000 2.14748365e+09    same
+u2f_test: 0x00ffffff -> 0x4b7fffff 16777215          C says 0x4b7fffff 16777215          same
+u2f_test: 6 value(s), 0 different; error 0
+os_same_file_description couldn't determine if two DRM fds reference the same file description. (No such file or directory)
+Let's just assume that file descriptors for the same file probablyshare the file description instead. This may cause problems whenthat isn't the case.
+U2F_RC=0

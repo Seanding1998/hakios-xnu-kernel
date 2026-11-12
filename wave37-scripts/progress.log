@@ -1,0 +1,254 @@
+# Wave 37 progress log (GPU step-1 hang localization)
+# Mission: locate the v26 kernel adreno driver step-1 hang (per wave36-handoff.md),
+# fix, and reach the GPU acceptance lines (probe + fw + GMU/ring + zero panic).
+
+[phase 0] recon (no device touch)
+- handoff read in full; device state at wave37 start: Android slot a (adb 3c268ac3, single device --
+  the wave36 "more than one device" condition self-healed after re-enumeration), boot_b = v26 (c55300e1) inactive, 2-2 = 22d9:2769 Shared
+- driver mechanism re-read (hakios.adreno.c): gpu=1 path sets last_step=21/skip=0x1c00/pause_ms=0/watch=0/keep=1,
+  then adreno_only=K overrides last_step=K, skip=~(1<<K), forces newest_step=K -> get()/get8() print
+  "about to read <block> <reg> at <phys>" before EVERY access (independent of fine).
+- DEVIATION from mission text (evidence-based, recorded): cmdline gains ONLY " adreno_only=1", not " adreno_fine=1".
+  Reasons: (a) wave23 ground truth -- the 607 budget is the COMBINED line: loader prepends a 110-char header
+  (debug=0x8 / rd=md0 / ufs_shared_pa / hakios_kver), payload cmdline goes LAST and is TRUNCATED past 607
+  (loader.c:3617-3625 prints a WARNING). Budget for the payload cmdline = 607-110 = 497 chars; v26 uses 477
+  (spare 20). " adreno_only=1" (14) -> 491 fits; " adreno_fine=1" would make 505 -> the tail of exactly that
+  arg gets cut. (b) under the gpu=1 path pause_ms=0, and hold() no-ops on pause_ms==0 regardless of fine --
+  adreno_fine is inert unless paired with adreno_pause; localization comes from the newest_step=1 prints,
+  which adreno_only=1 alone provides. Hang evidence survives (loader notes the log end every 2 s from
+  another core; the hang is indefinite, zero panic per v26 gen1).
+- fix-direction recon done while building (no device touch): kodiak (sm8475) gcc = refs gcc-waipio.c
+  (that is why wave36's grep for gcc-sm8475.c missed). GPU offsets differ from the sc7280 values the
+  driver carries:
+    clock            driver now (sc7280)   kodiak waipio
+    GCC_PLL_VOTE     0x52000               0x62000
+    gpu_cfg_ahb      0x71004               0x81004
+    gpu_memnoc_gfx   0x7100c               0x81010
+    gpu_snoc_dvm     0x71018               0x81018
+    ddrss_gpu_axi    0x71154               0x81154
+  NOTE: kodiak offsets reach 0x81xxx > the driver's gcc mapping size 0x80000 -> the fix must also widen
+  the mapping (waipio DTB reg = 0x1f7220). Evidence first: v27 probe decides; no fix before the hang line.
+
+[phase 1] v27 built + verified (no device touch)
+- make-payload-v27.sh: payload udon-hakios-payload-v27.bin = 24f765ff8a8130b7... (cmdline 492 B =
+  491 chars + NUL, ends "... gpu=1 adreno_only=1"; combined budget 601/607; kernel a39c931c /
+  ramdisk 156b5be1 byte-equal to v26; all other entries byte-equal)
+- make-graft-v27.sh: FD 8924cb67 + shim 108ce972 pins kept; graft udon-hakios-grafted-v27.img =
+  d61d454a9acada5145881d529b6518046e714e37a39161b4cbe1410fa3137a75
+- verify-udon-hakios-v27.py: ALL 62 CHECKS PASSED (wave37-scripts/verify-v27.log; 62 = v26's 61 +
+  the no-adreno_fine budget check); note: /tmp between WSL calls proved non-sticky -- payload
+  rebuilt + verified inside one WSL session, sha reproduced 24f765ff exactly
+
+[phase 2] v27 gen1 on device + fallback watch
+- 13:26:32 flash-bootb-v37.sh w37a: gate1 graft sha d61d454a PASS / gate2 product=taro PASS /
+  gate3 slot a->set_active b PASS / OKAY x2 (4.838s+0.641s) -> 13:27:09 FLASH CONFIRMED (boot_b = v27)
+- 13:27:41 catch-d00d-switch-a-v37.sh w37gen1 armed (host-side usbipd poll 3s, no loader knocks)
+- expected: kernel start ~13:27:40, step-1 probe ~13:28:50, hang; loader_return_after=600 -> ~13:37:30 session end
+- 13:39 bus = 2-2 0000:0002 (descriptor request failed) = the wave31 zombie pattern; d00d window of the
+  gen1->gen2 boundary missed or brokenly enumerated (watcher still polling; generation switches self-heal).
+  gen2 session expected to end ~13:48 -> tight-poll window then.
+- coordinator intel map received + read: wave35-gpu-prestage.md read in full (GMU 0x3d68000+0x37000 erratum,
+  RSCC 0x3d50000+0x10000, cape-gpucc PLL semantics; zizhan = registers-knowledge-only). f16/f14 skim pending;
+  wave36 wave-report accounting section to be checked before writing my verdict (dedupe discipline).
+- 13:49:05 EVIDENCE: bus 2-2 = 05c6:9008 QUSB_BULK_CID:043B_SN:3C268AC3 = EDL mode. The v27 session(s)
+  ended and the phone fell into EDL instead of surfacing the ABL d00d fastboot gadget -- that is why the
+  watcher never matched (both gen boundaries). logdump evidence is already on the logdump partition
+  (gen1 hung 13:28:50+; gen2 same hang, partition holds the latest generation's console -- identical probe lines).
+[13:49:30] NEED USER: 电源+音量下 10 秒 -> fastboot 界面待命（用户按键最快；我随后门禁 set_active a + reboot 进安卓拉 logdump）
+
+[phase 3] HANG POINT CONFIRMED + fix applied
+- 13:50:0x the watcher caught the fastboot window after NEED USER (user keypress): gates taro PASS /
+  current-slot=b -> set_active a (flag flip only) -> 13:50:32 Android up -> 13:51:29 logdump dd done:
+  wave37-scripts/logdump-v26-wave37-w37gen1.bin, 536870912 B size gate PASS, sha256 96bcfc4b1d0eedbe...
+- adreno line set (dedup, gen2 of the same image -- identical hang each generation):
+    steps up to 1, without those in mask 0xfffffffd; step 1 is the new one and waits 0 ms after each announcement
+    step 1: read the GPU's clocks in the global clock controller (registers the touch screen driver uses too)
+    1: about to read gcc pll votes at 0x152000
+  -> the machine hangs INSIDE the first gcc read, rd() at 0x152000 (sc7280 GCC_PLL_VOTE 0x52000 + gcc base
+  0x100000), zero panic, adreno_only=1 parsed (mask 0xfffffffd proves the boot-arg path). Zero "= value" line.
+- VERDICT: the sc7280 ("yupik") gcc offsets do not exist on this phone's bus. The phone's gcc is
+  "qcom,cape-gcc" (phk110.dts:785-787, reg 0x100000+0x1f4200); its vendor driver is gcc-waipio.c bound by
+  gcc_cape_fixup (f16 census corroborates: cape machines ship gcc-waipio.ko).
+- FIX APPLIED (wave37-scripts/apply-gcc-cape-v28.py, 5 exact-anchor replacements, 0 leftovers, backup
+  hakios.adreno.c.v27-orig; 49 diff lines):
+    gcc block size   0x80000 -> 0x1f4200 (the DTB's own reg size; 0x80000 could not even cover 0x81xxx)
+    GCC_PLL_VOTE     0x52000 -> 0x62000   (gcc-waipio.c gpll0 vote branch enable_reg)
+    gpu_cfg_ahb      0x71004 -> 0x81004   (gcc-waipio.c)
+    gpu_memnoc_gfx   0x7100c -> 0x81010   (gcc-waipio.c)
+    gpu_snoc_dvm     0x71018 -> 0x81018   (gcc-waipio.c)
+    ddrss_gpu_axi    0x71154 -> 0x81154   (gcc-waipio.c)
+    DEBUG_MUX/DIV/CBCR/XO_DIV4/MEASURE_CTL/MEASURE_STATUS 0x62xxx -> 0x72xxx (debugcc-waipio.c
+                     gcc_debug_mux + measure_clk_data; cape's own frequency-counter block)
+    DEBUG_MUX_GPUCC  0x146 -> 0x16e       (debugcc-waipio.c gcc_debug_mux_sels gpu_cc_debug_mux)
+    GCC_DISP_AHB_CBCR 0x27004 left with TODO-DEV note (display_probe=1 only, not in cmdline)
+  post_div register VALUE unchanged (cape post_div_val=2, clk-debug.c writes val-1 = the driver's existing
+  "divider - 1" semantics; only the offsets move).
+- next frontier already known: gpucc (step 3) offsets are still sc7280 -- gpucc-waipio.c differs broadly
+  (ahb 0x1078->0x911c, cx_gmu 0x1098->0x913c, hlos1_vote 0x5000->0x7000...). NOT touched this fix: one
+  evidence-backed fix per generation; v28 stays adreno_only=1 (step 1 only) to confirm the gcc fix and
+  capture the five register values; step 3 gets its own probe generation next.
+
+[phase 4] v28 built + flashed
+- make kernel: MAKE_RC=0 (the wrapper's documented kext symbol-set exit-2 is benign); kernel
+  a39c931c -> e3852a0f (only source delta = apply-gcc-cape-v28.py)
+- make-payload-v28.sh: payload = 3bf1be1d... (kernel entry swapped; cmdline/ramdisk/loader/resident/
+  kernel.ver/usb byte-equal v27; cmdline = the same 492 B probe)
+- make-graft-v28.sh: graft = 3381b4785aead906887877f1d1c29846781a73229b64e04da1319c98da95a6b4
+- verify-udon-hakios-v28.py: ALL 62 CHECKS PASSED (verify-v28.log)
+- 14:02 flash-bootb-v28.sh w37v28: gate1 sha 3381b478 PASS / gate2 taro PASS / gate3 slot a->b PASS /
+  OKAY x2 -> 14:03:23 FLASH CONFIRMED (boot_b = v28). (one cosmetic log label said v27; the sha gate
+  is the binding identity)
+- 14:04 catch-d00d-switch-a-v37.sh w37v28a armed; expected step-1 probe ~14:04:55, session end ~14:13:45;
+  on d00d the watcher switches to slot a and pulls the logdump itself; on EDL -> NEED USER next turn
+- 14:04-14:19 v28 gen1 session live (loader gadget 18d1:d00d/xnuloader up; >1x 600s cycle = gen2 running
+  or wedged enum). Lesson recorded twice now: the generation boundary NEVER yields a clean catchable ABL
+  d00d window (v27 round: zombie 0000:0002 -> EDL); the catchable fastboot state is user-created.
+[14:19:30] NEED USER: 电源+音量下 10 秒 -> fastboot 待命（守望器活着，3 秒内自动抓窗 -> set_active a -> 进安卓 -> 拉 v28 logdump）
+
+[phase 5] v28 verdict: STEP 1 PASSES
+- 14:20:50 watcher caught the user-created fastboot window (NEED USER round 2): gates taro PASS /
+  slot b -> set_active a -> 14:21:40 Android -> 14:22:33 logdump done:
+  wave37-scripts/logdump-v26-wave37-w37v28b.bin, 536870912 B PASS, sha256 5cee883a296677e0..., zero panic lines
+- the v28 adreno line set (step 1 ran to completion; probe prints on every access):
+    about to read gcc pll votes at 0x162000    ->  = 0xe0257f   (cape offset; read WORKS)
+    gcc gpu_cfg_ahb    (0x181004) = 0x1        (cfg_ahb clock ENABLED as the bootloader left it)
+    gcc gpu_memnoc_gfx (0x181010) = 0x1
+    gcc gpu_snoc_dvm_gfx (0x181018) = 0x80000001
+    gcc ddrss_gpu_axi  (0x181154) = 0x300001
+    cmd_db at 0x80860000: magic OK; RPMh has gfx.lvl (0x30050; levels 0..416), cx.lvl (0x30000; 0..448),
+    mx.lvl (0x30010; 0..448) -- the GMU's future CX/GFX level indices are in hand
+    step 1: done / THE GPU IS NOT STARTED: step 21 (...) -- the adreno_only=1 verdict line, correct form /
+    over; the system goes on starting   (session COMPLETED; no hang; machine walked to the end of its
+    one-step mandate and the system started normally)
+- WAVE 37 CORE RESULT: the step-1 hang = sc7280 gcc offsets on a cape bus; cape offsets fix it. Step 1
+  of the 22-step machine is GREEN. Acceptance lines (probe+fw+GMU/ring+zero panic) still ahead (steps 3+).
+- next frontier (same error class, vendor-anchored): step 3 gpucc offsets are still sc7280
+  (gpucc-waipio.c cape differs broadly). Step 2 fuses are plain reads (safe even if the cape qfprom cell
+  differs -- wave36 TODO-DEV noted the cell question; the reads stay, nothing gates on them).
+
+[phase 6] v29 (cape gpucc + step-3 walk) built + flashed
+- apply-gpucc-cape-v29.py: 3 replacement blocks, 0 leftovers, backup hakios.adreno.c.v28-orig, 66 diff
+  lines. Values: gpucc map 0x9000->0xa000 (DTB), PLL1 0x0100->0x1000 (waipio pll .offset), branches
+  0x90xx/0x91xx/0x93xx/0x7000 (waipio), GDSC 0x905c/0x9108 + sw_reset 0x9058 + hw_ctrl 0x953c +
+  domain 0x9504 (the phone's OWN DTB syscon/gdsc nodes -- the one-hand cape source), RCGs 0x9318/0x93ec,
+  debug mux/div/cbcr 0x9564/0x9270/0x9274 + sels remapped per debugcc-waipio cape table (gx_gfx3d ->
+  0x25 measure_only cx_gfx3d; cxo_aon 0x0b unchanged). CB clock: cape has NONE -- define kept with
+  TODO-DEV note (step-3 read decodes in-map harmless; the step-5 write unresolved until the walk gets
+  there). gpucc-waipio.c has no gdsc structs -- the DTB nodes are the authoritative cape GDSC addresses.
+- make kernel: MAKE_RC=0, kernel e3852a0f -> c2ea0ca2; payload v29 = d36f2fb7 (cmdline 487 B =
+  gpu=1 adreno=3, combined budget 596/607); graft v29 = 8ccf9a94...; verify-v29 ALL 62 CHECKS PASSED
+- FLASH INCIDENT (recorded): first flash run (14:34) wedged pre-flash -- the phone rebooted back into
+  Android at 14:34:52 (adb reboot bootloader glitch, landing in a normal boot instead of the bootloader),
+  the script hung in an adb wait without an internal timeout; killed via task-stop, no flash happened
+  (no /tmp/flash-v29 log, boot_b untouched, slot stayed a). Re-run at 14:49 clean end-to-end.
+- 14:50:08 FLASH CONFIRMED: boot_b = v29 8ccf9a94 (gates taro / slot a->b / sha pin; OKAY x2). gen1
+  expectation: steps 1-2 quick, step 3 per-access prints (~14:51:30-14:53), 20 s watch, then the system
+  starts on top (adreno=3 path: keep=0, watch_seconds=20, pause 2200 ms on announcements); session caps
+  600 s ~15:00:30. (cosmetic: the flash script's LOG line still names payload 24f765ff/kernel a39c931c
+  from the v27 label -- the sha gate pins the true image 8ccf9a94)
+- 14:50:16 FLASH CONFIRMED v29 (tail line of the clean re-run; gates taro/slot/sha, OKAY x2). gen1 ran
+  under a BROKEN loader enumeration (0000:0002 zombie from ~14:52 -- third recorded zombie round; the
+  kernel's stepping + the loader's 2 s storage note do not need USB, the probe lines are on the logdump
+  partition regardless). 15:00:30 session end -> 15:01:59 zombie again -> gen2 would loop 600 s with
+  identical probe evidence.
+[15:02:10] NEED USER: 电源+音量下 10 秒 -> fastboot 待命（守望器在位会自动抓窗：set_active a -> 进安卓 -> 拉 v29 logdump 读步 3 终判）
+
+[phase 7] v29 verdict: STEP 1+1 done, STEP 2 hangs (new evidence, new fix)
+- user landed the phone in Android (15:07); logdump-pull-v37.sh w37v29gen1 direct:
+  wave37-scripts/logdump-v26-wave37-w37v29gen1.bin, 536870912 B PASS, sha256 36bf2e032c52d5a4...
+- adreno=3 parsed (steps up to 3, mask 0, 2200 ms announcements); step 1 done in-session with the v28
+  values; step 2 announced then ZERO lines -- the machine hung inside step 2's first qfprom read at
+  0x780000+0x4000+0x1e9 = 0x7841e9 (get8 prints nothing for step 2: newest_step=3), zero panic.
+  gpucc/step 3 never reached (untested this generation).
+- GROUND TRUTH pulled from the phone itself: /sys/firmware/fdt (1,200,263 B) = ZERO occurrences of
+  qfprom / speed_bin / efuse. The cape platform does not expose the fuses to the AP. The vendor's own
+  driver agrees by construction: adreno_read_speed_bin() returns 0 when nvmem_cell_get("speed_bin")
+  is -ENOENT, and this phone's kgsl node carries qcom,chipid=<0x7030002> directly. wave36's
+  [TODO-DEV] "cape qfprom cell" is now resolved in the strongest form: there is no cell at all.
+- FIX (apply-fuses-cape-v30.py, 3 anchors, 0 leftovers, backup hakios.adreno.c.v29-orig, 43 diff
+  lines): step_fuses() = announce + speed_bin = 0, NO memory access (retiring the sc7280 reads that
+  hang the bus); qfprom block kept as a documented inert sc7280 record; get8 marked unused.
+
+[phase 8] v30 built + flashed
+- kernel c2ea0ca2 -> 95fd7568 (MAKE_RC=0); payload v30 = 7d492c96 (kernel-only swap; cmdline = the v29
+  walk 487 B unchanged); graft v30 = a85e68d8...; verify-v30 ALL 62 CHECKS PASSED
+- 15:15:17 FLASH CONFIRMED (gates taro / slot a->b / sha pin; OKAY x2; clean in-band run)
+- gen1 expectation: steps 1-2 (~49 s), step 3 per-access prints with cape gpucc (~15:17-15:19), 20 s
+  watch, system starts; session caps ~15:25:40. watcher armed for the boundary.
+
+[phase 9] v30 verdict: STEP 3 GREEN (gpucc fix holds)
+- watcher caught the user keypress at 15:27:10 -> gates -> set_active a -> Android -> logdump done:
+  wave37-scripts/logdump-v26-wave37-w37v30a.bin, 536870912 B PASS, sha256 47c34dd46e7d7b65...
+- the v30 adreno walk: steps 1,2,3 ALL DONE. step 2 = the new cape-native announce (no fuse access),
+  no hang. step 3 printed EVERY gpucc access with the cape offsets -- all answered, e.g.:
+    gx_gdscr (0x3d9905c) = 0x22f001 / gx_sw_reset = 0 / gx_domain_misc (0x3d99504) = 0x3c0001
+    pll0 mode = 0 (off) / pll1 mode (0x3d91000) = 0x100 / gmu_clk_src cmd = 0x80000000
+    gx_gmu = 0x80000000 / cx_gmu (0x3d9913c) = 0x80002221 (the GMU clock ON, bootloader-left)
+    cxo = 0x80000001 ON / ahb = 0 / hub_aon = 0x1 / hub_cx_int = 0x80000001 / smmu vote = 0x80000000
+  then "step 3: done", the 20 s watch, "over; the system goes on starting". Zero panic. The system
+  started on top of the walk (the machine was NOT cut short; the log is complete).
+- WAVE 37 SCORE: gcc -> fuses -> gpucc, three evidence-backed cape fixes, three generations, steps
+  1-3 fully green. The sc7280->cape migration of the clock layer is complete and machine-proven.
+
+[phase 10] v31 built + flashed = the production attempt
+- one more known hazard closed before walking past step 5: the cb clock WRITE removed
+  (apply-cb-cape-v31.py; cape carries no cb clock in gpucc-waipio.c, gpucc+0x1170 names no known
+  cape clock; the step-3 read of the offset stays for observation -- v30 read 0). kernel
+  95fd7568 -> a696adb0 (MAKE_RC=0). payload v31 = 567d8b4d (cmdline back to the v26 bytes 478 B:
+  gpu=1 alone = full machine to step 21, skip 10-12, pause 0, keep=1). graft v31 = aeeeae60...
+  verify-v31 ALL 62 CHECKS PASSED (combined budget 587/607).
+- 15:34:31 FLASH CONFIRMED (gates taro / slot a->b / sha pin; OKAY x2). gen1 = the first full-walk
+  attempt with all cape fixes in: if a step fails, the announce lines localize it; if all answer,
+  the acceptance lines land (zap 12 / GMU fw 14-15-16 / 3D core 17 / THE GPU STAYS ON 21).
+- [intel] coordinator: raphael fork (adelholzener69/hakios-xnu-kernel-raphael, fdf53f296b, same 21-step
+  machine +576/-82 for a640) = the per-chip-variable CHECKLIST for steps 4-11/12-21 if they hang -- which
+  steps are chip-sensitive and what class each swaps; F15 §4.3 has the GPU block dissection (firmware
+  family mixing a630_sqe+a640_gmu, TZ zap semantics, perf calibration). VALUES still anchored to
+  sm8475 vendor kernel + own DTB + zizhan only.
+
+[phase 11] v31 verdict: STEPS 14-18 GREEN, step 19 fails at the zap layout check
+- watcher caught the user keypress 15:46:35 -> set_active a -> logdump done:
+  wave37-scripts/logdump-v26-wave37-w37v31a.bin, 536870912 B PASS, sha256 a99956a2b070cca8...
+- THE WALK: steps 1-5 done (clocks on: ahb measures 150000020 Hz via the cape debug counter, 3D core
+  clock 282999740 Hz = the DTB's 283 MHz initial level, GMU clock ON) ... (full machine) ...
+  THE GMU'S FIRMWARE IS LOADED; versions core 0x40000007 power 0x40000007 HFI 0x20010000 (vendor's
+  GMU_VERSION(4,0,7) EXACT match) / THE GMU'S FIRMWARE RUNS / step 16 done (message queues) /
+  THE 3D CORE HAS POWER AND ANSWERS / step 17 done / step 18 done (a730_sqe.fw 75924 B, SMMU ctx) /
+  step 19 FAILED at the zap HEADER LAYOUT check (never reached TrustZone):
+    "an ELF header of 3 segments, 148 bytes with its table, then 3416 bytes; by the table, 2236 of hashes"
+    "the file is not the header followed by the hashes alone"
+  ROOT CAUSE: cape's a730_zap.mdt has THREE segments (0 = header itself, 1 = code b01 2236 B,
+  2 = HASHES 3416 B); the file IS header+table+hashes (148+3416 = 3564 = its size), but the check
+  read the hash size from segment 1 (sc7280's two-segment layout) = 2236 != 3416. (The earlier
+  "TrustZone returns -3145800" on the zap RELEASE is a separate, tolerated path.)
+- FIX (apply-zap-cape-v32.py, 2 anchors incl. the stale step-5 announce offsets, 20 diff lines, backup
+  hakios.adreno.c.v31-orig): the hash segment = whichever segment's p_filesz completes the file.
+- kernel a696adb0 -> ee283c74; payload v32 = c139672c (kernel-only; cmdline = v26 bytes);
+  graft v32 = ace9533a...; verify-v32 ALL 62 CHECKS PASSED
+- 15:56 FLASH CONFIRMED (gates + OKAY x2). gen1 = the walk with the zap fix in: steps 19 (release may
+  again return -3145800 -- tolerated; the LOAD and AUTH_RESET now get their correct header), 20, 21.
+
+[phase 12] v33 built + flashed (the step-20 address-mode fix)
+- offline analysis during the pause (no device touched): vendor gen7_start (adreno_gen7.c:422) is the
+  gen7-authoritative pre-CP program; it writes NO address-mode registers at all (gen7 = 64-bit native).
+  cross-checks: the driver's qsb_side writes are GEN7-LEGAL (gen7_0_0_gbif_regs carries
+  GBIF_QSB_SIDE0-3 = 0x71620, adreno-gpulist.h:1809 -- my a650-legacy suspicion retracted);
+  RBBM_GBIF_CLIENT_QOS_CNTL value delta (vendor 0x2120212 vs driver 3) = observation item, not touched.
+- FIX (apply-addrmodes-v33.py, 2 anchors, 10 diff lines, backup hakios.adreno.c.v32-orig): the a6xx
+  twelve-register address-mode list removed from step 20 (its sixth write reset the phone in v32);
+  nothing replaces it (the vendor writes nothing there). UCHE_CMDQ_CONFIG / NC_MODE bank encodings
+  noted as later-generation candidates with their own evidence.
+- kernel ee283c74 -> 55a8d40f; payload v33 = cb447ade; graft v33 = 6d5efeb5...; verify-v33 ALL 62 PASSED
+- 19:08:52 FLASH CONFIRMED (gates + OKAY x2). gen1 = steps 1-19 should repeat green; the verdict is
+  step 20 (does the walk survive its register program now) and then 21 (THE GPU STAYS ON).
+
+[phase 13] 🏆 v33 verdict: V0.5 GPU FIRST LIGHT ACHIEVED
+- user landed the phone in Android (16:0x era logdump held v32's complete console); v33 flashed
+  19:08:52 (gates + OKAY x2), gen1 walked the FULL machine; logdump pulled direct from Android:
+  wave37-scripts/logdump-v26-wave37-w37v33gen1.bin, 536870912 B PASS, sha256 f68e4e48955d4b3a...
+- 18 steps done (1-9, 13-21; 10/11/12 skipped by gpu=1's mask 0x1c00 BY DESIGN), ZERO panic:
+  step 19 done (TrustZone authenticated + started the zap shader), step 20 done (THE 3D CORE TAKES
+  COMMANDS), step 21 done ("the page reads 0x600dc0de: THE 3D CORE WRITES OUR MEMORY ON COMMAND"),
+  then "THE GPU STAYS ON for the system to draw with: the service HakiosGPU".
+- closure: wave report docs/waves/wave37-gpu-firstlight.md (六分支 A), STATUS 一句话现状 verdict
+  paragraph, README milestone row (v0.5 ✅) + waves table row, wave36-handoff §7 appendix.

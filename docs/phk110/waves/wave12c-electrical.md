@@ -146,7 +146,7 @@ b20 节奏轮）后第 3 刷 PASS，第 3 刷经外部网调报告确认后续�
 
 | Artifact | Path | Size | SHA-256 |
 | --- | --- | --- | --- |
-| **本波终态镜像（Boot #21 刷在 boot_b，PASS 版）** | `device-layer/udon-hakios-grafted-v10e.img` | 201,326,592 B | `0762e1bf54878d58f71cab7995d85d306c9ee1c04a4bed6b32306ec4815a0e9b` |
+| **本阶段终态镜像（Boot #21 刷在 boot_b，PASS 版）** | `device-layer/udon-hakios-grafted-v10e.img` | 201,326,592 B | `0762e1bf54878d58f71cab7995d85d306c9ee1c04a4bed6b32306ec4815a0e9b` |
 | v10e payload / 内核 / report | `device-layer/udon-hakios-payload-v10e.bin` / `hakios-kernel-v10e.bin` / `udon-hakios-grafted-v10e.report.json` | 14,944,984 / 14,860,288 B | `a2d048c2…` / `b777ff5d…` / `73ce1de4…` |
 | v10d 历史轮（Boot #20） | `device-layer/udon-hakios-grafted-v10d.img` + payload + kernel + report | 192 MiB | img `d69ff2c6…`，payload `1e36558b…`，kernel `49268c95…` |
 | v10c 历史轮（Boot #19 取证轮） | `device-layer/udon-hakios-grafted-v10c.img` + payload + kernel + report | 192 MiB | img `a6d3d007…`，payload `f5502738…`，kernel `181bfc57…` |

@@ -1,0 +1,25 @@
+SKIP /home/cyrux/hakios/refs/UniXNU-Adreno740 (exists)
+SKIP /home/cyrux/hakios/refs/UniXNU-AdrenoPM4 (exists)
+SKIP /home/cyrux/hakios/refs/UniXNU-AdrenoFirmware (exists)
+SKIP /home/cyrux/hakios/refs/UniXNU-AirNir (exists)
+SKIP /home/cyrux/hakios/refs/UniXNU-AdrenoMetal (exists)
+SKIP /home/cyrux/hakios/refs/UniXNU-UniXNU (exists)
+Cloning into '/home/cyrux/hakios/refs/UniXNU-UniXNU-sheng'...
+Cloning into '/home/cyrux/hakios/refs/UniXNU-UniXNU-sm8550-common'...
+=== clone ledger ===
+Adreno740	2a91aa1a14a33e970aa73795274ff361caefbd71	2026-11-11T23:27:40+08:00	158 commits
+AdrenoPM4	282606b528b2595bc4274ea7490b62b323f35a5f	2026-10-25T02:03:54+08:00	3 commits
+AdrenoFirmware	20ad3d7aca14bd46aecab6335c780f5413fa054b	2026-10-25T02:03:54+08:00	3 commits
+AirNir	b356371a74cd158c2902f4886f373ebb0f833a36	2026-10-25T02:03:54+08:00	3 commits
+AdrenoMetal	54ac1a006d274a9b8ca66b13d1db2f5d09e92900	2026-11-11T23:36:55+08:00	289 commits
+UniXNU	75f35420137371d10b5c66399a39619991cde077	2026-11-11T23:42:47+08:00	810 commits
+UniXNU-sheng	14bf88adfadd1f86f33b8bac7f7176e222c6befe	2026-11-11T23:41:31+08:00	611 commits
+UniXNU-sm8550-common	97665e28578483082b674e8375a8fa65f4cf49cf	2026-11-07T16:54:29+08:00	9 commits
+2.1M	/home/cyrux/hakios/refs/UniXNU-Adreno740
+304K	/home/cyrux/hakios/refs/UniXNU-AdrenoFirmware
+3.2M	/home/cyrux/hakios/refs/UniXNU-AdrenoMetal
+324K	/home/cyrux/hakios/refs/UniXNU-AdrenoPM4
+424K	/home/cyrux/hakios/refs/UniXNU-AirNir
+52M	/home/cyrux/hakios/refs/UniXNU-UniXNU
+8.9M	/home/cyrux/hakios/refs/UniXNU-UniXNU-sheng
+368K	/home/cyrux/hakios/refs/UniXNU-UniXNU-sm8550-common

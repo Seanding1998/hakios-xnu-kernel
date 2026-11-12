@@ -2,15 +2,15 @@
 
 > 2026-11-10 · 阶段 30 工具链前置
 > 任务书：把 F15 确认的"固定源码管线范式"（fork 的 `tools/mk-ath10k.py` + 16 个 `check-wifi-*.py`）提前做成 PHK110 v0.6 WiFi 前置工具链；另做 Mu-Silicium nuwaPkg 快查
-> 红线执行：零手机零刷写零 fastboot/adb ✓（全程只碰主机侧 + 上游克隆）；上游浅 clone 全部放 `wave30-scripts/upstream-scratch/`（不入库，已加 .gitignore）✓；未改动 WSL 构建树任何产物 ✓（本波无 WSL 写操作）
+> 红线执行：零手机零刷写零 fastboot/adb ✓（全程只碰主机侧 + 上游克隆）；上游浅 clone 全部放 `wave30-scripts/upstream-scratch/`（不入库，已加 .gitignore）✓；未改动 WSL 构建树任何产物 ✓（本阶段无 WSL 写操作）
 
 ## 0. 判定（先行，六条）
 
-1. **fork 管线范式 = 证实可搬**。`tools/mk-ath10k.py`（191 行）是一条完整的"固定源码 → 主机侧编 .o → 链入 XNU"流水线：4 个上游归档（linux/freebsd/wpa_supplicant/mbedtls）全部 SHA256 锁定 → tar 定向抽取（strip-components 定位）→ 逐文件 patch → clang `-target arm64-apple-ios16.5 -mkernel` 按 FreeBSD 内核码编译 → `ld64 -r` 合体 → 未定义符号门 → 只导出 4 个入口（`lx_prepare/lx_start/lx_stop/lx_transmit`）。`xnu-build.sh` 用 `HAKIOS_OBJECTS=$WIFI_OBJECT` 把 `ath11k.o`/`ath10k.o` 链进 XNU 并按 mtime 失效缓存内核。**这四样（SHA 锁、许可门、stub 阶梯、单入口导出）就是我们要搬的全部骨架**，本波已照搬为可运行的 `wave30-scripts/mk-ath11k.py`。
-2. **本波把管线真跑到了"源码就绪"**：`mk-ath11k.py --verify` 真实拉取 linux-7.0.14.tar.xz（157,262,664 B）+ freebsd-15.1-src.txz（253,039,000 B），SHA256 与 fork 锁定值逐字节一致；抽出 22 个 ath11k 文件（20 core + mhi + pci），**逐文件许可证门 22/22 通过**（fork 规则：每文件必须自带 `SPDX-License-Identifier: BSD-3-Clause-Clear` 或 ISC 全文）；`compile-plan.json` 已产出。编译/链接步按任务书**故意拒绝**（`--build` 返回解释性错误），等内核侧 `hakios.lx.h` 出现。
+1. **fork 管线范式 = 证实可搬**。`tools/mk-ath10k.py`（191 行）是一条完整的"固定源码 → 主机侧编 .o → 链入 XNU"流水线：4 个上游归档（linux/freebsd/wpa_supplicant/mbedtls）全部 SHA256 锁定 → tar 定向抽取（strip-components 定位）→ 逐文件 patch → clang `-target arm64-apple-ios16.5 -mkernel` 按 FreeBSD 内核码编译 → `ld64 -r` 合体 → 未定义符号门 → 只导出 4 个入口（`lx_prepare/lx_start/lx_stop/lx_transmit`）。`xnu-build.sh` 用 `HAKIOS_OBJECTS=$WIFI_OBJECT` 把 `ath11k.o`/`ath10k.o` 链进 XNU 并按 mtime 失效缓存内核。**这四样（SHA 锁、许可门、stub 阶梯、单入口导出）就是我们要搬的全部骨架**，本阶段已照搬为可运行的 `wave30-scripts/mk-ath11k.py`。
+2. **本阶段把管线真跑到了"源码就绪"**：`mk-ath11k.py --verify` 真实拉取 linux-7.0.14.tar.xz（157,262,664 B）+ freebsd-15.1-src.txz（253,039,000 B），SHA256 与 fork 锁定值逐字节一致；抽出 22 个 ath11k 文件（20 core + mhi + pci），**逐文件许可证门 22/22 通过**（fork 规则：每文件必须自带 `SPDX-License-Identifier: BSD-3-Clause-Clear` 或 ISC 全文）；`compile-plan.json` 已产出。编译/链接步按任务书**故意拒绝**（`--build` 返回解释性错误），等内核侧 `hakios.lx.h` 出现。
 3. **决定性新发现（修正 F14 的两个隐含假设）**：上游 linux 7.0.14 的 ath11k **根本没有 `ATH11K_HW_QCA6490` 这个 hw_rev**——PHK110 DTB 里的 `qcom,cnss-qca6490` 在 ath11k 世界里的身份是 **WCN6750 hw1.0**（`core.h` 枚举 + `core.c` hw_params 表在证）；固件目录因此是 **`WCN6750/hw1.0/`**（`core.c:582`，F14 写的 "QCA6490/hw1.0" 不存在）。且 **ath11k_pci 模块对 WCN6750 是"core 就绪、胶水缺失"**：`pci.c` 设备 ID 表只有 QCA6390/WCN6855/QCN9074，`mhi.c` 的 hw_rev switch 没有 WCN6750 case（default 直接报 `failed assign mhi_config`）。→ **管线必须携带 2 个一行级补丁**（见 §2.3，已写成 check 脚本的 GAP 清单）。
 4. **GPL 边界是 ath11k-PCI 路线与 ath10k-SNOC 路线的结构性差异**：ath11k 全树 BSD-3-Clause-Clear（许可门可过），但它依赖的 **drivers/bus/mhi（MHI 主机栈）是 GPL-2.0-only**——不能像 ath11k 一样链入。fork 自己的答案是把总线协议在手写垫层里重实现（`wifi/lx/src/lx_bus.c` 为 WCN6750 手写了 ahb.c 探测序 + 1ms CE 轮询线程，270ms 到 "unified ready" 真机实证）；我们的 MHI 协议实现同样应住在 wifi/lx 层（MHI 环形通道协议本身有公开规范形态，ath11k/mhi.c 的调用面就是需求文档）。
-5. **check-wifi-*.py 的判定模式 = "宿主编译内核真实函数 + mock 环境 + ASan/UBSan + assert"**：脚本用 regex 从 `hakios.wifi.c` 里抽出真实交付到手机的函数（MDT 解析器、QRTR 状态机、SMMU 页表……）连同其常量，镶进生成的 C harness，mock 掉硬件边界（image_file/rd/kmem_alloc 等），`cc -fsanitize=address,undefined` 原生跑 assert，`puts("PASS: ...")` 收尾。**测的是真机验证的那份代码，不是测试替身**。本波 5 个 `check-phk110-wifi-*.py` 已按此范式立起（内核代码未写前先测 DTB/固件清单/环算术/上游契约；e2e 脚本挂 wave27 通道）。
+5. **check-wifi-*.py 的判定模式 = "宿主编译内核真实函数 + mock 环境 + ASan/UBSan + assert"**：脚本用 regex 从 `hakios.wifi.c` 里抽出真实交付到手机的函数（MDT 解析器、QRTR 状态机、SMMU 页表……）连同其常量，镶进生成的 C harness，mock 掉硬件边界（image_file/rd/kmem_alloc 等），`cc -fsanitize=address,undefined` 原生跑 assert，`puts("PASS: ...")` 收尾。**测的是真机验证的那份代码，不是测试替身**。本阶段 5 个 `check-phk110-wifi-*.py` 已按此范式立起（内核代码未写前先测 DTB/固件清单/环算术/上游契约；e2e 脚本挂 wave27 通道）。
 6. **nuwaPkg 情报修正（F15 §5.3 两处失实）**：Mu-Silicium `Platforms/Xiaomi/nuwaPkg`（仅 13 文件）**不是 Redmi K60/SM8475，而是小米 13 Pro/SM8550**——`nuwa.dsc` 注释 `0 = SM8550-AB / 1 = SM8550-AC`、`!include KailuaPkg/KailuaPkg.dsc.inc`、FDT `sm8550-xiaomi-nuwa.dtb`、SMBIOS `PcdSmbiosSystemModel|"13 Pro"` 四处互证。"同 SoC 备胎"降级为"**同生态模板备胎**"（kalama vs cape 隔一代，但它是一套完整能出 UEFI 的 Qualcomm 设备包模板，vendor DXE 全集见 §4）。
 
 ---
@@ -107,7 +107,7 @@ raphael 的 WCN3990-SNOC 特定事实全部**硬编码在 host.c**，这是最�
 | 固件 | MPSS PAS 签名装载 wlanmdsp.mdt+bNN（modem DSP 承载） | **WCN6750/hw1.0/{amss.bin,m3.bin,board-2.bin}** 经 MHI BHI 直载，无 PIL | 固件拉取不走 modem 分区；BDF 纪律照抄 fork（拒绝通用 bdwlan.bin） |
 | 电源 | 借 ICNSS 状态（5 轨核对名） | 6 路轨（aon/dig/io/rfa1/rfa2/ant-switch）+ wlan-en GPIO 80 + bt-en 81 + sw-ctrl 82（phk110.dts:13446 实证） | check-phk110-wifi-dtb.py 已锁死这些事实 |
 
-### 2.2 本波实跑证据（管线就绪的判定依据）
+### 2.2 本阶段实跑证据（管线就绪的判定依据）
 
 ```
 fetch https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.14.tar.xz   → 157,262,664 B, SHA256=de9999b7… ✓
@@ -118,7 +118,7 @@ compile-plan.json emitted ✓
 --build → REFUSED with三条件清单（hakios.lx.h / wifi/lx 实现 / ld64+nm 主机工具）✓
 ```
 
-### 2.3 上游缺口 = 补丁清单（本波最值钱的一页）
+### 2.3 上游缺口 = 补丁清单（本阶段最值钱的一页）
 
 对 staged linux-7.0.14 源码直接读出的三个事实（check-phk110-wifi-mhi.py 自动检测前两个）：
 
@@ -138,10 +138,10 @@ compile-plan.json emitted ✓
 
 五个脚本全部可运行（`--help` + 默认运行，exit 0=PASS/SKIP，1=FAIL），命名与判定对象：
 
-| 脚本 | 判定对象 | 本波实跑 |
+| 脚本 | 判定对象 | 本阶段实跑 |
 |---|---|---|
 | `check-phk110-wifi-dtb.py` | phk110.dts 的 wlan/pcie0 节点事实：cnss-qca6490@b0000000、wlan-en GPIO80、bt-en 81、sw-ctrl 82、6 路轨（含 `wlan-ant-switch-supply` 的无 vdd- 前缀变体——写脚本时被真实 DTS 纠正）、rc-num 0、pcie0@1c00000 reg-names 七件套、msi-map | **PASS 21/21** |
-| `check-phk110-wifi-fw.py` | `fw-phk110/WCN6750/hw1.0/{amss,m3,board-2}.bin` 门 + SHA256 注册表（本波空）+ **通用 bdwlan.bin 拒绝条款**（raphael BDF 教训）+ QCA6490 旧命名别名捕获 | SKIP×3（预期，零手机） |
+| `check-phk110-wifi-fw.py` | `fw-phk110/WCN6750/hw1.0/{amss,m3,board-2}.bin` 门 + SHA256 注册表（本阶段空）+ **通用 bdwlan.bin 拒绝条款**（raphael BDF 教训）+ QCA6490 旧命名别名捕获 | SKIP×3（预期，零手机） |
 | `check-phk110-wifi-mhi.py` | MHI 环算术自检（pow2/门铃回绕）+ staged mhi.c/pci.c 契约（IPCR 20/21、`ath11k_mhi_get_msi` 等真实符号）+ **上游 GAP 自动检测**（§2.3 补丁清单即其输出） | **PASS**（2 GAP 挂账） |
 | `check-phk110-wifi-wlfw.py` | qmi.c 指示族（REQUEST_MEM/FW_MEM_READY/FW_READY/COLD_BOOT_CAL_DONE/FW_INIT_DONE）+ 服务 ID/instance + 消息 ID 数值的 TODO-SOURCE 诚实标注 | **PASS** |
 | `check-phk110-wifi-e2e.py` | 未来验收门（挂机后启用）：`getvar:wifi-state/wifi-fw/wifi-irq`（loader 通道）+ `kern.hakios.wifi.{scan_done,link,ssid}`（SSH/sysctl，wave22 约定）+ 五级阶梯 driver-attached→fw-ready→scan-heard→joined→frames（rung5 复用 wave27 SSH 门）；零手机时 SKIP | SKIP（dry-run 契约可打印） |
@@ -183,21 +183,21 @@ compile-plan.json emitted ✓
 | 2 | wifi/lx 移植起步：lx_base/锁线程内存 + **WCN6750 PCIe/MHI 总线层**（BHI 引导、通道环、IPCR→QRTR 端点） | #1 | `wifi/lx/src/lx_bus.c` 同位物 |
 | 3 | 上游补丁 A/B 入库：pci.c 设备 ID + mhi.c WCN6750 config case（进 `wave30-scripts` 或内核树 patches/） | #2 | `patches/mhi-wcn6750-config.patch` 等 |
 | 4 | `mk-ath11k.py --build` 解禁：补 CC 环境探测 + stub 阶梯账本（`out/stubs.txt`）接进 `--verify` 报告 | #1–3 | 首个 `ath11k.o`（哪怕全 stub） |
-| 5 | 固件拉取实跑（`pull-firmware` 按本波修正的 `WCN6750/hw1.0` 布局落 `fw-phk110/`），SHA 回填 check-phk110-wifi-fw 注册表 | 手机回归 | fw-phk110/ 3 文件 + SHA 锁 |
-| 6 | e2e 门通电：loader 注册 `getvar:wifi-*`、内核注册 `kern.hakios.wifi.*`（名字按本波 e2e 脚本契约） | #4 + 内核 WiFi 首步 | check-phk110-wifi-e2e 从 SKIP 转 PASS 路径 |
+| 5 | 固件拉取实跑（`pull-firmware` 按本阶段修正的 `WCN6750/hw1.0` 布局落 `fw-phk110/`），SHA 回填 check-phk110-wifi-fw 注册表 | 手机回归 | fw-phk110/ 3 文件 + SHA 锁 |
+| 6 | e2e 门通电：loader 注册 `getvar:wifi-*`、内核注册 `kern.hakios.wifi.*`（名字按本阶段 e2e 脚本契约） | #4 + 内核 WiFi 首步 | check-phk110-wifi-e2e 从 SKIP 转 PASS 路径 |
 | 7 | QMI WLFW 消息 ID 数值源纳入 SOURCES（§2.3-5），冻结 shim 表 | #2 | wlfw id 头 + 回归 |
 
 ## 6. 诚实边界
 
 1. fork 的 `check-wifi-*.py` 只解剖了 3/16（mdt/qrtr/smmu）+ 全清单行数统计，其余 13 个按同范式推断——范式判定不依赖它们。
-2. `ath11k_mhi_config_qca6490` 独立表在别的树（vendor/ Qualcomm 分支）是否存在未查——本波只对 linux 7.0.14 主线树下判；补丁 B 选 qca6390 表复用有 `core.c` CE 配置复用在证，但**最终以实测 fw-ready 为准**。
+2. `ath11k_mhi_config_qca6490` 独立表在别的树（vendor/ Qualcomm 分支）是否存在未查——本阶段只对 linux 7.0.14 主线树下判；补丁 B 选 qca6390 表复用有 `core.c` CE 配置复用在证，但**最终以实测 fw-ready 为准**。
 3. PHK110 PCI device id（17cb:?）未实测（零手机），§2.3 补丁 A 留白。
 4. mk-ath11k.py 的 compile/link 段未真跑（任务书边界 + 主机无 arm64 clang/ld64）；其 flags 与序列是 fork 同款逐字搬运，风险点（WME 宏冲突、crc.c 生成、opt 头集合）已在 §1 记录。
 5. QMI WLFW ID 数值未入库（§2.3-5）。
 6. nuwaPkg 依据 = 13 文件全文 + 目录清单；Mu-Silicium wiki/README 的设备状态表未读（不在 sparse 子树内），"vendor DXE 全集能用"是结构判断，未构建验证。
 7. 上游克隆与缓存全部在 `wave30-scripts/upstream-scratch/`（.gitignore 新增条目，不入库）；`upstream-manifest.txt` 基线（kernel@96ffbc5 等）未动。
 
-## 附录：本波文件清单
+## 附录：本阶段文件清单
 
 - `wave30-scripts/mk-ath11k.py`（骨架管线，可运行）
 - `wave30-scripts/check-phk110-wifi-{dtb,fw,mhi,wlfw,e2e}.py`（5 门）

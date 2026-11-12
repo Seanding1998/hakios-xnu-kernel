@@ -1,0 +1,22 @@
+=== AirNir: repos API license field ===
+{"default_branch":"main","license":{"key":"mit","name":"MIT License","node_id":"MDc6TGljZW5zZTEz","spdx_id":"MIT","url":"https://api.github.com/licenses/mit"},"pushed_at":"2026-10-24T18:04:57Z","size":48}
+=== AirNir: /license endpoint ===
+{"name":"MIT License","path":"LICENSE","sha":"9b9bc8a5eaedf5e71731d54d17baaa86b82c7099","size":1076,"spdx":"MIT"}
+=== AirNir: root listing ===
+file	.clang-format	51
+file	AGENTS.md	2105
+file	AirNir.h	1985
+file	BackendABI.h	7458
+file	ConstantUploads.c	6677
+file	ConstantUploads.h	1842
+file	Frontend.cpp	40923
+file	FusedF32.h	8235
+file	LICENSE	1076
+file	Library.c	8478
+file	Library.h	1931
+file	MesaBackend.c	19658
+file	README.md	306
+dir	licenses	0
+dir	tests	0
+=== AirNir: HEAD ===
+b356371a74cd158c2902f4886f373ebb0f833a36	2026-10-24T18:03:54Z	docs: document component scope and shared porting workflow

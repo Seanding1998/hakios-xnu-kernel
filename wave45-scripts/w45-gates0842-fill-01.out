@@ -1,0 +1,17 @@
+gl_test: freedreno; FD725; OpenGL ES 3.2 Mesa 25.0.7
+gl_test: RENDER backend=hw renderer=FD725
+os_same_file_description couldn't determine if two DRM fds reference the same file description. (No such file or directory)
+Let's just assume that file descriptors for the same file probablyshare the file description instead. This may cause problems whenthat isn't the case.
+gl_test: fill: frames of 1080 x 2400 (10125 KB), the shortest of 16 each:
+gl_test: fill: a clear and nothing else                         290 us (the longest 1283)
+gl_test: fill: no clear, one small rectangle                    122 us (the longest 682)
+gl_test: fill: a clear, 1 rectangle over all of it              771 us (the longest 943)
+gl_test: fill: a clear, 2 rectangles                           1017 us (the longest 1055)
+gl_test: fill: a clear, 4 rectangles                           1502 us (the longest 1716)
+gl_test: fill: a clear, 8 rectangles                           2682 us (the longest 2918)
+gl_test: fill: a clear, 1 rectangle with a texture, blended     773 us (the longest 822)
+gl_test: fill: a clear, 2 such                                 1021 us (the longest 1069)
+gl_test: fill: a clear, 4 such                                 1735 us (the longest 1775)
+gl_test: fill: a clear, 8 such                                 3180 us (the longest 3436)
+gl_test: fill: error 0
+FILL_RC=0

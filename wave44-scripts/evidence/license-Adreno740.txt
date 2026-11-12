@@ -1,0 +1,83 @@
+=== Adreno740: repos API license field ===
+{"default_branch":"main","license":{"key":"mit","name":"MIT License","node_id":"MDc6TGljZW5zZTEz","spdx_id":"MIT","url":"https://api.github.com/licenses/mit"},"pushed_at":"2026-11-11T15:28:16Z","size":676}
+=== Adreno740: /license endpoint ===
+{"name":"MIT License","path":"LICENSE","sha":"8803ca3258ca670bd45c3ee0d411aa8297932a73","size":1082,"spdx":"MIT"}
+=== Adreno740: root listing ===
+file	AGENTS.md	2116
+file	Info.plist	1258
+file	LICENSE	1082
+file	NativeAdrenoA740HwInit.h	6721
+file	NativeAdrenoABI.h	9218
+file	NativeAdrenoAccelerator.cpp	2945
+file	NativeAdrenoBoard.cpp	2435
+file	NativeAdrenoBoard.h	1502
+file	NativeAdrenoClient.cpp	8200
+file	NativeAdrenoClient.h	2506
+file	NativeAdrenoCpInit.cpp	2887
+file	NativeAdrenoCpInit.h	2112
+file	NativeAdrenoCpu.cpp	13132
+file	NativeAdrenoFirmware.cpp	722
+file	NativeAdrenoFirmware.h	961
+file	NativeAdrenoFirmwareDefaults.cpp	788
+file	NativeAdrenoGmuConfig.cpp	1730
+file	NativeAdrenoGmuConfig.h	866
+file	NativeAdrenoGmuContext.cpp	5986
+file	NativeAdrenoGmuContext.h	3560
+file	NativeAdrenoGmuMemory.cpp	4169
+file	NativeAdrenoGmuMemory.h	3445
+file	NativeAdrenoGmuPlatform.cpp	2503
+file	NativeAdrenoGmuPlatform.h	1426
+file	NativeAdrenoGmuService.cpp	3897
+file	NativeAdrenoGmuService.h	1165
+file	NativeAdrenoGpu.cpp	2908
+file	NativeAdrenoGpu.h	3337
+file	NativeAdrenoGpuContext.cpp	14380
+file	NativeAdrenoGpuContext.h	7681
+file	NativeAdrenoHandleIndex.h	3694
+file	NativeAdrenoIrq.cpp	5042
+file	NativeAdrenoIrq.h	2521
+file	NativeAdrenoKernelTime.cpp	503
+file	NativeAdrenoKernelTime.h	482
+file	NativeAdrenoMemory.cpp	34234
+file	NativeAdrenoMemory.h	15627
+file	NativeAdrenoPool.cpp	16863
+file	NativeAdrenoPool.h	9479
+file	NativeAdrenoPreempt.cpp	9542
+file	NativeAdrenoPreempt.h	8443
+file	NativeAdrenoPublish.cpp	91049
+file	NativeAdrenoPwrup.cpp	2670
+file	NativeAdrenoPwrup.h	1864
+file	NativeAdrenoPwrupRegs.h	745
+file	NativeAdrenoRing.cpp	37871
+file	NativeAdrenoRing.h	16734
+file	NativeAdrenoService.cpp	36917
+file	NativeAdrenoSha256.cpp	2950
+file	NativeAdrenoSha256.h	531
+file	NativeAdrenoSmmuContext.cpp	2921
+file	NativeAdrenoSmmuContext.h	3720
+file	NativeAdrenoSmmuMemory.cpp	7785
+file	NativeAdrenoSmmuMemory.h	3623
+file	NativeAdrenoSmmuService.cpp	3941
+file	NativeAdrenoSmmuService.h	1090
+file	NativeAdrenoStatus.h	1146
+file	NativeAdrenoSubmit.cpp	69807
+file	NativeAdrenoSubmit.h	20876
+file	NativeAdrenoTimer.cpp	2214
+file	NativeAdrenoTimer.h	1908
+file	NativeAdrenoUserClient.cpp	40257
+file	NativeAdrenoUserClient.h	11099
+file	NativeAdrenoVm.cpp	47808
+file	NativeAdrenoVm.h	18692
+file	NativeAdrenoVmAlias.h	2240
+file	NativeGpuLatency.h	2046
+file	NativeGpuPerfCounters.h	1842
+file	NativeGpuPerfCountersTest.cpp	820
+file	NativeGpuThreadTargets.h	1231
+file	NativeGpuTrace.h	1808
+file	NativeGpuTrace.inc	4100
+file	NativeGpuTraceStore.h	1714
+file	NativeGpuTraceTest.cpp	3291
+file	README.md	5276
+dir	tests	0
+=== Adreno740: HEAD ===
+2a91aa1a14a33e970aa73795274ff361caefbd71	2026-11-11T15:27:40Z	fix(submit): count the BV thread's progress as GPU progress

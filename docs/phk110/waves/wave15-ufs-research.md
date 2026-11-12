@@ -21,7 +21,7 @@
 
 ## 1. upstream 存储架构考古（最重要）
 
-### 1.1 三层接力总览
+### 1.1 三层转接总览
 
 ```
 [UEFI]  vendor UFSDxe（闭源 DXE）= 唯一 init 者：控制器+PHY+时钟+RPMh 电源+链路+SCSI 探测，UEFI 永不退出
@@ -178,7 +178,7 @@ SAME  userland/src/var_store.c
 SAME  tools/userdata-carve.py
 SAME  tools/darwin-write.py
 DIFF  xnuloader/loader.c   (201 行 = PAYLOAD_BASE 参数化 + klog flush 修复 + GICR stride + platform_phk110 —— 全是已刷入真机验证的 PHK110 平台件，存储段 0 diff)
-DIFF  configs/common_defconfig (7 行 = S3910/buttons 条目，与本波无关)
+DIFF  configs/common_defconfig (7 行 = S3910/buttons 条目，与本阶段无关)
 ```
 
 ### 3.2 配置链现状
@@ -292,7 +292,7 @@ Binaries/udon（提取自本机原厂 FD）已就位。**真机验证实证**：
 
 ### boot-args 总账（608 字符预算，现用 451）
 ```
-+ufs=2 ufs_write=1 var_hfs=ufs_darwin_data     → ~+50 字符（S0+S3+S6 三波分步加）
++ufs=2 ufs_write=1 var_hfs=ufs_darwin_data     → ~+50 字符（S0+S3+S6 三刷分步加）
 （N 步另加 ufs_native=…；S8 不需要新 arg）
 ```
 

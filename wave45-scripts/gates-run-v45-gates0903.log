@@ -1,0 +1,10 @@
+[09:05:58 t+0000.0s] wave45 gates hunt armed (run-id gates0903, deadline 150 min)
+[09:05:58 t+0000.0s] gates on record: A=None B=PASS C=hardware-DONE D=None
+[09:05:58 t+0000.0s] bus: d00d addrs [1] (was None)
+[09:05:58 t+0000.4s] attempt k001 -> rc=0 in 0.4s (out 257 B)
+[09:05:58 t+0000.4s] branch: HIT
+[09:05:58 t+0000.4s] === HIT: entering the gates ladder (open: a,d) ===
+[09:06:04 t+0006.2s] attempt klog -> rc=0 in 5.8s (out 7373 B)
+[09:06:04 t+0006.2s] klog pull: 7359 B in 5.8s
+[09:06:04 t+0006.2s] gate A -> REGRESSED (steps 0, magic False, stays-on False)
+[09:06:04 t+0006.2s] MARCH STOP: gate A = REGRESSED: the mission's stop-loss stops the ladder here -- the ladder is abandoned (verdict45-overall.txt written)

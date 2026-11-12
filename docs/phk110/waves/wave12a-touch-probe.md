@@ -23,15 +23,15 @@ GENI 直接探活成功（`firmware 0x102` = SPI 协议，引擎可达且有时�
 
 | Artifact | Path | Size | SHA-256 |
 | --- | --- | --- | --- |
-| **本波镜像（现刷在 boot_b，Boot #17）** | `device-layer/udon-hakios-grafted-v10.img` | 201,326,592 B (192 MiB) | `a5bd42dca06c8398e1465a205f1b9bb06015b4ce69fc08b453bdc9e8f95b5bfb` |
+| **本阶段镜像（现刷在 boot_b，Boot #17）** | `device-layer/udon-hakios-grafted-v10.img` | 201,326,592 B (192 MiB) | `a5bd42dca06c8398e1465a205f1b9bb06015b4ce69fc08b453bdc9e8f95b5bfb` |
 | payload v10（kernel 换 v10 + cmdline 300→60） | `device-layer/udon-hakios-payload-v10.bin` | 14,944,584 B | `1e4abe33c68ad8237bfe0ff0a8567b1dfac1bb2ca5ab2184a85826e25bc681ac` |
 | cmdline v10（374 B = v9 的 375 B 翻 300→60） | `device-layer/udon-hakios-cmdline-v10.bin` | 374 B | `81a56ccfb81699550b0ae30f457e03b2556af9df167c885a84e2907b829e572b` |
 | 打包报告 | `device-layer/udon-hakios-grafted-v10.report.json` | — | fd `8924cb67…` / shim `108ce972…` / container `1f147ae1…` |
-| 本波脚本（cmdline/repack/verify） | `wave12-scripts/`→ `wave12a-scripts/make-cmdline-v10.py`、`repack-payload-v10.py`、`verify-udon-hakios-v10.py` | — | 只新增，未动 v7/v9 任何文件 |
+| 本阶段脚本（cmdline/repack/verify） | `wave12-scripts/`→ `wave12a-scripts/make-cmdline-v10.py`、`repack-payload-v10.py`、`verify-udon-hakios-v10.py` | — | 只新增，未动 v7/v9 任何文件 |
 | Boot #17 logdump | `logdump-v10.bin`（仓库根） | 131,072 B | `c01cc7605a3a1a21a949bb91a93da14c0452610fbfae26edb037aab3099da41d` |
 | **Boot #17 内核日志（判定证据）** | `intel/m3-boot1/b17-kernel-log.txt` | 24,771 B | `3c4b68e2b698a223a2192fee705a832354c9591863e6c4fbb70e4c9f19b9f4ed` |
 
-未动构件（逐字节校验，红线遵守）：FD（`8924cb67…`，v4 起从未重建——本波从 WSL 构建输出原样取用）、
+未动构件（逐字节校验，红线遵守）：FD（`8924cb67…`，v4 起从未重建——本阶段从 WSL 构建输出原样取用）、
 BootShim（`108ce972…`）、loader.efi（`66c6b342…`）、ramdisk（`4f72da61…`）、kernel.ver（`afd473f5…`）
 ——后三者经 repack 断言 + 验证脚本条目级 cmp 双重确认逐字节=v9=v6 原件。
 
@@ -52,7 +52,7 @@ BootShim（`108ce972…`）、loader.efi（`66c6b342…`）、ramdisk（`4f72da6
    `~/hakios/uefi-udon/Build/udonPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd` 原样取用
    （sha `8924cb67…` = v4→v9 报告同值，禁重建条款遵守）。
 4. `verify-udon-hakios-v10.py`：32 项基线 + 2 项新增（FD=`8924cb67` 钉死、cmdline=仅 token 翻转）
-   = **ALL 34 CHECKS PASSED**。条目级：kernel==v10 构建件且 ≠v9；cmdline==本波文件且
+   = **ALL 34 CHECKS PASSED**。条目级：kernel==v10 构建件且 ≠v9；cmdline==本阶段文件且
    `replace(60→300)==v9 条目`；loader.efi/ramdisk/kernel.ver 逐字节==v9。
 
 ## 2. 刷写与取证全记录（Boot #17）
@@ -83,7 +83,7 @@ BootShim（`108ce972…`）、loader.efi（`66c6b342…`）、ramdisk（`4f72da6
 [   10.402451]: GenericARMPE: 7 of 7 processors are running
 [   10.494099]: bsd_init: bsd_do_post - done
 [   60.387860]: memory: free 6071, …
---- loader_return_after expired ---   （60 s 真机验证兑现，本波 cmdline 唯一改动生效）
+--- loader_return_after expired ---   （60 s 真机验证兑现，本阶段 cmdline 唯一改动生效）
 ```
 按键链照常工作（ch 407/434、type/subtype 逐字吻合 v9，`1256 reads of the bus, 6 us each … 0 failed`）。
 

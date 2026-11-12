@@ -1,0 +1,191 @@
+--- /home/cyrux/hakios/kernel/drivers/gpu/hakios.adreno.c.v41-orig	2026-11-11 22:51:13.676696980 +0800
++++ /home/cyrux/hakios/kernel/drivers/gpu/hakios.adreno.c	2026-11-11 22:51:32.637636247 +0800
+@@ -2517,6 +2517,28 @@
+ #define CP_ME_INIT              0x48
+ #define CP_SET_MARKER           0x65
+ #define CP_SET_SECURE_MODE      0x66
++#define CP_THREAD_CONTROL       0x17    /* [VENDOR adreno_pm4types.h] */
++#define CP_THREAD_CONTROL_CONCURRENT_BIN_DISABLE (1u << 27)     /* Mesa's CONCURRENT_BIN_DISABLE */
++
++/*
++ * The seventh generation says, in the word after a type-7 header, what a completion event
++ * writes and where (Mesa's CP_EVENT_WRITE7, adreno_pm4.xml: the event id in bits 0-7,
++ * WRITE_SRC in 20-22, WRITE_DST in 24, WRITE_ENABLED in bit 27, IRQ in 31). The vendor's
++ * fence event is CACHE_CLEAN with WRITE_ENABLED (adreno_gen7_ringbuffer.c: CACHE_CLEAN |
++ * BIT(27); BIT(31) more is the interrupting kind, which this polling wait does not ask
++ * for), and Linux's a7xx_submit builds the same. WRITE_SRC 0 is the payload word after the
++ * 64-bit address (EV_WRITE_USER_32B), WRITE_DST 0 is memory (EV_DST_RAM): with the bit off
++ * the core writes nothing anywhere, and the submission number a waiter reads in the scratch
++ * page never arrives -- the sixth generation's event word (0x04) asked for the event alone
++ * and put the number in a scratch register instead.
++ */
++#define EV_WRITE_USER_32B       0
++#define EV_DST_RAM              0
++#define CP_EVENT_WRITE7_SRC(src)        ((uint32_t)(src) << 20)
++#define CP_EVENT_WRITE7_DST(dst)        ((uint32_t)(dst) << 24)
++#define CP_EVENT_WRITE7_WRITE_ENABLED   (1u << 27)
++#define FENCE_EVENT(event)      ((event) | CP_EVENT_WRITE7_SRC(EV_WRITE_USER_32B) | CP_EVENT_WRITE7_DST(EV_DST_RAM) \
++	    | CP_EVENT_WRITE7_WRITE_ENABLED)
+ 
+ /*
+  * Linux (qcom_adreno_smmu_write_sctlr): after a fault the core's other requests are served, or it
+@@ -2570,6 +2592,18 @@
+ 	ring(value);
+ }
+ 
++/* A completion event of the seventh generation, with its write-back: the event id, where the
++ * word goes, and the word itself (a type-7 header and four words, FENCE_EVENT first). */
++static void
++ring_fence_event(uint32_t event, uint64_t address, uint32_t word)
++{
++	ring_command(CP_EVENT_WRITE, 4);
++	ring(FENCE_EVENT(event));
++	ring((uint32_t)address);
++	ring((uint32_t)(address >> 32));
++	ring(word);
++}
++
+ /* What has been written to the ring since the last time: out to memory, and the core told how far to read. */
+ static void
+ ring_send(void)
+@@ -2761,6 +2795,17 @@
+ 	return true;
+ }
+ 
++/*
++ * How the five NC_MODE registers encode the memory's banks: highest_bank_bit, 16 for this
++ * chip (gen7_4_0 in the vendor's list, Mesa's FD725), which the vendor's own start takes down
++ * to 14 when the memory is DDR type 0x7 ("If the memory type is DDR 4", adreno_gen7.c
++ * gen7_init). This phone's device tree declares ddr_device_type = <0x08> (phk110.dts:22), so
++ * the override does not fire -- but the branch is kept below, and the adreno_ddr_type boot
++ * argument corrects a tree that lies without a rebuild. Mesa is told the same number
++ * (hakios_gpu_parameter).
++ */
++static uint32_t gpu_highest_bank_bit = 16;
++
+ /* ---- step 20: the 3D core's registers, its command processor started, its first command ------------------- */
+ 
+ static bool
+@@ -2800,14 +2845,27 @@
+ 	put(&gpu, "pc_dbg_eco_cntl", PC_DBG_ECO_CNTL, 0x00200200);
+ 	put(&gpu, "cp_ahb_cntl", CP_AHB_CNTL, 1);
+ 	/*
+-	 * How textures in the GPU's own tiled and compressed layouts are laid out in memory (Linux's
+-	 * a6xx_calc_ubwc_config, a6xx_set_ubwc_config for this GPU: highest bank bit 14, and the
+-	 * rest as below); Mesa is told the same (hakios_gpu_parameter()).
++	 * How textures in the GPU's own tiled and compressed layouts are laid out in memory: the
++	 * vendor's gen7_gpu_init computes these five from highest_bank_bit and the device tree's
++	 * qcom,min-access-length (adreno_gen7.c: bank_bit = (highest_bank_bit - 13) & 3, each
++	 * register takes bank_bit in its own field, a 64-byte access length would add its bit, and
++	 * this phone's tree says <0x20>, 32, so none). The values this table had were bank_bit 1's
++	 * -- highest_bank_bit 14, what a DDR-4 machine gets -- while the chip, its tree and Mesa
++	 * all say 16: bank_bit 3. GRAS_NC_MODE_CNTL (word 0x8602, gen7_reg.h:726) is the vendor's
++	 * fifth register, which the sixth generation has no counterpart of and the old table forgot.
+ 	 */
+-	put(&gpu, "rb_nc_mode_cntl", GPU_WORD(0x8e08), 1u << 11 | 1u << 4 | 1u << 1);
+-	put(&gpu, "tpl1_nc_mode_cntl", GPU_WORD(0xb604), 1u << 1);
+-	put(&gpu, "sp_nc_mode_cntl", GPU_WORD(0xae02), 2u << 4 | 1u << 1);
+-	put(&gpu, "uche_mode_cntl", GPU_WORD(0x0e01), 1u << 21);
++	uint32_t ddr_type = 0x8, bank_bit;      /* dt: ddr_device_type (phk110.dts:22) */
++
++	PE_parse_boot_argn("adreno_ddr_type", &ddr_type, sizeof(ddr_type));
++	if (ddr_type == 0x7) {                 /* [VENDOR adreno_gen7.c gen7_init] DDR 4: highest_bank_bit 14 */
++		gpu_highest_bank_bit = 14;
++	}
++	bank_bit = (gpu_highest_bank_bit - 13) & 3;
++	put(&gpu, "rb_nc_mode_cntl", GPU_WORD(0x8e08), 1u << 11 | 1u << 4 | bank_bit << 1);
++	put(&gpu, "tpl1_nc_mode_cntl", GPU_WORD(0xb604), bank_bit << 1);
++	put(&gpu, "sp_nc_mode_cntl", GPU_WORD(0xae02), 2u << 4 | bank_bit << 1);
++	put(&gpu, "gras_nc_mode_cntl", GPU_WORD(0x8602), bank_bit << 5);
++	put(&gpu, "uche_mode_cntl", GPU_WORD(0x0e01), bank_bit << 21);
+ 	put(&gpu, "rbbm_nc_mode_cntl", GPU_WORD(0x0534), 1);
+ 	put(&gpu, "rbbm_perfctr_cntl", RBBM_PERFCTR_CNTL, 1);
+ 	put(&gpu, "rbbm_interface_hang_int_cntl", RBBM_INTERFACE_HANG_INT_CNTL, 1u << 30 | 0x1fffff);
+@@ -2855,6 +2913,23 @@
+ 	}
+ 
+ 	announce("give the 3D core its first command, \"initialize\"");
++	/*
++	 * The vendor's own command-processor start turns concurrent binning off first
++	 * (gen7_cp_init_cmds: "Disable concurrent binning before sending CP init"), and Mesa's
++	 * seventh-generation restores do the same (fd6_emit.cc: CP_THREAD_CONTROL with
++	 * CONCURRENT_BIN_DISABLE). This kernel drives one direct command stream: binning beside
++	 * rendering needs the binning stream's own completion event and the CP_WAIT_TIMESTAMP that
++	 * orders it against the render stream before the draws that read it (the three-part fence
++	 * of adreno_gen7_ringbuffer.c) -- none of which exist here. CONCURRENT_BINNING below is
++	 * the single switch, and a hard precondition, not a TODO: flipped before those exist, it
++	 * fails right here.
++	 */
++#define CONCURRENT_BINNING 0
++#if CONCURRENT_BINNING
++#error "concurrent binning needs the BV and BR completion events and CP_WAIT_TIMESTAMP first (see the comment above)"
++#endif
++	ring_command(CP_THREAD_CONTROL, 1);
++	ring(CP_THREAD_CONTROL_CONCURRENT_BIN_DISABLE);
+ 	ring_command(CP_ME_INIT, 8);            /* a6xx_cp_init; gen7 turns DMS off with bit 11 [PONG] */
+ 	ring(0x0000082f);
+ 	ring(0x00000003);                       /* several hardware contexts */
+@@ -2922,8 +2997,11 @@
+ #define FORMAT_8888             0x30
+ #define BLIT_SOLID_8888         (1u << 7 | FORMAT_8888 << 8 | 0xfu << 20 | 0x10u << 24) /* one colour; all channels; 8-bit */
+ #define DST_BGRA_LINEAR         (FORMAT_8888 | 1u << 10)        /* rows of pixels, blue first in memory */
+-#define EVENT_FLUSH_COLOR       0x1d
+-#define EVENT_CACHE_FLUSH       0x04
++#define EVENT_CCU_CLEAN_COLOR   0x20    /* the seventh generation's clean of the colour caches (Mesa's
++                                         * fd_gpu_events: FD_CCU_CLEAN_COLOR = CCU_CLEAN_COLOR); the sixth's
++                                         * 0x1d flush is, on a seventh, its clean-and-invalidate kind */
++#define EVENT_CACHE_CLEAN       0x31    /* [VENDOR adreno_pm4types.h CACHE_CLEAN] the event the seventh generation's
++                                         * fences write their word back with */
+ #define TARGET_WIDTH            1080
+ #define TARGET_HEIGHT           2400
+ #define TARGET_ROW              4352            /* 1088 pixels: the next multiple of 64 bytes */
+@@ -2975,21 +3053,13 @@
+ 	ring_fill(800, 1600, 255, 255, 255);
+ 	ring_fill(1600, TARGET_HEIGHT, 0, 128, 255);
+ 	/*
+-	 * What it has drawn out of its caches into memory. Each of the two events is followed by an
+-	 * address and a word that the core writes there when it is done (Linux's a6xx_submit; Mesa's
+-	 * tu6_emit_event_write: the events named ..._TS): the core takes those three words whether
+-	 * they are there or not.
++	 * What it has drawn out of its caches into memory. Each event says, in the seventh
++	 * generation's own fields, to write its word into memory when the clean is done (the sixth
++	 * generation asked for the event alone and never had the word after the address written;
++	 * wave 41 gives these the same write-back the submission fences have).
+ 	 */
+-	ring_command(CP_EVENT_WRITE, 4);
+-	ring(EVENT_FLUSH_COLOR);
+-	ring(CORE_SCRATCH_ADDRESS + 32);
+-	ring(0);
+-	ring(0x0c0c0c0c);
+-	ring_command(CP_EVENT_WRITE, 4);
+-	ring(EVENT_CACHE_FLUSH);
+-	ring(CORE_SCRATCH_ADDRESS + 16);
+-	ring(0);
+-	ring(0x0d0e0d0e);
++	ring_fence_event(EVENT_CCU_CLEAN_COLOR, CORE_SCRATCH_ADDRESS + 32, 0x0c0c0c0c);
++	ring_fence_event(EVENT_CACHE_CLEAN, CORE_SCRATCH_ADDRESS + 16, 0x0d0e0d0e);
+ 	ring_command(CP_WAIT_FOR_IDLE, 0);
+ 	if (!ring_run("fill a picture")) {
+ 		return false;
+@@ -3349,7 +3419,7 @@
+ 		*value = 1;
+ 		return true;
+ 	case 0x10:                              /* HIGHEST_BANK_BIT */
+-		*value = 16;                    /* [VENDOR highest_bank_bit] = Mesa's FD725 (16) */
++		*value = gpu_highest_bank_bit;  /* what the NC_MODE registers were computed from (16; 14 if the memory is DDR type 0x7) */
+ 		return true;
+ 	case 0x12:                              /* UBWC_SWIZZLE */
+ 		*value = 6;                     /* [TODO-DEV] the reference's 6; this phone's dt says ubwc-mode <0x04> */
+@@ -3564,11 +3634,7 @@
+ 	}
+ 	ring_time(gpu_fence, 1);
+ 	ring_register(CP_SCRATCH_REG2, gpu_fence);
+-	ring_command(CP_EVENT_WRITE, 4);
+-	ring(EVENT_CACHE_FLUSH);
+-	ring(CORE_SCRATCH_ADDRESS + GPU_FENCE_AT);
+-	ring(0);
+-	ring(gpu_fence);
++	ring_fence_event(EVENT_CACHE_CLEAN, CORE_SCRATCH_ADDRESS + GPU_FENCE_AT, gpu_fence);
+ 	ring_send();
+ 	return gpu_fence;
+ }

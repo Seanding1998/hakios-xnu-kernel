@@ -12,7 +12,7 @@
 |---|---|
 | **机制（使命 1）** | **不是** HFS+ 卷离线预置、**不是** init 从分区解包 tar、**不是** USB 安装。是 **构建期把 bootstrap 前缀离线预置进系统 APFS 镜像（`/jb`，只读）+ 设备侧 init 每次 boot 自动嫁接（graft）到 `/private/var/jb`**。HFS+ 数据卷只是嫁接地，唯一的"离线种子"是 ssh 密钥（经镜像内 `etc/var.skel` 通道，init 开机时种子进卷） |
 | **下载核验（使命 2）** | `mk-jb.sh` 副本运行 **EXIT=0**：bootstrap `1800` 套件快照（20,792,571 B，sha256 `a99b39bb…`）+ 7 个 .deb 全部落 `jb/debs/`，sha256 全记录；前缀 `jb/root/var/jb` = **130M / 6,926 条目 / 70 包**；openssh-server **9.7p1-1**（仓库最新，已预置解包）；sshd 抽查 = 纯 **arm64**（cputype 0x0c000001 subtype 0，零 arm64e） |
-| **预置落地（使命 3）** | 机制 = 系统镜像侧预置，HFS+ 离线写入**不需要也不可行**（WSL2 内核无 hfsplus 文件系统，实测记录见 §6）；`jb/` 与 `ssh/` 两个 build.sh 输入目录已就位，下一波拷入 kernel 树顶层跑一次 `RC_JOBS=rc.jobs.ssh userland/build.sh` 即完成全部接线 |
+| **预置落地（使命 3）** | 机制 = 系统镜像侧预置，HFS+ 离线写入**不需要也不可行**（WSL2 内核无 hfsplus 文件系统，实测记录见 §6）；`jb/` 与 `ssh/` 两个 build.sh 输入目录已就位，下一阶段拷入 kernel 树顶层跑一次 `RC_JOBS=rc.jobs.ssh userland/build.sh` 即完成全部接线 |
 | **密钥（使命 4）** | host key（ed25519）+ 登录密钥对已生成于 `procursus-prep/{ssh,keys}/`，公钥/指纹见 §5 留档；`ssh/` 目录布局严格对齐 build.sh:392-403 的 `../ssh` 读取约定 |
 | 磁盘 | 本阶段净耗 **~156M**（130M 前缀 + 26M debs + 密钥/日志），WSL 916G 可用，无压力 |
 | 红线 | 零手机调用 ✅；kernel 树只读（脚本副本执行，ROOT 解析为 procursus-prep）✅；`var-hfs-data.img` 原件未动（仅 sparse 读复制）✅；下载全走 127.0.0.1:7897 ✅ |
@@ -114,7 +114,7 @@
 
 **本阶段已完成（产物即交付物）**：`~/hakios/procursus-prep/` 下 `jb/root/var/jb`（前缀树 = build.sh 的 `../jb` 输入）、`ssh/`（build.sh 的 `../ssh` 输入）、`keys/`（登录密钥对）、`logs/`（哈希台账）。
 
-**下一波执行（构建窗口期，与 阶段 12a 协调，勿并行写 kernel 树）**：
+**下一阶段执行（构建窗口期，与 阶段 12a 协调，勿并行写 kernel 树）**：
 
 ```bash
 # 1. 拷入 kernel 树顶层（build.sh 以相对路径 ../jb、../ssh 消费；TREE 内只增两个新顶层目录）
@@ -122,7 +122,7 @@ cp -a ~/hakios/procursus-prep/jb  ~/hakios/kernel/jb
 cp -a ~/hakios/procursus-prep/ssh ~/hakios/kernel/ssh
 # 可选核验：sha256sum ~/hakios/kernel/jb/debs/* 对照 procursus-prep/logs/debs-sha256.txt
 
-# 2. 构建镜像（RC_JOBS 换成 ssh 场景；其余参数按当波 build.sh 惯例）
+# 2. 构建镜像（RC_JOBS 换成 ssh 场景；其余参数按当阶段 build.sh 惯例）
 cd ~/hakios/kernel/userland
 RC_JOBS=rc.jobs.ssh bash build.sh     # build.sh:407 烤 rc.jobs.ssh；:650-665 放 /jb；:392-403 放密钥+var.skel
 

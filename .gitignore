@@ -39,6 +39,19 @@
 !/prebuilt/
 !/wifi/
 
+# host-side tooling and evidence per stage (scripts, verdict files, text logs; added 2026-11-12 with stages 31-45)
+!/wave34-scripts/
+!/wave35-scripts/
+!/wave36-scripts/
+!/wave37-scripts/
+!/wave38-scripts/
+!/wave39-scripts/
+!/wave41-scripts/
+!/wave42-scripts/
+!/wave43-scripts/
+!/wave44-scripts/
+!/wave45-scripts/
+
 __pycache__/
 *~
 *.orig

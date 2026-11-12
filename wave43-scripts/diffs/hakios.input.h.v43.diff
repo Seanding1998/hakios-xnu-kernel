@@ -1,0 +1,10 @@
+--- xnu/files/bsd/sys/hakios.input.h.v43-orig	2026-11-08 02:02:46.381924709 +0800
++++ xnu/files/bsd/sys/hakios.input.h	2026-11-12 00:00:36.250770833 +0800
+@@ -50,6 +50,7 @@
+ /* a file of one of the RAM disks (drivers/storage/hakios.image.c): fw/<name> is the firmware userland/build.sh put there */
+ const uint8_t *hakios_image_file(const char *dir, const char *name, uint64_t *size, int *disk_out);
+ void hakios_battery_init(void);        /* boot-arg battery=1: Qualcomm UEFI charger state shared by xnuloader */
++void hakios_fuelgauge_init(void);      /* boot-arg fuelgauge=1 static, 2 the buses: the fuel gauge feeds the pipeline */
+ int hakios_battery_temperature(void);  /* the battery's temperature in C, -273 while it is not known */
+ /* one transfer at a time through the PMIC arbiter for this system (drivers/input/hakios.buttons.c) */
+ void hakios_spmi_lock(void);

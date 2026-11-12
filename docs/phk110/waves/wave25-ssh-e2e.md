@@ -8,11 +8,11 @@
 
 **WAVE21-SSH-OK 未达成——但 N3 数据面已真机闭环到「sshd 应答横幅」，最后一公里精确定位到内核 en0 poll 线程会话中途停摆（阶段 21 内核驱动 bug，计数证据在案）**
 
-硬证据清单（全部在本波实录）：
+硬证据清单（全部在本阶段实录）：
 1. **TCP 三路握手经网环建立 ≥5 次**（05:42:46、06:25±、06:51、08:05、09:04±——`established (10.0.0.1:… -> 10.0.0.2:22)`）
 2. **sshd 版本横幅收到**：`SSH-2.0-OpenSSH_9.7`（05:42:46 首证）——Darwin 侧 Procursus openssh 9.7p1 对主机 TCP 连接的真实应答，主机→inet→en0→tx环→loader→host 与反向全链闭环
 3. **ARP 双向往返**：`arp learned: ['10.0.0.2']`——主机 ARP 请求经 download→rx环→内核 inet 应答→tx环→upload 回主机
-4. **v0.4 的其余要件（阶段 20/24 遗产）本波全程复验**：loader serving 稳定（gen0 beat1 武装）、sshd 装载、`oem netmode/netstat` 真机验证
+4. **v0.4 的其余要件（阶段 20/24 遗产）本阶段全程复验**：loader serving 稳定（gen0 beat1 武装）、sshd 装载、`oem netmode/netstat` 真机验证
 5. **最后一公里（新发现，计数证据）**：TCP 建立后 30-60s 内，内核 en0 的 poll 线程停摆——`oem netstat` 冻结序列：`tx 184`（内核→loader 排空数）、`rx 242`（loader→内核送达数）双双冻结，RX 环 `held 0 16`（16/16 全满），`lost` 以 ~3-4/s 递增（主机重传帧被弃）→ 内核侧双向同时断流 → ssh 握手饿死（客户端 banner/KEX 3 段重传 20+ 次无 ACK）
 
 **v0.4 宣告继续顺延**；阻塞从「USB serving」（阶段 24 已解）转到「内核 en0 驱动」——阶段 26 的第一目标（见 §6）。
@@ -26,7 +26,7 @@
 4. **隧道**：无 wintun 路线——wave21 loader_talk 的 tunnel 语义（ProxyCommand + 网环 TCP），重写为 wave25-scripts/tunnel25w.py（原因见 §2）
 5. **判定**：见 §0/§6
 
-## 2. 主机侧八个真缺陷 + 内核侧一个（本波全部定位 + 主机侧全部修复，零刷写）
+## 2. 主机侧八个真缺陷 + 内核侧一个（本阶段全部定位 + 主机侧全部修复，零刷写）
 
 按时间序——每一条都在真机上消耗了会话窗才定位，全部修复物在 wave25-scripts/（新文件或 wrapper 内补丁，未动 wave13/wave21 原件）：
 
@@ -41,7 +41,7 @@
 | H7 | wave21 Tunnel.send 的窗口等待阻塞调用者；wave25 初版把 send 放进主循环 → send 等对端 ACK、ACK 需要推帧、推帧在 send 之后 = 死锁 | established 后 5 分钟零数据 | 计数器 `acked` 冻结 | 非阻塞流水线：stdin→pending 缓冲，按窗口每拍 `_emit`（只入队），pump_once 统一推 |
 | H8 | **wave21 的 SYN 从未消费序列号**：SYN 占 1 个 seq，数据段仍从 ISN 发 → sshd 视为窗外全丢 → banner 后握手永久饿死（05:42 banner 之后所有 KEX 都死于此） | established 后零 KEX 进展；sshd 端全部静默丢弃 | 计数器 `acked=0x1` 冻结 | ESTABLISHED 后 `seq += 1` |
 | H9 | **stdin 的 buffered read(4096) 阻塞等满额**：ssh 的 banner 34B、KEX 2-4KB 永远凑不齐 → reader 线程永久阻塞在管道上 | established 后客户端零字节发出（`acked=0x1`） | r3#1 计数器（up=165 全是空 DATA0，无 banner 出账） | `os.read(fd, 4096)` 原语读（有多少回多少） |
-| K1 | **内核侧：hakios.loader_net.c 的 en0 poll 线程会话中途停摆**（阶段 21 内核驱动） | TCP 建立后 30-60s 内双向断流；`oem netstat` 冻结：`tx 184 rx 242 held 0 16 lost +3/s`——RX 环 16/16 全满、内核不排空、主机重传全弃 | 隧道内 `oem netstat` 直读（计数证据 §0.5） | 未修（内核驱动 = 刷写+内核改，超本波预算）；阶段 26 首目标 |
+| K1 | **内核侧：hakios.loader_net.c 的 en0 poll 线程会话中途停摆**（阶段 21 内核驱动） | TCP 建立后 30-60s 内双向断流；`oem netstat` 冻结：`tx 184 rx 242 held 0 16 lost +3/s`——RX 环 16/16 全满、内核不排空、主机重传全弃 | 隧道内 `oem netstat` 直读（计数证据 §0.5） | 未修（内核驱动 = 刷写+内核改，超本阶段预算）；阶段 26 首目标 |
 
 执行纪律级教训：**两个编排器进程并存时，并发命令流会把 loader 的单线程命令状态机撕碎**（一次双进程互踩制造了 17 分钟假死）；**相位探针每条命令都续 240s 服务窗**——"等下一个会话"的等待必须由外层占空比控制（真静默期），wrapper 内部自睡只会把窗推到永远。
 
@@ -119,6 +119,6 @@ established 后 ~50s: tx 184 lost 0  rx 242 lost 5 held 0 16   ← 主机重传�
    - 主机侧全管线（tunnel25w.py）已就绪可直接复用，无需再动
 3. **sshd 间歇缺席**：合并内核日志（`oem log`+`upload` 通道已通；`== KERNEL LOG ==` 段在会话返回后的服务窗可拉）读 launchd/sshd 行——若证实 vnode 帽/init spin 吞掉 sshd，与 23.y 的 kern.maxvnodes DT 注入同修
 4. **loader 侧记账**：`netmode on` 丢 stage 帧（net_stage_len=0 重置，已观测）；3s in-session usb_wait 帽返回 -1 不 abort 挂起传输（主机侧已用排干纪律绕开）；两者低优先
-5. **方法论**：wave21 的 Pipe/TCP 层从未上过真机——「自检 N/N」不等于协议正确；本波 9 个缺陷中 6 个（H4/H5/H6/H7/H8/H9）属于此类。**计数器可见性**（link.counts + pipe 计数 + 隧道内 netstat 直读）是从"暗失败"到"指令级定位"的关键投资，已固化进 tunnel25w.py
+5. **方法论**：wave21 的 Pipe/TCP 层从未上过真机——「自检 N/N」不等于协议正确；本阶段 9 个缺陷中 6 个（H4/H5/H6/H7/H8/H9）属于此类。**计数器可见性**（link.counts + pipe 计数 + 隧道内 netstat 直读）是从"暗失败"到"指令级定位"的关键投资，已固化进 tunnel25w.py
 6. **误伤登记**：执行中一次宽匹配 Stop-Process 误杀了 4 个用户应用（astronaut backend）的 python 进程（PID 32904/33048/34068/62176，可重启，非系统服务）——已停止该匹配方式，改按 PID 精确 kill
 7. **手机状态**：阶段 25 收尾时手机在 slot b 循环中（loader serving 正常）；logdump-handback-25.sh 看护已后台启动（等 ABL 自动回退到安卓 → 拉 logdump-v20-wave25.bin（md5 纪律）→ set_active a 交还）。若看护已死：人工路径 = 等安卓（22d9:2769）→ `adb reboot bootloader` → `set_active a` → `reboot`

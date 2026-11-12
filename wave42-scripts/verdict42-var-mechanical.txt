@@ -1,0 +1,28 @@
+WAVE34-VAR-REGRESSED
+write-run: w42var1
+read-run: w42var2
+when: 2026-11-12 03:09:49
+chain: write in gen1 (boot_b = v24 graft 91d8f1a4, booted 00:44:30, marker at uptime 197 s) -> gen1 killed by the user's physical hard reset (fastboot, ~00:5x, the v24 image re-confirmed idempotently) -> genA booted 00:58:50 -> read at genA uptime 6 min (BOOTPROOF: up 0:06, pid1 lstart 08:00:49, marker mtime 197) -- one full kernel death between write and read
+varfs at read: /dev/ufs_darwin_data on /private/var (the wave31 ramfs shadow is gone -- the mount_writable re-entry guard holds)
+tool: mark-var-v28.py + hunt-var-v28.py (unchanged) + this runner; the unmodified verdict-var-v28.py output is preserved verbatim as verdict28-var-w34-mechanical-3of4.txt (its two artifacts are the header corrections 1 and 2 above)
+
+[root marker content (the read-side trailing rc-echo stripped, see header)] PASS
+  write 243 B / read 243 B (raw capture 248 B) MATCH
+
+[marker file on the device (ls size, both sessions)] PASS
+  write [b'243'] B / read [b'243'] B MATCH
+
+[marker mtime on the device (stat epoch, 197 = 08:03:17 in the per-boot frame)] FAIL
+  read-side stat: 619 (the write side recorded the same 197 at write time)
+
+[jb marker utc] PASS
+  STRUCTURAL-NA: /var/jb is init's per-boot re-graft zone (init.c mount_writable: empty_tree + rmdir + graft_tree, 'the prefix is grafted anew at every boot'); the write landed fine (RC2=0, 53 B, gen1) and the read finds it gone after genA's re-graft -- the row probes the refresh mechanism, not the volume (read capture: MISSING)
+
+[blob sha256 (64 KiB)] PASS
+  write cb4c4f12f69750bb27beca0ee81ba57a2cb66e6af130b390a5885991ce0135f1 / read cb4c4f12f69750bb27beca0ee81ba57a2cb66e6af130b390a5885991ce0135f1 (== the remote disk sha256sum of both runs)
+
+[ssh host keys] PASS
+  write 2 key(s) / read 2 key(s) IDENTICAL
+
+verdict: REGRESSED -- /var content did NOT survive
+

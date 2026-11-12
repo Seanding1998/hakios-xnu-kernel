@@ -1,0 +1,42 @@
+[01:19:14 t+0000.0s] wave27 wide-window SSH hunt armed (run-id w42ssh4, deadline 90 min)
+[01:19:14 t+0000.0s] knock cmd: 'uname -a && id && echo WAVE21-SSH-OK W27-w42ssh4'
+[01:19:14 t+0000.0s] report| hunt armed, run-id w42ssh4, deadline 90 min, single-owner mode
+[01:19:14 t+0000.0s] bus: d00d addrs [4] (was None)
+[01:19:14 t+0000.2s] attempt k001 -> rc=255 in 0.1s
+[01:19:14 t+0000.2s] branch: LOADER-PHASE (armed=True, ct=170)
+[01:19:14 t+0000.2s]   err| tunnel25w: round 0: d00d nodes at addr [4]
+[01:19:14 t+0000.2s]   err| tunnel25w: addr 4: LIVE (product b'xnuloader'); this is our loader
+[01:19:14 t+0000.2s]   err| tunnel25w: loader phase (raw b'FAILno recording'); exiting fast -- the CALLER owns the duty cycle: probing extends the loader's 240 s window forever, so the campaign must alternate active windows with
+[01:19:14 t+0000.2s]   err| Connection closed by UNKNOWN port 65535
+[01:19:14 t+0000.2s] loader answered: silence until +250 s (the exec clock)
+[01:23:15 t+0241.2s] bus: d00d addrs [] (was [4])
+[01:23:47 t+0273.0s] bus: d00d addrs [4] (was [])
+[01:25:58 t+0404.1s] attempt k002 -> rc=0 in 131.0s
+[01:25:58 t+0404.1s] branch: HIT (armed=True, ct=170) HIT-CANDIDATE
+[01:25:58 t+0404.1s]   err| tunnel25w: pkt OUT 10.0.0.1:25469 -> 10.0.0.2:22 flags=ACK seq=268437742 ack=2971859120 win=16384 len=0 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=2971859120 state=ESTABLISHED
+[01:25:58 t+0404.1s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:25469 flags=PSH|ACK seq=2971859120 ack=268437742 win=65535 len=76 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=2971859120 state=ESTABLISHED
+[01:25:58 t+0404.1s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:25469 flags=PSH|ACK seq=2971859196 ack=268437742 win=65535 len=60 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=2971859196 state=ESTABLISHED
+[01:25:58 t+0404.1s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:25469 flags=PSH|ACK seq=2971859256 ack=268437742 win=65535 len=176 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=2971859256 state=ESTABLISHED
+[01:25:58 t+0404.1s] === ACCEPTANCE MODE (session must still be live) ===
+[01:25:58 t+0404.4s] attempt acc2 -> rc=0 in 0.3s
+[01:25:58 t+0404.4s] acceptance conn2 -> rc=0, marker OK, Darwin OK
+[01:26:16 t+0422.6s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:26:19 t+0425.4s] attempt acc3 -> rc=0 in 0.3s
+[01:26:19 t+0425.4s] acceptance conn3 -> rc=0, marker OK, Darwin OK
+[01:26:37 t+0443.5s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:27:14 t+0480.0s] attempt transfer -> rc=0 in 34.0s
+[01:27:14 t+0480.0s] acceptance transfer -> rc=0, phone counted 262144 of 262144 bytes in 34.0s
+[01:27:32 t+0498.1s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:28:41 t+0566.9s] attempt sha-rt -> rc=0 in 68.8s
+[01:28:41 t+0566.9s] step sha-rt try1 unsatisfied (rc=0) -- retrying after the attach race (8 s)
+[01:29:56 t+0642.4s] attempt sha-rt -> rc=0 in 67.5s
+[01:29:56 t+0642.4s] step sha-rt try2 unsatisfied (rc=0) -- retrying after the attach race (8 s)
+[01:31:12 t+0718.7s] attempt sha-rt -> rc=0 in 68.3s
+[01:31:12 t+0718.7s] step sha-rt try3 unsatisfied (rc=0) -- retrying after the attach race (8 s)
+[01:31:20 t+0726.7s] content sha round trip -> rc=0 in 68.3s: device hash MATCH, returned payload MISMATCH (950143/524288 B) -- FAIL
+[01:31:39 t+0745.0s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:31:57 t+0763.2s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[01:31:57 t+0763.2s] verdict written: C:\Users\<host>\.zcode\workspace\9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7\hakios-phk110\wave42-scripts\verdict42-w42ssh4.txt (transfer PASS, sha FAIL, mgmt OKAY)
+[01:31:57 t+0763.2s] report| HIT + acceptance: conn2/conn3 + transfer(PASS) + sha(FAIL) + mgmt(OKAY); verdict verdict42-w42ssh4.txt
+[01:31:57 t+0763.2s] report| === WAVE21-SSH-OK on record: verdict42-w42ssh4.txt ===
+[01:31:57 t+0763.2s] === v0.4 SSH GATE: PASS (hit + 3 conns + verified transfer + mgmt) ===

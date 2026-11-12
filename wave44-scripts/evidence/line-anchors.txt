@@ -1,0 +1,215 @@
+##### ours: 356f5bf4a9f230f054b10a20b54dde982db398762802fc0a1732bb7c9b30ea3e (3986 lines)
+--- negative checks: registers the references write and this file never names (a count of 0 is the finding)
+GBIF_GX                      0
+10240e0                      0
+RB_CMP_DBG                   0
+CP_BV_                       0
+CP_LPAC_APRIV                0
+CP_LPAC_CHICKEN              0
+CMDQ_CONFIG *,               0
+CP_PROTECT_CNTL              0
+CP_PROTECT_REG               0
+APERTURE                     0
+INT_0_MASK                   0
+CP_WAIT_TIMESTAMP            2
+CP_SET_THREAD                0
+RPTR_ADDR                    0
+GMEM_RANGE                   0
+FENCE_STATUS_WRITEDROPPED    0
+--- ours: anchors
+1822:step_gmu_firmware(void)
+1939:step_gmu_start(void)
+2046:step_gmu_queues(void)
+2234:hfi_send(const char *what, uint32_t id, uint32_t *message, uint32_t words)
+2334:step_core_power(void)
+2582:ring_command(uint32_t command, uint32_t words)
+2589:ring_register(uint32_t number, uint32_t value)
+2598:ring_fence_event(uint32_t event, uint64_t address, uint32_t word)
+2609:ring_send(void)
+2623:ring_run(const char *what)
+2812:step_core_start(void)
+2952:step_core_commands(void)
+3034:step_frame(void)
+3395:hakios_gpu_parameter(uint32_t which, uint64_t *value)
+3522:hakios_gpu_done(uint32_t fence)
+3603:hakios_gpu_submit(const uint64_t *addresses, const uint32_t *words, uint32_t count)
+1953:	hfi->words = sizeof(struct hfi_table) / 4;      /* 210: the head 6 + 17 headers of 12 */
+1956:	hfi->queues = hfi->active_queues = HFI_QUEUE_SLOTS;     /* gen7 counts all 17 slots (vendor init_queues) */
+2509:#define CP_RB_CNTL_VALUE        (12u | 2u << 8 | 1u << 27)      /* 2^12 pairs of words; do not copy the read position to memory */
+2540:#define FENCE_EVENT(event)      ((event) | CP_EVENT_WRITE7_SRC(EV_WRITE_USER_32B) | CP_EVENT_WRITE7_DST(EV_DST_RAM) \
+2618:	wr(gpu.base + CP_RB_WPTR, ring_at);
+2834:	put(&gpu, "rbbm_gbif_client_qos_cntl", RBBM_GBIF_CLIENT_QOS_CNTL, 3);
+2840:	put(&gpu, "uche_cache_ways", UCHE_CACHE_WAYS, 0x4);
+2867:	put(&gpu, "gras_nc_mode_cntl", GPU_WORD(0x8602), bank_bit << 5);
+2871:	put(&gpu, "rbbm_interface_hang_int_cntl", RBBM_INTERFACE_HANG_INT_CNTL, 1u << 30 | 0x1fffff);
+2873:	put(&gpu, "cp_chicken_dbg", CP_CHICKEN_DBG, 1);
+2874:	put(&gpu, "rbbm_gbif_client_qos_cntl", RBBM_GBIF_CLIENT_QOS_CNTL, 0);
+2875:	put(&gpu, "cp_apriv_cntl", CP_APRIV_CNTL, 1u << 6 | 1u << 5 | 1u << 3 | 1u << 2 | 1u << 1);
+2889:	get(&gpu, "cp_apriv_cntl", CP_APRIV_CNTL);
+2927:#define CONCURRENT_BINNING 0
+2932:	ring(CP_THREAD_CONTROL_CONCURRENT_BIN_DISABLE);
+2933:	ring_command(CP_ME_INIT, 8);            /* a6xx_cp_init; gen7 turns DMS off with bit 11 [PONG] */
+2934:	ring(0x0000082f);
+3061:	ring_fence_event(EVENT_CCU_CLEAN_COLOR, CORE_SCRATCH_ADDRESS + 32, 0x0c0c0c0c);
+3062:	ring_fence_event(EVENT_CACHE_CLEAN, CORE_SCRATCH_ADDRESS + 16, 0x0d0e0d0e);
+3424:	case 0x12:                              /* UBWC_SWIZZLE */
+3427:	case 0x13:                              /* MACROTILE_MODE */
+3623:	ring(EVENT_INVALIDATE_DEPTH);
+3625:	ring(EVENT_INVALIDATE_COLOR);
+3637:	ring_fence_event(EVENT_CACHE_CLEAN, CORE_SCRATCH_ADDRESS + GPU_FENCE_AT, gpu_fence);
+3910:		last_step = 21;
+##### theirs: Adreno740 2a91aa1a
+20:    RingFenceOpcode = 0x46,   /* CP_EVENT_WRITE7 on A7XX */
+21:    RingFenceEvent = 0x31,    /* CACHE_CLEAN */
+22:    RingFenceEnable = 1u << 27,
+23:    RingFenceIrq = 1u << 31,
+41:    RingCacheFlush7 = 0x32,
+77:    RingFenceWords = 7,       /* kernel bring-up submissions: TYPE4 scratch + TYPE7 event */
+78:    RingFramedFenceWords = 31,/* user submissions: scratch, BV timestamp, BR wait, ring timestamp */
+93:    RingBvFenceOffset = 12    /* msm_rbmemptrs.bv_fence; +8 is bv_rptr, the BV RPTR shadow hw init programs */
+114:IOReturn NativeAdrenoRing::writeWptr(uint32_t value)
+136:IOReturn NativeAdrenoRing::readRptr(uint32_t *value)
+158:IOReturn NativeAdrenoRing::stallState(uint32_t *out)
+168:IOReturn NativeAdrenoRing::kick()
+176:IOReturn NativeAdrenoRing::drainBus(uint32_t *ack)
+206:IOReturn NativeAdrenoRing::emitPrologue(uint32_t at,bool reset,bool table,uint32_t *end,uint32_t number)
+259:IOReturn NativeAdrenoRing::emitFence(uint32_t at,uint32_t seqno,uint32_t *end)
+279:IOReturn NativeAdrenoRing::emitFramedFence(uint32_t at,uint32_t seqno,uint32_t *end,bool yield)
+411:IOReturn NativeAdrenoRing::program()
+424:IOReturn NativeAdrenoRing::restart(uint32_t completed)
+442:IOReturn NativeAdrenoRing::restartSecondary(uint32_t completed)
+468:IOReturn NativeAdrenoRing::fenceValue(uint32_t *value)
+510:IOReturn NativeAdrenoRing::progressState(uint32_t out[6])
+523:IOReturn NativeAdrenoRing::bvProgressState(uint32_t out[5])
+580:IOReturn NativeAdrenoRing::submitWords(const uint32_t *words,size_t word_count,uint32_t number,bool framed,bool give_wptr,uint32_t *fence)
+646:NativeAdrenoRingFence NativeAdrenoRing::wait(uint32_t fence,const NativeAdrenoRingClock *clock,
+145:    if(rptr>=ring_bytes_/4)return poison(); /* unusable read pointer */
+266:    words[3]=RingFenceEvent|RingFenceEnable|RingFenceIrq;
+290:    const uint32_t bvWrite[4]={RingFenceEvent|RingFenceEnable,(uint32_t)bv,(uint32_t)(bv>>32),seqno};
+291:    const uint32_t bvWait[4]={0,(uint32_t)bv,(uint32_t)(bv>>32),seqno};
+292:    const uint32_t fence[4]={RingFenceEvent|RingFenceEnable|RingFenceIrq,(uint32_t)at4,(uint32_t)(at4>>32),seqno};
+639:        if(value>seqno_) {poison();return NativeAdrenoRingFencePoisoned;}
+657:        if(value>=fence) {if(value>seqno_) {poison();return NativeAdrenoRingFencePoisoned;}completed_=value;
+17:    CpConcurrentBinDisable = 1u << 27,
+48:        AdrenoPM4Type7(CpMeInitOpcode,7,&words[2])!=AdrenoPM4Success)return poison();
+49:    words[1]=CpConcurrentBinDisable;
+53:    words[6]=0x00000002;      /* operation mode */
+31:    IrqBitCpFence = 1u << 20,
+50:static constexpr uint32_t kEnable = IrqBitAhb | IrqBitAtbAsync | IrqBitGpc | IrqBitCpSw |
+NativeAdrenoSubmit.cpp:278:void NativeAdrenoSubmit::driveSwitch(const NativeAdrenoRingClock *clock)
+NativeAdrenoSubmit.cpp:296:                        volatile uint32_t *row=native_adreno_switch_timeout[n];
+NativeAdrenoSubmit.cpp:712:void NativeAdrenoSubmit::noteStall(uint32_t observed,const NativeAdrenoRingClock *clock,uint32_t waited)
+NativeAdrenoSubmit.cpp:797:    if(kick_due && !working) {
+NativeAdrenoSubmit.cpp:805:    if(now && stage_due(stall_stage,1,pending,200000)) {
+NativeAdrenoSubmit.cpp:966:bool NativeAdrenoSubmit::madeProgress()
+NativeAdrenoUserClient.cpp:33:volatile uint64_t native_adreno_map_met[7];}
+NativeAdrenoUserClient.cpp:603:                native_adreno_map_met[0]=request.iova;
+NativeAdrenoUserClient.cpp:604:                native_adreno_map_met[1]=(asked?asked->memory.bytes():0)|(asked && asked->mapped_state?UINT64_C(1)<<63:0);
+NativeAdrenoUserClient.cpp:605:                for(unsigned k=0;k<5;++k)native_adreno_map_met[2+k]=found?met[k]:~UINT64_C(0);
+101:        CHECK(op(ring[25])==0x46 && ring[26]==(0x31u|(1u<<27)) && ring[27]==0x10800c && ring[28]==0 && ring[29]==1);   /* BV timestamp */
+104:        CHECK(op(ring[37])==0x46 && ring[38]==(0x31u|(1u<<27)|(1u<<31)));
+##### theirs: sheng 14bf88ad
+727:    if (gIrqEmpty > 100000) gpuWr(A740_RBBM_INT_0_MASK, 0);
+1042:NativeAdrenoAbiDeviceInfo gDeviceInfo = {0x43050a01u, 3u << 20, 0x1000000ull, 0x1fffffffff000ull, GpuClientVaStart,
+1590:void gpuHwInit() {
+1604:    gpuWr(A740_RBBM_GBIF_CLIENT_QOS_CNTL, 0x2120212);
+1611:    gpuWr(A740_UCHE_CACHE_WAYS, 1u << 23);
+1620:    gpuWr(A740_UCHE_CMDQ_CONFIG, (6u << 16) | (6u << 12) | (9u << 8) | (1u << 3) | (1u << 2) | 2u);
+1622:    gpuWr(A740_CP_APRIV_CNTL, 0x6f);
+1623:    gpuWr(A740_CP_BV_APRIV_CNTL, 0x0f);
+1629:    gpuWr(A740_RB_NC_MODE_CNTL, (1u << 11) | (1u << 4) | (3u << 1));
+1634:        gpuWr(A740_GRAS_NC_MODE_CNTL, 3u << 5);
+1637:    gpuWr(A740_UCHE_MODE_CNTL, 3u << 21);
+1640:    gpuWr(A740_RBBM_INT_0_MASK, 0x33d283c2);
+1650:IOReturn gpuRestart(void *, NativeAdrenoRing *ring, uint32_t completed) {
+##### theirs: sm8550-common 97665e28; AdrenoFirmware 20ad3d7a; AdrenoPM4 282606b5
+98:    if(AdrenoFirmwarePlanGmu(c->firmware,c->firmware_bytes,regions,3,blocks,32,&count)!=AdrenoFirmwareSuccess || count!=15)
+167:        core_write(d,REG_GMU_AHB_FENCE_RANGE_0,UINT32_C(0x80000000)|(0x32u<<18)|0x8a0,r) ||
+174:    uint32_t mask=value<=UINT32_C(0x20010004)?UINT32_MAX:0x1ff;
+/home/cyrux/hakios/refs/UniXNU-AdrenoFirmware/AdrenoHfi.c:36:    shared[1]=168;shared[2]=6;shared[3]=12;shared[4]=3;shared[5]=3;
+/home/cyrux/hakios/refs/UniXNU-AdrenoFirmware/AdrenoHfiStartup.c:59:        message=4;n=58;
+/home/cyrux/hakios/refs/UniXNU-AdrenoFirmware/AdrenoHfiStartup.c:70:        message=3;n=159;
+/home/cyrux/hakios/refs/UniXNU-AdrenoFirmware/AdrenoHfiStartup.c:83:    case AdrenoHfiStageIfpc:message=11;n=3;p[0]=9;p[1]=1;p[2]=0x1680;break;
+/home/cyrux/hakios/refs/UniXNU-AdrenoFirmware/AdrenoHfiStartup.c:84:    case AdrenoHfiStageCoreStart:message=14;n=1;p[0]=0;break;
+/home/cyrux/hakios/refs/UniXNU-AdrenoFirmware/AdrenoHfiStartup.c:85:    case AdrenoHfiStageStart:message=10;n=0;break;
+20:    *header = 0x40000000u | count | (odd_bit(count) << 7) |
+29:    *header = 0x70000000u | count | (odd_bit(count) << 15) |
+##### vendor (same phone)
+38:	GEN7_GRAS_NC_MODE_CNTL,
+101:void gen7_cp_init_cmds(struct adreno_device *adreno_dev, u32 *cmds)
+128:	cmds[i++] = cp_type7_packet(CP_ME_INIT, 7);
+134:	cmds[i++] = 0x00000002; /* Operation mode mask */
+150:int gen7_fenced_write(struct adreno_device *adreno_dev, u32 offset,
+432:	kgsl_regwrite(device, GEN7_UCHE_GBIF_GX_CONFIG, 0x10240e0);
+460:	kgsl_regwrite(device, GEN7_UCHE_CACHE_WAYS, 0x800000);
+462:	kgsl_regwrite(device, GEN7_UCHE_CMDQ_CONFIG,
+503:	kgsl_regwrite(device, GEN7_GRAS_NC_MODE_CNTL,
+526:	kgsl_regrmw(device, GEN7_RB_CMP_DBG_ECO_CNTL, 0, (1 << 11));
+528:	gen7_protect_init(adreno_dev);
+534:	kgsl_regwrite(device, GEN7_CP_APRIV_CNTL, GEN7_BR_APRIV_DEFAULT);
+536:		kgsl_regwrite(device, GEN7_CP_BV_APRIV_CNTL, GEN7_APRIV_DEFAULT);
+547:		kgsl_regwrite(device, GEN7_CP_BV_CHICKEN_DBG, 0x1);
+/home/cyrux/hakios/refs/kernel_oneplus_sm8475/drivers/gpu/msm/adreno_gen7_hfi.c:17:#define HFI_QUEUE_MAX HFI_QUEUE_DEFAULT_CNT
+/home/cyrux/hakios/refs/kernel_oneplus_sm8475/drivers/gpu/msm/adreno_gen7_hfi.c:186:	tbl->qtbl_hdr.size = sizeof(struct hfi_queue_table) >> 2;
+/home/cyrux/hakios/refs/kernel_oneplus_sm8475/drivers/gpu/msm/adreno_gen7_hfi.c:189:	tbl->qtbl_hdr.num_q = HFI_QUEUE_MAX;
+/home/cyrux/hakios/refs/kernel_oneplus_sm8475/drivers/gpu/msm/adreno_gen7_hwsched_hfi.c:21:#define HFI_QUEUE_MAX (HFI_QUEUE_DEFAULT_CNT + HFI_QUEUE_DISPATCH_MAX_CNT)
+336:	if (is_concurrent_binning(drawctxt)) {
+347:		cmds[index++] = CACHE_CLEAN | BIT(27);
+360:		cmds[index++] = cp_type7_packet(CP_WAIT_TIMESTAMP, 4);
+373:		cmds[index++] = CACHE_CLEAN | BIT(31) | BIT(27);
+379:		cmds[index++] = CACHE_CLEAN | BIT(31) | BIT(27);
+387:		cmds[index++] = CACHE_CLEAN | BIT(27);
+558:	if (is_concurrent_binning(drawctxt)) {
+587:	if (is_concurrent_binning(drawctxt)) {
+248:#define KGSL_UBWC_4_0	4
+##### second pass: the remaining anchors the report cites
+--- sheng hw_init
+1601:        for (unsigned i = 0; i < NATIVE_ADRENO_A740_HWCG_COUNT; ++i) gpuWr(NativeAdrenoA740Hwcg[i][0], NativeAdrenoA740Hwcg[i][1]);
+1602:        gpuWr(A740_RBBM_CLOCK_CNTL, 0x8aa8aa82);
+1605:    gpuWr(A740_UCHE_GBIF_GX_CONFIG, 0x10240e0);
+1609:    gpuWr64(A740_UCHE_GMEM_RANGE_MIN, 0x1000000);                    // a740 family: SZ_16M
+1610:    gpuWr64(A740_UCHE_GMEM_RANGE_MAX, 0x1000000 + 3 * 0x100000 - 1);  // gmem 3 MiB
+1617:    gpuWr(A740_CP_PROTECT_CNTL, (1u << 0) | (1u << 1) | (1u << 3));
+1619:        gpuWr(A740_CP_PROTECT + NativeAdrenoA740Protect[i][0], NativeAdrenoA740Protect[i][1]);
+1624:    gpuWr(A740_CP_LPAC_APRIV_CNTL, 0x0f);
+1625:    gpuWr(A740_RB_CMP_DBG_ECO_CNTL, gpuRd(A740_RB_CMP_DBG_ECO_CNTL) | (1u << 11));
+1632:    for (uint32_t pipe = 1; pipe <= 2; ++pipe) {   // PIPE_BR, PIPE_BV
+1636:    gpuWr(A740_CP_APERTURE_CNTL_HOST, 0);           // PIPE_NONE
+--- vendor gen7_start
+418:#define GEN7_APRIV_DEFAULT (BIT(3) | BIT(2) | BIT(1) | BIT(0))
+420:#define GEN7_BR_APRIV_DEFAULT (GEN7_APRIV_DEFAULT | BIT(6) | BIT(5))
+422:int gen7_start(struct adreno_device *adreno_dev)
+537:		kgsl_regwrite(device, GEN7_CP_LPAC_APRIV_CNTL, GEN7_APRIV_DEFAULT);
+546:		kgsl_regwrite(device, GEN7_CP_CHICKEN_DBG, 0x1);
+548:		kgsl_regwrite(device, GEN7_CP_LPAC_CHICKEN_DBG, 0x1);
+1814:	{ GEN7_RBBM_GBIF_CLIENT_QOS_CNTL, 0x2120212 },
+2056:		.gpudev = &adreno_gen7_gmu_gpudev.base,
+2089:		.gpudev = &adreno_gen7_gmu_gpudev.base,
+2112:static const struct adreno_gen7_core adreno_gpu_core_gen7_4_0 = {
+2121:		.gpudev = &adreno_gen7_gmu_gpudev.base,
+2153:		.gpudev = &adreno_gen7_gmu_gpudev.base,
+2182:		.gpudev = &adreno_gen7_gmu_gpudev.base,
+--- Adreno740 details
+430:    /* msm_rbmemptrs: +0 rptr, +4 fence, +8 bv_rptr, +12 bv_fence. */
+16:    PreemptGmemSaveRestore = 0x8e50,
+99:    if(io_.write32(io_.cookie,PreemptGmemSaveRestore,1) ||
+153:    uint32_t gmem_bytes;
+161:    uint32_t ubwc_version;        /* encoder version, 4 for UBWC 4.0 */
+331:    /* The BV thread's progress counts as the CP's: with concurrent binning BR waits for the visibility pass, so BR's own words stand
+35:#define A740_CP_BV_RB_RPTR_ADDR 0x00a98
+118:#define NATIVE_ADRENO_A740_HWCG_COUNT 54
+168:#define NATIVE_ADRENO_A740_PROTECT_COUNT 46
+--- AdrenoFirmware HFI send
+46:AdrenoHfiStatus AdrenoHfiSend(AdrenoHfi *h,unsigned id,const uint32_t *payload,
+57:    uint32_t header=(sequence<<20)|(count<<8)|id;
+60:    for(unsigned i=count;i<padded;++i)data[(write+i)&(WORDS-1)]=UINT32_C(0xfafafafa);
+--- ours: the service's wait and the report
+172:#define GPU_ASK_AGAIN_US        200             /* while waiting for the core: how long between two looks at how far it is */
+190:gpuWait(uint32_t fence, uint64_t milliseconds)
+211:		gGPUReported = true;
+997:		gGPUReported = true;
+3437:hakios_gpu_address(uint64_t size)
+3644:hakios_gpu_report(const char *why)
+/home/cyrux/hakios/kernel/drivers/gpu/hakios.adreno.c:0
+/home/cyrux/hakios/kernel/drivers/gpu/hakios.gpu.cpp:0
+##### ours at the end of the wave: 356f5bf4a9f230f054b10a20b54dde982db398762802fc0a1732bb7c9b30ea3e

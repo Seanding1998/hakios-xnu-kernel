@@ -100,7 +100,7 @@ if (!PEGetTargetName(dummy, 64)) {
 - **F5（新）**：真身份 loader 刷入后 `PEGetTargetName` 仍走 boot-arg 层——IODTPlatformExpert::getModelName 读的是 IOKit registry provider 的 `model`，与 pe_init 的 SecureDT 根读法不同源；阶段 21+ 若要"树侧真值"需在 GenericARMPE 侧补齐（非阻塞，boot-arg 层已满足 launchd）。
 - F3（沿登）：b25 console 环含双周期残页（L43 首周期 + L557 次周期 init 输出并存），周期归属法证仍挂账。
 - usbipd fastboot 通道首次 getvar 挂死、kill 重试即愈（wave16c 卡死的"数据端点打死"仅在半途中断后出现；完整重启 bootloader 后通道健康）。
-- WSL /tmp 在调用间可能被清（本波实测两次）——执行脚本一律落 /mnt/c 持久路径，`/tmp` 只作缓冲。
+- WSL /tmp 在调用间可能被清（本阶段实测两次）——执行脚本一律落 /mnt/c 持久路径，`/tmp` 只作缓冲。
 
 ## 6. 交付清单
 

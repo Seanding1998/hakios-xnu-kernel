@@ -1,0 +1,77 @@
+[header]
+  PASS ANDROID! magic 
+  PASS header diff vs stock is kernel_size/ramdisk_size only diff bytes [8, 9, 10, 11, 12, 13, 14]
+  kernel_size=7269802
+[payload pages]
+  PASS kernel zero-padded to page 
+[gzip round-trip]
+  PASS gunzip == shim+fd+payload(+pad) 27765344 B
+  PASS sha256 decompressed 
+[shim header]
+  PASS text_offset == 0xA7100000 0xa7100000
+  PASS image_size == shim+fd 0x4000f0
+  PASS ARMd magic @0x38 
+[FD]
+  PASS _FVH at shim+0x28 
+  PASS FD bytes equal source 
+  PASS FD is the untouched v4+ build (8924cb67) 8924cb67e349f7c1
+  PASS shim is the untouched build (108ce972) 108ce972adb82cc9
+[XNUP payload]
+  PASS magic XNUP 50554e58
+  PASS Size == len-8 23570784
+  PASS container byte-equal to source 
+  PASS payload fits the 64 MB window 23570792 B
+  PASS entries (usb joins: the USB server is up before the kernel) {'loader.efi': 83456, 'kernel': 15097968, 'resident': 4194304, 'ramdisk': 4194304, 'cmdline': 487, 'kernel.ver': 48, 'usb': 2}
+  cmdline: serial=0 loader_return_after=600 small_cores_after=0 touchscreen=1 buttons=1 buttons_map=1 buttons_core=0xc400000 buttons_cnfg=0xc42d000 buttons_obs=0xc440000 cpus=8 bootcpu=7 soc_ipa_base=0x3e40000 soc_gsi_base=0x3e04000 soc_ipcc=0xed18000 soc_rsc=0x17a20000 soc_mpss_mem=0x8bc00000 modem_ipa_fw_at=0x8b910000 soc_ipa_stream=0x5c0 soc_ipa_stream_uc=0x5c2 soc_ipa_fw=ipa_fws ufs=2 ufs_write=1 var_hfs=ufs_darwin_data root_apfs=ufs_darwin hw_target=D22ap en0_addr=10.0.0.2 gpu=1 adreno=3
+[cmdline]
+  PASS cmdline = the v29 walk cmdline unchanged (gpu=1 + adreno=3, NUL at the tail) 
+  PASS cmdline carries loader_return_after=600, gpu=1, adreno=3 (all before the NUL) 
+  PASS cmdline carries no adreno_only and no adreno_fine (the walk arg is adreno=3) 
+  PASS cmdline carries no recording boot-args (the display rounds stay out) 
+  PASS cmdline is 486 chars (combined budget 110+486=596/607: no truncation) 
+[entries]
+  PASS kernel == the passed kernel file (the wave 37 cape-native-step-2 build; differs from v29's) sha256 95fd75687075d32d (v29's was c2ea0ca2...)
+  PASS kernel carries the gen7 parameter layer (the a730 names, the chip id, the log lines) 
+  PASS kernel still carries the Wave 26 feeder (carried, not under test) 
+  PASS kernel carries the Mini display + surface drivers (carried, not under test) 
+  PASS loader.efi == the v24 carry (0ade78b5, the maxvnodes build) byte for byte 0ade78b58321575f
+  PASS loader carries the kern.maxvnodes DT injection (the vnode cap's bypass) 
+  PASS kernel.ver byte-equal to the v26 entry 48 B
+  PASS resident entry byte-equal to the v26 entry 4194304 B
+  PASS cmdline entry == the built v29 cmdline file 487 B
+  PASS usb entry byte-equal to the v26 entry b'1\x00'
+  PASS usb entry says 1 b'1\x00'
+  PASS ramdisk byte-equal to the v29 entry (unchanged in v30) sha256 156b5be1f2b48af0
+  PASS ramdisk carries the pulled a730 firmware (plain fw/: the bytes, not just the names) 
+  PASS ramdisk is a 4 MB APFS container (NXSB @+32) 
+  PASS resident is an APFS container (NXSB @+32) 
+[loader (the Wave 26 maxvnodes build)]
+  PASS item 1: the console mirror (the vendor door is the shim's SerialPort Lib, not ConOut) 
+  PASS item 1: the mirror leads list 
+  PASS item 2: the one event consumer 
+  PASS item 3: the standing receive + the gate 
+  PASS item 4: the state sampler (registers + the vendor fields behind the signature) 
+  PASS item 4: the timeline 
+  PASS item 4: the GCTL reset cleared by hand (P1-1) 
+  PASS item 4: the raw look moved to the failure window's end 
+  PASS item 4: the buffer allocations split (P2-5) 
+  PASS v19b's beat-0 raw look and the zero-length probe are retired 
+  PASS v18's mechanism kept: the present + armed + never-armed + re-throw forensics 
+  PASS v18's DWC3 wake kept 
+  PASS loader.efi carries the oem recording handler 
+  PASS loader.efi keeps the d22ap identity 
+  PASS loader entry at RVA 0x2140 0x2140
+  PASS PAYLOAD_BASE=0xF4000000 pin (movz #0xF400 near the XNUP-magic movk #0x5055) 
+  PASS .text section found 
+  PASS the pin's RVA is reported for the record 0x2374
+  PASS loader is the dual-ramdisk/resident build 
+[graft]
+  PASS footer AVBf v1.0 
+  PASS orig_size == vbmeta_offset == content end 7274496
+  PASS vbmeta size 2432 
+  PASS vbmeta == stock bytes @stock footer offset 
+  PASS zero fill between vbmeta end and footer 
+  PASS final size 192 MiB 
+
+ALL 62 CHECKS PASSED
+final sha256: a85e68d8a4ede5b74e65622d980e796c066949b456fc2011595436e6e72b0309

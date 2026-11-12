@@ -11,7 +11,7 @@
 
 ## 0. 摘要（判定先行，六条）
 
-1. **"raphael 支持存在" = 证实，但不在上游官方 org，而在社区 fork**。上游 oosexgang org（7 个仓）无任何 raphael/sm8150 仓；上游 main 的 `devices/manifest.conf` 只登记 redwood+qemu，`docs/devices/` 只有 redwood.md/qemu.md，main README 不提 raphael。raphael 移植的真身在 **HeliumStudio-Dev/hackios-xnu-kernel**（`raphael-bringup` 分支 + 已发布的 `raphael-uefi` Release）与后续接力的 fork **adelholzener69/hakios-xnu-kernel-raphael**（`raphael` 分支）。
+1. **"raphael 支持存在" = 证实，但不在上游官方 org，而在社区 fork**。上游 oosexgang org（7 个仓）无任何 raphael/sm8150 仓；上游 main 的 `devices/manifest.conf` 只登记 redwood+qemu，`docs/devices/` 只有 redwood.md/qemu.md，main README 不提 raphael。raphael 移植的真身在 **HeliumStudio-Dev/hackios-xnu-kernel**（`raphael-bringup` 分支 + 已发布的 `raphael-uefi` Release）与后续接手的 fork **adelholzener69/hakios-xnu-kernel-raphael**（`raphael` 分支）。
 2. **"GPU 驱动已修好" = 证实（有边界）**：Adreno 640 经 freedreno FD640 出 OpenGL ES 3.2，1080×2340 三角形绘制+读回无 GL 错误、桌面确认可用 [实测转述]；但 **Metal 明确不可用**（作者自述 "Metal is not available on either"），而上游 redwood 已是"Metal 窗口服务器出画、滑动 100–104 fps"。就 GPU 而言 raphael 反而落后 redwood 半步。
 3. **"WiFi 已修好" = 部分证实**：WCN3990/ath10k SNOC 栈，5 GHz WPA3-SAE（H2E/PMF/IGTK）与 2.4 GHz WPA2 的关联、取地址、**真实网页加载**均经真机验证 [实测转述]；但作者原文"连接仍不稳定……此次提交保存已有实现，**不声称已经修复该问题**"，且关闭再开启 WiFi 后无法重连（日志 `failed to power on device: -19`）是文档明写的已知 bug。合拢上游 redwood 的 "wifi works" 口径，raphael WiFi 还差一口气。
 4. **"4G 已修好" = 证伪**。作者自己的设备状态表（`devices/raphael/device.conf`，rapheal 分支 tip）：**`cellular missing`**；启动参数 `modem=0`（蜂窝链路不跑）；状态文档工作顺序里蜂窝排第 4 步（在存储持久化之后）；RAPHAEL-WIFI.md："保留这些上游改动，**但不启用 raphael 蜂窝功能**"。SM8150 上 modem 固件（wlanmdsp.mbn 经 MPSS PAS 4）确实被加载——但那是为了 **WiFi 固件跑在 modem DSP 里**，与蜂窝数据/注册无关。
@@ -27,7 +27,7 @@
 | 1 | raphael 支持存在 | **证实（社区 fork，非上游）** | ① 官方侧证据（均为负面）：org 仓列表（仅 7 仓，push 至 2026-11-10）https://github.com/orgs/oosexgang/repositories ；main `devices/manifest.conf`（redwood+qemu+uefi，无 raphael）https://raw.githubusercontent.com/oosexgang/hakios-xnu-kernel/main/devices/manifest.conf ；`docs/devices/`（index/qemu/redwood）https://github.com/oosexgang/hakios-xnu-kernel/tree/main/docs/devices 。② fork 侧证据（正面）：https://github.com/HeliumStudio-Dev/hackios-xnu-kernel （标题自述 "HackiOS XNU kernel for Redmi K20 Pro aka Mi 9T Pro (raphael)"，`raphael-bringup` 分支 @57722468a3）；https://github.com/adelholzener69/hakios-xnu-kernel-raphael/tree/raphael （squash 基座 = 上游 main tip 63fc2b4633，fork 独有 `raphael` 分支 @3233e83714） | Helium-Studio 主账号 https://github.com/Helium-Studio 的 /hackios-xnu-kernel 301 → HeliumStudio-Dev（重定向验证）。上游 PR 列表页 JS 渲染无法匿名确认"有无 raphael PR"，但 manifest/设备页/README/org 四处皆无 → 未被上游收编 [实证] |
 | 2 | GPU 已修好 | **证实（GLES 层）** | `devices/raphael/kit/extract-gpu-firmware.sh`：固件 = `a640_gmu.bin`、**`a630_sqe.fw`**、`a640_zap.mdt/.b00/.b01/.b02`（"the a660_* files of other phones must not be used"）https://github.com/adelholzener69/hakios-xnu-kernel-raphael/blob/raphael/devices/raphael/kit/extract-gpu-firmware.sh ；`device.conf`：`gpu works Adreno 640 through GLES (gpu=1); needs fw-gpu/` ；`docs/RAPHAEL.md`：A640 全部初始化步骤、TZ zap shader 认证、`freedreno / FD640 / OpenGL ES 3.2`、三角形绘制 42 ms/回读 25 ms、CoreAnimation accelerated renderer（2026-10-23 真机日志 `logs/011423-run.log`）[实测转述] | 边界：Metal 不可用（zh README："图形路径 Mesa/Freedreno，OpenGL ES；**当前不提供 Metal 驱动**"）；默认 GPU 时钟 257/427 MHz；"不保证所有场景稳定 60 FPS" |
 | 3 | WiFi 已修好 | **部分证实（首次连接可用，重连 bug 未修）** | `docs/RAPHAEL-WIFI.md`（中文，作者亲笔）："已通过 2.4 GHz WPA2、5 GHz WPA3 SAE 的关联和实际网页加载……**连接仍不稳定；关闭再开启 Wi-Fi 后无法正常扫描。此次提交保存已有实现，不声称已经修复该问题**" https://github.com/adelholzener69/hakios-xnu-kernel-raphael/blob/raphael/docs/RAPHAEL-WIFI.md ；zh README 实测表："Wi-Fi 关闭后重新开启 **仍有问题**：……`failed to power on device: -19`" https://github.com/HeliumStudio-Dev/hackios-xnu-kernel/blob/raphael-bringup/README.raphael.zh.md（fork 内同名文件） | redwood 口径 "wifi works (radio/驱动/入网)" vs raphael "partly"——raphael 不高于 redwood |
-| 4 | 4G 已修好 | **证伪** | `device.conf`：`status cellular missing` ；`docs/RAPHAEL-K20PRO.md` L23："Bluetooth, cellular, cameras……\*\*no\*\*" ；实测 XL_CMDLINE 含 **`modem=0`**（L125）；`docs/RAPHAEL-K20PRO-STATUS.md` 工作顺序："3. Storage persistence. 4. Cellular, then cameras"，且"NV partitions pulled in step 3 are **already the first ingredient**"（= NV 只是备料，未开工） | SM8150 的 WiFi 依赖 MPSS（PAS 4）签名装载 `wlanmdsp.mbn` + TFTP/PD mapper——modem PIL 链路因此真机通过 [实测转述]，但这是 **WiFi 的载体**，不是蜂窝；蜂窝的 NAS/QMI WDS/IPA 链路在 raphael 上明确"不启用" |
+| 4 | 4G 已修好 | **证伪** | `device.conf`：`status cellular missing` ；`docs/RAPHAEL-K20PRO.md` L23："Bluetooth, cellular, cameras……\*\*no\*\*" ；实测 XL_CMDLINE 含 **`modem=0`**（L125）；`docs/RAPHAEL-K20PRO-STATUS.md` 工作顺序："3. Storage persistence. 4. Cellular, then cameras"，且"NV partitions pulled in step 3 are **already the first ingredient**"（= NV 只是备料，未开始） | SM8150 的 WiFi 依赖 MPSS（PAS 4）签名装载 `wlanmdsp.mbn` + TFTP/PD mapper——modem PIL 链路因此真机通过 [实测转述]，但这是 **WiFi 的载体**，不是蜂窝；蜂窝的 NAS/QMI WDS/IPA 链路在 raphael 上明确"不启用" |
 | 5 | "几乎完全正常" | **夸大** | 见 §③ 完成度总表：缺 storage 持久化/cellular/BT/相机/Metal/充电/麦克风/第 8 核；wifi 重连 bug | 与 redwood 对比：redwood 有 storage 持久化、相机、Metal 出画、麦克风、8/8 核 |
 
 **消息源推测**：中文圈 2026-11-03 起的病毒传播（smzdm 文章 https://post.smzdm.com/p/aomqr29m ，"2019 年的红米 K20 Pro 启动 iOS 16.5、弹出式前摄收起"——全文被腾讯验证码墙挡住未能直读，仅搜索摘要可见 [待核]）；以及 HeliumStudio-Dev 仓的中文测试指南（README.raphael.zh.md，561 行，本身就是面向中文读者写的）。UniXNU 生态的 unixnu.com 设备目录另有 raphael 条目（见 §②-3），口径为"compile-only"，与"几乎完全正常"不符。
@@ -41,7 +41,7 @@
 | 角色 | 谁 | 仓/分支 | 性质 |
 |---|---|---|---|
 | 原始 bringup | **Helium-Studio**（17 岁开发者，账号 2020-07 建；公开仓为 Zundamon Kernel/AnyKernel3 等 raphael 刷机生态；文档引用自己的 `zundamon-miui-5.4` defconfig 与 "Helium A640 notes"） | HeliumStudio-Dev/hackios-xnu-kernel，`raphael-bringup` 分支（@57722468a3）；Release `raphael-uefi`（2026-10-27T11:25Z 发布 DEBUG r5 UEFI 镜像，GPG 已验证签名） | 公开 fork（基座 = 上游重写前 main 8851317 时代） |
-| squash+接力 | **adelholzener69** | adelholzener69/hakios-xnu-kernel-raphael，`raphael` 分支（@3233e83714，无 Release） | 公开 fork（基座 = 上游 main tip 63fc2b4633，2026-11-06） |
+| squash+接手 | **adelholzener69** | adelholzener69/hakios-xnu-kernel-raphael，`raphael` 分支（@3233e83714，无 Release） | 公开 fork（基座 = 上游 main tip 63fc2b4633，2026-11-06） |
 | AI 协作 | squash 提交 co-author：`Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>` [实证] | — | 与我们同为 AI 协作工程范式 |
 | 上游官方 | oosexgang（shimoku/shimoku74） | hakios-xnu-kernel main | **未收编 raphael**；但 11-06 合并了 dlz3388461878-cmd 的两个社区 PR（#53 soc-args 寄存器宽度解码、#54 var-store 旧档回退）——raphael fork 的基座恰好包含它们，说明 fork 圈子与上游在互馈 |
 
@@ -101,7 +101,7 @@
 - **主机路径**：12 路 level-high CE 中断、NAPI、HTC/WMI、数据收发。
 - **调试工作**（docs/RAPHAEL.md 10-24 节，对我们 WiFi 战的参考价值最高的部分）：固件 early crash（SMP2P wlan bit1 → WLAN PD DOWN/UP）→ 对照本机 6.12 分支 4 条 commit（`4c37abf82a78` ICNSS/MSA/SID/CE、`f48d0a8dfc4e` L10C 供电、`ad7584e9454f` 6.12 用 ICNSS+qcacld 的配置辨伪、`0ad06c1c3f64` QDSS 时钟投票）→ 修好后两轮真机 `0x21 FW_READY`（step 14）；再修 BDF 选择（cnss-daemon 机型逻辑核对）→ 扫描 dwell ≥120 ms → WPA3 SAE H2E 真机联网。
 - **代码与构建**：`drivers/wifi/hakios.wifi.c` +1406/−82（ICNSS 步法）；`wifi/lx/ath10k/{host.c 14.7 KB, include/, patches/icnss-bootstrap.patch 1.5 KB}`；`tools/mk-ath10k.py`（**固定源码管线**：linux **7.0.14** tar.xz + freebsd 15.1 src + wpa_supplicant 2.11 + mbedtls 3.6.7，全部 SHA256 锁定 → 编出 `ath10k.o` → `WIFI_OBJECT=... make kernel` 链入 XNU）；`device.conf` 选 `WIFI_ATH10K=1`。启动参数 `wifi_step=15 wifi_lx=2 wifi_bdf=... wifi_smmu=2 wifi_keep=1 ...`。
-- **验收工具范式**：`tools/check-wifi-{mdt,smem,doorbell,proxy,memory,rmtfs,tftp,pd,pdr,qrtr,icnss,dms,diag,dump,microdump,smmu}.py` 十六项主机回归 + `tools/wpa-test/run.sh` + `mk-ath10k.py --sae-test`（195 项 WPA2 检查、WPA3 SAE/PMF 检查）——"ASan/UBSan 通过不能替代实机扫描、重新关联及网络稳定性验证"。
+- **验收尾具范式**：`tools/check-wifi-{mdt,smem,doorbell,proxy,memory,rmtfs,tftp,pd,pdr,qrtr,icnss,dms,diag,dump,microdump,smmu}.py` 十六项主机回归 + `tools/wpa-test/run.sh` + `mk-ath10k.py --sae-test`（195 项 WPA2 检查、WPA3 SAE/PMF 检查）——"ASan/UBSan 通过不能替代实机扫描、重新关联及网络稳定性验证"。
 
 ### 4.2 4G/蜂窝（证伪细节）
 
@@ -158,9 +158,9 @@ Mu-Silicium 上游 `Platforms/Xiaomi` 有 **nuwaPkg = Redmi K60（SM8475，与 P
 
 ### 5.4 "如果我们抄它，下一个波该干什么"——Top 3
 
-1. **把"固定源码驱动对象管线"立起来（v0.5/v0.6 共用前置）**：以 `tools/mk-ath10k.py` 为模板写 `tools/mk-ath11k.py`（拉 ath11k/mac80211 源 + SHA256 锁 + 补丁集进 `wifi/lx/ath11k/patches/`，主机编 .o），同时把 raphael 的 `check-wifi-*.py` 范式改造成我们的 `tools/check-phk110-wifi-*.py`（CNSS 供电序列/MHI/QRTR/WDI 各一）。产出物与手机无关，本周即可开工。
+1. **把"固定源码驱动对象管线"立起来（v0.5/v0.6 共用前置）**：以 `tools/mk-ath10k.py` 为模板写 `tools/mk-ath11k.py`（拉 ath11k/mac80211 源 + SHA256 锁 + 补丁集进 `wifi/lx/ath11k/patches/`，主机编 .o），同时把 raphael 的 `check-wifi-*.py` 范式改造成我们的 `tools/check-phk110-wifi-*.py`（CNSS 供电序列/MHI/QRTR/WDI 各一）。产出物与手机无关，本周即可开始。
 2. **UEFI patch 管理收编成"清单+校验"（v0.x 工程质量项，半天）**：把我们 阶段 18–24 的 udon UEFI 手术（UsbConfigDxe start_ex/DALSYSDxe 等）写成 `devices/phk110/uefi/firmware-patches.json` + `check-xbl.py` 式的模块哈希校验脚本；顺带登记 Mu-Silicium nuwaPkg @commit 为 UEFI 备胎锚点（一行 BASE 文件）。
-3. **修正情报面 + 亮度/sysctl 注入侦察（本波完成）**：① 在 STATUS/landscape 里补记"raphael fork 生态（两仓+release+smzdm 出圈）"与"上游 mtk 蓝牙打通"，把跟进范围从官方 org 扩到 fork 网络 + unixnu.com；② 亮度链虽排在 v1.0 后，但读一遍 `hakios.brightness.c` 的 sysctl 挂点与 backboardd 注入法成本极低，先入档（PHK110 亮度是 redwood 也没有的能力，将来是加分项）。
+3. **修正情报面 + 亮度/sysctl 注入侦察（本阶段完成）**：① 在 STATUS/landscape 里补记"raphael fork 生态（两仓+release+smzdm 出圈）"与"上游 mtk 蓝牙打通"，把跟进范围从官方 org 扩到 fork 网络 + unixnu.com；② 亮度链虽排在 v1.0 后，但读一遍 `hakios.brightness.c` 的 sysctl 挂点与 backboardd 注入法成本极低，先入档（PHK110 亮度是 redwood 也没有的能力，将来是加分项）。
 
 ---
 

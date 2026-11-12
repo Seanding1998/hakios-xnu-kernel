@@ -1,0 +1,176 @@
+--- /home/cyrux/hakios/kernel/userland/src/gl_test.c.v41-orig	2026-11-11 22:51:13.680061445 +0800
++++ /home/cyrux/hakios/kernel/userland/src/gl_test.c	2026-11-11 22:56:54.128378964 +0800
+@@ -129,7 +129,8 @@
+ 	glCompileShader(name);
+ 	glGetShaderiv(name, GL_COMPILE_STATUS, &good);
+ 	if (!good) {
+-		printf("gl_test: a shader does not compile\n");
++		printf("gl_test: GL_COMPILE_FAIL a shader does not compile\n");
++		return 0;                       /* the callers judge: a shader that did not compile ends the run */
+ 	}
+ 	return name;
+ }
+@@ -272,8 +273,12 @@
+ 		printf("gl_test: no OpenGL ES context\n");
+ 		return 1;
+ 	}
+-	printf("gl_test: %s; %s; %s\n", (const char *)glGetString(GL_VENDOR), (const char *)glGetString(GL_RENDERER),
+-	    (const char *)glGetString(GL_VERSION));
++	const char *vendor_string = (const char *)glGetString(GL_VENDOR), *renderer = (const char *)glGetString(GL_RENDERER),
++	           *version_string = (const char *)glGetString(GL_VERSION);
++
++	printf("gl_test: %s; %s; %s\n", vendor_string, renderer, version_string);
++	printf("gl_test: RENDER backend=%s renderer=%s\n", strstr(renderer, "FD725") != NULL ? "hw" : "sw", renderer);
++	fflush(stdout);
+ 	if (argc > 1 && strcmp(argv[1], "fill") == 0) {
+ 		fill(argc > 3 ? atoi(argv[2]) : 1125, argc > 3 ? atoi(argv[3]) : 2436);
+ 		return 0;
+@@ -293,12 +298,18 @@
+ 		return 1;
+ 	}
+ 	program = glCreateProgram();
+-	glAttachShader(program, shader(GL_VERTEX_SHADER,
++	unsigned vertex = shader(GL_VERTEX_SHADER,
+ 	    "attribute vec2 where; attribute vec3 colour; varying vec3 c;\n"
+-	    "void main() { gl_Position = vec4(where, 0.0, 1.0); c = colour; }\n"));
+-	glAttachShader(program, shader(GL_FRAGMENT_SHADER,
++	    "void main() { gl_Position = vec4(where, 0.0, 1.0); c = colour; }\n");
++	unsigned fragment = shader(GL_FRAGMENT_SHADER,
+ 	    "precision mediump float; varying vec3 c;\n"
+-	    "void main() { gl_FragColor = vec4(c, 1.0); }\n"));
++	    "void main() { gl_FragColor = vec4(c, 1.0); }\n");
++
++	if (vertex == 0 || fragment == 0) {
++		return 1;                       /* shader() has already told which of them does not compile */
++	}
++	glAttachShader(program, vertex);
++	glAttachShader(program, fragment);
+ 	glBindAttribLocation(program, 0, "where");
+ 	glBindAttribLocation(program, 1, "colour");
+ 	glLinkProgram(program);
+@@ -307,6 +318,8 @@
+ 		printf("gl_test: the program does not link\n");
+ 		return 1;
+ 	}
++	printf("gl_test: RENDER_PASS backend=%s renderer=%s\n", strstr(renderer, "FD725") != NULL ? "hw" : "sw", renderer);
++	fflush(stdout);
+ 	glUseProgram(program);
+ 	glViewport(0, 0, width, height);
+ 	glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
+@@ -315,9 +328,12 @@
+ 	glVertexAttribPointer(1, 3, GL_FLOAT, 0, 5 * sizeof(float), corners + 2);
+ 	glEnableVertexAttribArray(0);
+ 	glEnableVertexAttribArray(1);
++	unsigned error_setup = glGetError();
++
+ 	glDrawArrays(GL_TRIANGLES, 0, 3);
+ 	glFinish();
+ 	drew = now_ms();
++	unsigned error_drawn = glGetError();
+ 
+ 	drawn = malloc((size_t)width * (size_t)height * 4);
+ 	shown = malloc((size_t)width * (size_t)height * 4);
+@@ -327,6 +343,7 @@
+ 	memset(drawn, 0x55, (size_t)width * (size_t)height * 4);
+ 	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, drawn);
+ 	read = now_ms();
++	unsigned error_read = glGetError();
+ 	/* the panel's rows go down and its pixels are blue first */
+ 	for (int y = 0; y < height; y++) {
+ 		const uint8_t *from = drawn + (size_t)(height - 1 - y) * (size_t)width * 4;
+@@ -345,23 +362,86 @@
+ 	printf("gl_test: %d x %d drawn in %llu ms, read back in %llu ms; error %#x; red green blue alpha: a corner %u %u %u %u, "
+ 	    "the middle %u %u %u %u, near the red corner %u %u %u %u, near the green %u %u %u %u, near the blue %u %u %u %u; "
+ 	    "%u of %u pixels inside the triangle (%u%%; 26%% by geometry)\n", width, height, drew - began, read - drew,
+-	    glGetError(), PIXEL(2, 2), PIXEL(width / 2, height / 2), PIXEL(width * 15 / 100, height * 22 / 100),
++	    error_setup | error_drawn | error_read, PIXEL(2, 2), PIXEL(width / 2, height / 2), PIXEL(width * 15 / 100, height * 22 / 100),
+ 	    PIXEL(width * 85 / 100, height * 22 / 100), PIXEL(width / 2, height * 80 / 100), coloured,
+ 	    (unsigned)(width * height), (unsigned)((uint64_t)coloured * 100 / (uint64_t)(width * height)));
+ 
++	/*
++	 * The judgement, in the open. The triangle's corners are pure red, green and blue at
++	 * (-0.8, -0.6), (0.8, -0.6) and (0, 0.7), the clear is (0.1, 0.1, 0.2, 1.0): a pixel inside
++	 * the triangle is the barycentric mixture of the corners, one outside is the clear colour,
++	 * the alpha is 255 everywhere, and 26% of the frame lies inside by geometry. A rasteriser
++	 * covers the pixels whose centres are in the triangle, which differs from its area by no
++	 * more than half the edges' length -- under half a percent of this frame. Each judgement
++	 * prints a line of its own (RENDER_/READBACK_/GL_ERROR_/PRESENT_...), and a failed one
++	 * leaves by a code that is not 0, so that no runner can call a broken picture a pass:
++	 * 1 the context or its program, 2 the pixels, 3 the panel call, 4 a GL error.
++	 */
++	int rc = 0;
++	unsigned whole = (unsigned)(width * height), coverage = (unsigned)((uint64_t)coloured * 100 / whole);
++	const struct { int x, y, r, g, b, tolerance; } judged[] = {
++		{ 2, 2, 26, 26, 51, 3 },                /* the clear, outside; also proves the read back anything at all */
++		{ width / 2, height / 2, 69, 69, 118, 20 },      /* the middle: the corners in a 7 : 7 : 12 mixture */
++		{ width * 15 / 100, height * 22 / 100, 235, 12, 8, 30 },        /* in, by the red corner */
++		{ width * 85 / 100, height * 22 / 100, 12, 235, 8, 30 },        /* in, by the green corner */
++		{ width / 2, height * 80 / 100, 10, 10, 235, 30 },      /* in, by the blue apex */
++	};
++	unsigned judged_all = sizeof(judged) / sizeof(judged[0]), samples = 0;
++
++	for (unsigned k = 0; k < judged_all; k++) {
++		const uint8_t *p = drawn + ((size_t)judged[k].y * (size_t)width + (size_t)judged[k].x) * 4;
++
++		if (abs((int)p[0] - judged[k].r) <= judged[k].tolerance && abs((int)p[1] - judged[k].g) <= judged[k].tolerance
++		    && abs((int)p[2] - judged[k].b) <= judged[k].tolerance && p[3] >= 254) {
++			samples++;
++		} else {
++			printf("gl_test: READBACK_FAIL pixel %d, %d: red green blue alpha %u %u %u %u, judged %u %u %u 255 (tolerance %u)\n",
++			    judged[k].x, judged[k].y, p[0], p[1], p[2], p[3], judged[k].r, judged[k].g, judged[k].b, judged[k].tolerance);
++		}
++	}
++	if (error_setup != 0 || error_drawn != 0 || error_read != 0) {
++		printf("gl_test: GL_ERROR_FAIL setup %#x, draw %#x, read %#x\n", error_setup, error_drawn, error_read);
++		rc = 4;
++	}
++	if (samples == judged_all && coverage >= 25 && coverage <= 27) {
++		printf("gl_test: READBACK_PASS samples %u/%u coverage %u%% (26%% by geometry)\n", samples, judged_all, coverage);
++	} else {
++		if (coverage < 25 || coverage > 27) {
++			printf("gl_test: READBACK_FAIL coverage %u%% (26%% by geometry; %u of %u pixels judged inside)\n",
++			    coverage, coloured, whole);
++		}
++		if (rc == 0) {
++			rc = 2;
++		}
++	}
++	fflush(stdout);
++
+ 	service = IOServiceGetMatchingService(0, IOServiceMatching("HakiosGPU"));
+ 	if (service == 0 || IOServiceOpen(service, mach_task_self(), 0, &connection) != 0) {
+-		printf("gl_test: no GPU service in this kernel to put the picture on the panel with\n");
+-		return 0;
+-	}
+-	for (int i = 0; i < seconds * 5; i++) {
++		printf("gl_test: PRESENT_CALL_FAIL no GPU service in this kernel to put the picture on the panel with\n");
++		if (rc == 0) {
++			rc = 3;
++		}
++	} else {
+ 		struct show show = { (uint64_t)(uintptr_t)shown, (uint32_t)width, (uint32_t)height, (uint32_t)width * 4, 0 };
+ 		kern_return_t result = IOConnectCallStructMethod(connection, 0x7f, &show, sizeof(show), NULL, NULL);
+ 
+-		if (i == 0) {
+-			printf("gl_test: the picture is on the panel (%#x), for %d seconds\n", result, seconds);
++		printf("gl_test: the picture is on the panel (%#x), for %d seconds\n", result, seconds);
++		if (result != 0) {
++			printf("gl_test: PRESENT_CALL_FAIL the panel call did not take\n");
++			if (rc == 0) {
++				rc = 3;
++			}
++		} else {
++			printf("gl_test: PRESENT_CALL_OK\n");
++			for (int i = 1; i < seconds * 5; i++) {
++				struct show again = { (uint64_t)(uintptr_t)shown, (uint32_t)width, (uint32_t)height, (uint32_t)width * 4, 0 };
++
++				IOConnectCallStructMethod(connection, 0x7f, &again, sizeof(again), NULL, NULL);
++				usleep(200000);
++			}
+ 		}
+-		usleep(200000);
++		fflush(stdout);
+ 	}
+-	return 0;
++	return rc;
+ }

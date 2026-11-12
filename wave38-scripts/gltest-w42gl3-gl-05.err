@@ -1,0 +1,32 @@
+tunnel25w: round 0: d00d nodes at addr [4]
+tunnel25w: addr 4: LIVE (product b'xnuloader'); this is our loader
+tunnel25w: phase: the kernel session is live -- tunneling
+tunnel25w: netmode on -> OKAY b'the pipes carry frames (oem netstat)'
+tunnel25w: pkt OUT 42 B non-IPv4
+tunnel25w: pkt OUT 42 B non-IPv4
+tunnel25w: pkt IN  42 B non-IPv4
+tunnel25w: arp learned: ['10.0.0.2']
+tunnel25w: pkt OUT 10.0.0.1:22857 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=24 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt OUT 10.0.0.1:22857 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt IN  42 B non-IPv4
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:22857 flags=RST|ACK seq=0 ack=268435457 win=0 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt OUT 10.0.0.1:22857 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:22857 flags=RST|ACK seq=0 ack=268435457 win=0 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt OUT 10.0.0.1:22857 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:22857 flags=RST|ACK seq=0 ack=268435457 win=0 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt OUT 10.0.0.1:22857 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:22857 flags=RST|ACK seq=0 ack=268435457 win=0 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt OUT 10.0.0.1:22857 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:22857 flags=RST|ACK seq=0 ack=268435457 win=0 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt OUT 10.0.0.1:22857 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:22857 flags=RST|ACK seq=0 ack=268435457 win=0 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt OUT 10.0.0.1:22857 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:22857 flags=RST|ACK seq=0 ack=268435457 win=0 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt OUT 10.0.0.1:22857 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:22857 flags=RST|ACK seq=0 ack=268435457 win=0 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt OUT 10.0.0.1:22857 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:22857 flags=RST|ACK seq=0 ack=268435457 win=0 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt OUT 10.0.0.1:22857 -> 10.0.0.2:22 flags=SYN seq=268435456 ack=0 win=16384 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:22857 flags=RST|ACK seq=0 ack=268435457 win=0 len=0 cksum=ok | SND.UNA=268435456 SND.NXT=268435457 RCV.NXT=0 state=SYN_SENT
+Connection timed out during banner exchange
+Connection to UNKNOWN port 65535 timed out

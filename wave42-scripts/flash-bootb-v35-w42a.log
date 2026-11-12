@@ -1,0 +1,17 @@
+[flash-v35-w42a 23:50:51] graft pinned: 6558d303ac792e6e0536b0b80deb3efcaa8195abaa4f398254ae869d7705f0a0 (payload 82add009, kernel 55a8d40f wave37 first-light, loader 5de055ea the wave42 root-fixed v35 build, ramdisk c2780842 the GL=test carrier, verify 69/69)
+[flash-v35-w42a 23:50:51] waiting for the Android state (22d9:2765/2769)...
+[flash-v35-w42a 23:50:52] android on the bus; waiting for boot_completed
+[flash-v35-w42a 23:50:53] adb reboot bootloader
+[flash-v35-w42a 23:50:56] waiting for the d00d ABL fastboot gadget (serial/name must not be xnuloader)
+[flash-v35-w42a 23:51:06] waking the distro first, then attach --wsl at 2-2
+usbipd: info: Detected networking mode 'mirrored'.
+usbipd: info: Using IP address 127.0.0.1 to reach the host.
+[flash-v35-w42a 23:51:15] identity gate (getvar product must be taro)
+[flash-v35-w42a 23:51:16] slot gate (must be b)
+[flash-v35-w42a 23:51:17] set_active b done
+[flash-v35-w42a 23:51:17] flashing boot_b (192 MiB) with v35 -- exit-checked, OKAY asserted
+Sending 'boot_b' (196608 KB)                       OKAY [  4.865s]
+Writing 'boot_b'                                   OKAY [  0.694s]
+Finished. Total time: 5.781s
+[flash-v35-w42a 23:51:24] set_active b + reboot into the v35 cycle
+[flash-v35-w42a 23:51:25] FLASH CONFIRMED: boot_b = v35 6558d303ac792e6e0536b0b80deb3efcaa8195abaa4f398254ae869d7705f0a0; the slot-b cycle restarts

@@ -1,0 +1,22 @@
+=== AdrenoFirmware: repos API license field ===
+{"default_branch":"main","license":{"key":"other","name":"Other","node_id":"MDc6TGljZW5zZTA=","spdx_id":"NOASSERTION","url":null},"pushed_at":"2026-10-24T18:04:52Z","size":25}
+=== AdrenoFirmware: /license endpoint ===
+{"name":"Other","path":"LICENSE","sha":"217b4df4b4037c3b6cd4522a3909d3223f1ec1ac","size":2682,"spdx":"NOASSERTION"}
+=== AdrenoFirmware: root listing ===
+file	AGENTS.md	2131
+file	AdrenoFirmware.c	2655
+file	AdrenoFirmware.h	1059
+file	AdrenoHfi.c	5944
+file	AdrenoHfi.h	3449
+file	AdrenoHfiStartup.c	8433
+file	AdrenoHfiStartup.h	4016
+file	AdrenoHfiVotes.c	4062
+file	AdrenoHfiVotes.h	2239
+file	LICENSE	2682
+file	README.md	287
+file	test_gmu.c	3430
+file	test_hfi.c	8900
+file	test_startup.c	8722
+file	test_votes.c	5843
+=== AdrenoFirmware: HEAD ===
+20ad3d7aca14bd46aecab6335c780f5413fa054b	2026-10-24T18:03:54Z	docs: document component scope and shared porting workflow

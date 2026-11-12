@@ -63,7 +63,7 @@ python3 wave27-scripts/timed-ssh-v27.py
 前提：USB 服务通道已建立（usbipd attach 到位，或用直连的 WinUSB 后端）；
 SSH 私钥放在 `wave21-scripts/id_ed25519_phk110`——本分支不含私钥（只发布了
 公钥），复跑需要自备同名密钥，并按
-[wave17-ssh-bootstrap.md](../wave17-ssh-bootstrap.md) 的做法把你的公钥注入
+[wave17-ssh-bootstrap.md](wave17-ssh-bootstrap.md) 的做法把你的公钥注入
 镜像的 `authorized_keys`。
 
 它做什么：按相位感知的节奏等待并建立 SSH 连接——loader 相位时保持静默
@@ -111,6 +111,43 @@ python3 wave30-scripts/mk-ath11k.py --help
 
 它做什么：对设备树节点、固件文件、MHI/WLFW 配置做静态检查，以及 ath11k
 固件打包。纯本机文件检查，无风险；WiFi 路线尚未在真机上进行。
+
+## 8. GPU 四门判定复验（内核会话内经 SSH 执行；不刷写）
+
+v36 起的四门判定工具随 [wave45-scripts/](../../wave45-scripts/) 发布：
+
+```sh
+# 门 A：上电步进回归（从日志分区块设备读上一代内核日志，grep 步进判据）
+# 门 B：fence 探针（设备上运行 fence_probe，两次随机数写回 + 序号递增断言）
+# 门 C：GL 验收器（设备上运行 /bin/gl_test：像素真值 + 覆盖窗 + 分级退出码）
+# 门 D：电量读链（battery_probe 直读 sysctl oid）
+python3 wave45-scripts/gates-run-v45.py --deadline-minutes 300
+```
+
+前提：手机在 slot b 循环（boot_b = v36 或同代镜像），SSH 通道按第 4 节就绪。
+runner 会按相位感知的节奏在每代内核会话内依次执行四门并落判定文件
+（参考样例：`wave45-scripts/verdict45-gate{a,b,c,d}.txt`）。探针源码
+（`fence_probe.c` / `battery_probe.c`）随目录发布。判定语义见
+[waves/wave45-v36-firstframe.md](waves/wave45-v36-firstframe.md)。
+
+## 9. /var 持久化判定复验（不刷写）
+
+```sh
+python3 wave28-scripts/verdict-var-v28.py --help
+bash wave28-scripts/runbook-var-gate.sh state
+```
+
+前提：手机在 slot b 循环，SSH 通道就绪。做法 = 会话 1 写标记包
+（[wave28-scripts/mark-var-v28.py](../../wave28-scripts/mark-var-v28.py)：双标记 +
+64 KiB blob + host key 指纹）→ 等内核世代更替（或人为让会话结束）→ 会话 2
+复读 → 判定（v34 起判定器升级为
+[wave34-scripts/verdict-var-v34.py](../../wave34-scripts/verdict-var-v34.py)）。
+判定语义与两轮结果（REGRESSED → 修复 → PERSIST 6/6 → v35
+复验）见 [waves/wave31-var-verdict.md](waves/wave31-var-verdict.md) 与
+[waves/wave34-var-fix.md](waves/wave34-var-fix.md)；判定文件在
+[wave28-scripts/](../../wave28-scripts/)（`verdict28-var.txt` /
+`verdict34-var.txt`）与 [wave42-scripts/](../../wave42-scripts/)
+（`verdict42-var.txt`）。
 
 ## 操作关系一图
 

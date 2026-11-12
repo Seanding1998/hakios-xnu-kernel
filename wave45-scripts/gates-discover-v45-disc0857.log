@@ -1,0 +1,13 @@
+[08:54:47 t+0000.0s] wave45 discovery armed (run-id disc0857, deadline 45 min)
+[08:54:47 t+0000.0s] bus: d00d addrs [1] (was None)
+[08:54:48 t+0000.2s] attempt k001 -> rc=255 in 0.2s (out 0 B)
+[08:54:48 t+0000.2s] branch: LOADER-PHASE
+[08:54:48 t+0000.2s] loader answered: silence until +250 s
+[08:58:49 t+0241.4s] bus: d00d addrs [] (was [1])
+[08:59:15 t+0268.0s] bus: d00d addrs [1] (was [])
+[09:01:31 t+0404.1s] attempt k002 -> rc=0 in 136.1s (out 257 B)
+[09:01:31 t+0404.1s] branch: HIT
+[09:01:31 t+0404.1s] === HIT: running the discovery command ===
+[09:01:32 t+0404.7s] attempt disc -> rc=0 in 0.6s (out 911 B)
+[09:01:32 t+0404.7s] discovery captured (911 B) -> w45-discovery-disc0857.txt
+[09:01:50 t+0422.8s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total

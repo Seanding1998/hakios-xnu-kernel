@@ -5,7 +5,7 @@
 
 ## 0. 一句话结论
 
-**出画判定未完成（无 mp4 / 无日志级出画证据），本波把"提取链为何拿不到"从疑似收敛为三层实锤，并把全部修复面交给阶段 24（Exp-1 诊断刷写）**：①cmdline-only 的 v19（rec_secs/rec_ring/rec_mb + loader_return_after=300）一次刷写真机验证，屏录在机内每循环重新武装（内核侧链路工作，见 §5 logdump 判读）；②提取失败的原因不在屏录本身，而在 serving 窗：Round 1 两循环 bulk 对 un-armed（DwcPrepareURB phys[2] 状态 0，屏摄四行链证据），loader 返回后 `usb_ready=0` 直接重启，240 s 服务窗从未打开；③v19b（软化重掷 + 服务相位提前 + raw 码透传 + settle 5s）刷入真机验证，但审阅抓到其 5 处实现缺陷（§6），结论一律打折；④提取脚本两处协议 bug（缺 `upload`、FAIL 冒号错位）由审阅抓获、已修复并 8/8 单测（§4）；⑤**本波最重要的工程发现 = cmdline 真实预算**：loader 组合头 110 字符（f13 的"预算余 228"作废，en0_addr 被置换下机，§1）。
+**出画判定未完成（无 mp4 / 无日志级出画证据），本阶段把"提取链为何拿不到"从疑似收敛为三层实锤，并把全部修复面交给阶段 24（Exp-1 诊断刷写）**：①cmdline-only 的 v19（rec_secs/rec_ring/rec_mb + loader_return_after=300）一次刷写真机验证，屏录在机上每循环重新武装（内核侧链路工作，见 §5 logdump 判读）；②提取失败的原因不在屏录本身，而在 serving 窗：Round 1 两循环 bulk 对 un-armed（DwcPrepareURB phys[2] 状态 0，屏摄四行链证据），loader 返回后 `usb_ready=0` 直接重启，240 s 服务窗从未打开；③v19b（软化重掷 + 服务相位提前 + raw 码透传 + settle 5s）刷入真机验证，但审阅抓到其 5 处实现缺陷（§6），结论一律打折；④提取脚本两处协议 bug（缺 `upload`、FAIL 冒号错位）由审阅抓获、已修复并 8/8 单测（§4）；⑤**本阶段最重要的工程发现 = cmdline 真实预算**：loader 组合头 110 字符（f13 的"预算余 228"作废，en0_addr 被置换下机，§1）。
 
 ## 1. T1 准备工作核实（零手机，全部树内实证）
 
@@ -18,7 +18,7 @@
 | F6（vnode 表） | 无 boot-arg 可调：`desiredvnodes = sane_size/64K+1024`，帽 CONFIG_VNODES，唯一覆盖口 = **设备树属性** `kern.maxvnodes`（`PE_get_default`，unix_startup.c:200-215）——需 loader 改动，本轮红线禁止。按施工单接受风险：panic→stackshot→干净返回，`loader_recording` 照常保留，rec_ring 保尾帧 |
 | busy 门 | `oem recording` 在内核运行期回 `FAILa kernel is running (oem stop ends it)`（:4437；fb_reply 无冒号，见 §4） |
 
-**cmdline v19 决策**（一处与施工单的偏离，理由如实记录）：预算差 9 字符，故**去掉 ` en0_addr=10.0.0.2`（−18）**换 ` rec_secs=280 rec_ring=1 rec_mb=256`（+35）+ `loader_return_after=180→300`（0）；`surftrace=24 surftrace_of=backboardd fb_hz=30` 全部落选（surftrace=24 已是默认，b25 未带该参数也出了 surface 行；fb_hz 默认 60）。偏离理由：en0 驱动**无此参数则整体不启动**（hakios.loader_net.c:11 "is what turns this on"），但本波 serving 走 loader USB bulk 命令通道，与 IP 无关；touchscreen=1 不可去（inject.c 虚拟 HID 消费 /dev/hakios-touch）。组合后 **488+110=598/607**，无截断。审阅确认此修正方向正确、余量小（§八-4：最终以 logdump 实印 cmdline 验收）。
+**cmdline v19 决策**（一处与施工单的偏离，理由如实记录）：预算差 9 字符，故**去掉 ` en0_addr=10.0.0.2`（−18）**换 ` rec_secs=280 rec_ring=1 rec_mb=256`（+35）+ `loader_return_after=180→300`（0）；`surftrace=24 surftrace_of=backboardd fb_hz=30` 全部落选（surftrace=24 已是默认，b25 未带该参数也出了 surface 行；fb_hz 默认 60）。偏离理由：en0 驱动**无此参数则整体不启动**（hakios.loader_net.c:11 "is what turns this on"），但本阶段 serving 走 loader USB bulk 命令通道，与 IP 无关；touchscreen=1 不可去（inject.c 虚拟 HID 消费 /dev/hakios-touch）。组合后 **488+110=598/607**，无截断。审阅确认此修正方向正确、余量小（§八-4：最终以 logdump 实印 cmdline 验收）。
 
 ## 2. T2 构建（wave23-scripts/ 新目录，Windows device-layer 只新增）
 
@@ -58,7 +58,7 @@ v1 的两处 P1 **全部成立、已修复**（fetch-recording-23.py v2/v2.1）�
 
 ## 5. v19b 真机验证（第二轮刷写）与判读边界
 
-v19b（graft `5468b6f2…`）已刷入 boot_b 并进入循环（本阶段未执行刷写）。手机在机期间 Windows 总线形态：偶发 xnuloader episode（01:15:46 一例，写被吞；01:25/01:33 同）+ 持续 `0000:000x` 死节点；01:33 起 ABL fastboot gadget（`Android`）attached 于 WSL。
+v19b（graft `5468b6f2…`）已刷入 boot_b 并进入循环（本阶段未执行刷写）。手机驻留本系统期间 Windows 总线形态：偶发 xnuloader episode（01:15:46 一例，写被吞；01:25/01:33 同）+ 持续 `0000:000x` 死节点；01:33 起 ABL fastboot gadget（`Android`）attached 于 WSL。
 
 **判读边界（审阅 §一、§五，全部采纳）**：v19b 的 5 处实现缺陷使"v19b 循环仍 un-armed"这一观测**不能当作任何假设的证据**：
 - `host_seen` 生命周期错：等待 helper（usb_wait_pumped）内消费的状态事件不计入（漏收）+ Disconnected 也算"主机在场"（假阳性）+ 每代清零；
@@ -66,22 +66,22 @@ v19b（graft `5468b6f2…`）已刷入 boot_b 并进入循环（本阶段未执�
 - raw 探针只在 beat 0（恰是最差的采样点——present 后配置大概率未发生，§五-F5）；
 - `BS->stall(200000)` 降级路 = **200 ms/片**（250 片=50 s 非 5 s；1250 片=250 s）——set_timer 返回值未查（F3 同族：usb_present 的 stall(50000) 实为 50 ms，注释错）；
 - GCTL bit11 置位后等自清、超时不主动清（Linux 显式清 CORESOFTRESET；"三重唤醒无效"的旧结论不能完全排除复位生命周期问题）。
-以上全部并入 阶段 24 修复，**不得用作本波任何方向的结论**（审阅明令）。
+以上全部并入 阶段 24 修复，**不得用作本阶段任何方向的结论**（审阅明令）。
 
 **logdump 判读**：[待 Android 返回后自动拉取补齐——见 §8 附记。截至 01:59 手机状态 = ABL fastboot gadget（`18d1:d00d Android`）自 01:33 起持续停在总线并 attached 于 WSL（>25 min 静止）——非循环形态、归属不明的意外态，按约定停手不猜，留给后续定夺；auto-logdump-23.sh（Android 一回即拉）与 fetch23 v2.1 采样器（xNuloader episode 一回即试提取）均在后台值守，处置后无需值守即可自动取证。]
 
-## 6. 审阅项逐条清单（已验证/已修复/转入下一波）
+## 6. 审阅项逐条清单（已验证/已修复/转入下一阶段）
 
 **已验证（复核属实）**：
 - fb_reply 无冒号（loader.c:4465）✅；upload 才发数据（:4643）✅；服务窗 `if (usb_ready)`（:5117）✅；错误墙刷屏源 = usb_poll_command 未武装时每 pass 重提交 511 B 接收（:4839 一带）✅；cmdline 组合头（110 B 实测）✅；屏摄四行 = DwcPrepareURB phys[2] 状态 0 → 0x8000000C → UsbfnDwcSubmitUrbNode/Transfer/UsbDeviceSend 尾链 ✅（审阅二轮：**对照片中这些提交，"没排队接收"的解释已不够，直接原因 = vendor 软件端点状态为零**；但状态为何为零仍未分辨——Exp-1 目标）。
 
-**已修复（本波）**：提取协议两处 P1 + 活性检查 + 单一所有者纪律（§4）；cmdline 预算（§1）。
+**已修复（本阶段）**：提取协议两处 P1 + 活性检查 + 单一所有者纪律（§4）；cmdline 预算（§1）。
 
 **转入 阶段 24（Exp-1，见 §7）**：v19b 五缺陷、统一事件消费入口、持续真实 RX、双层 speed/phys 采样、GCTL bit11、前导错误粘性、四检查点验收、失败提交限频、ConOut 镜像钩子。
 
 **结论修正（写进底账）**：
 - 撤回：fetch23"已发 set_configuration"/"2.5 min 稳定窗=同一代际"——libusb WinUSB 对同配置号 set_configuration 本地短路（v1.0.29 windows_winusb.c L3014-3031），无代际证据；**H1/H2 升为首要嫌疑的表述撤回**（现排序 H1>H2>H3 为条件概率暂排，证据不足）。
-- 修正：f13"23.x 与 USB 阻塞零耦合"过强——屏录在内存、提取走 loader staging/upload，USB 不通则显示取证只能算未完成（本波即实证）。
+- 修正：f13"23.x 与 USB 阻塞零耦合"过强——屏录在内存、提取走 loader staging/upload，USB 不通则显示取证只能算未完成（本阶段即实证）。
 - v18 的 `armed at generation 0, beat 1` 措辞应收窄：证明的是"该次 OUT 零长度提交被接受"，未独立验 IN、未等真实数据完成，"bulk pair 双向验证完成"超出证据。
 
 ## 7. 阶段 24 = Exp-1 诊断刷写施工单（终稿，预算另批）
@@ -119,6 +119,6 @@ v19b（graft `5468b6f2…`）已刷入 boot_b 并进入循环（本阶段未执�
 ## 10. 后续工作清单
 
 1. **阶段 24**：§7 Exp-1 终稿施工单（一轮诊断刷写 + 判决表）；轮次安排见后续阶段。
-2. **v19b 仍在机**：其循环继续重置屏录缓冲——若 Exp-1 前需再尝试零刷写提取，v2.1 采样器（fetch23.log）继续守 Windows 总线，但按审阅边界，v19b 的 un-armed 观测不作为证据。
+2. **v19b 仍在机上**：其循环继续重置屏录缓冲——若 Exp-1 前需再尝试零刷写提取，v2.1 采样器（fetch23.log）继续守 Windows 总线，但按审阅边界，v19b 的 un-armed 观测不作为证据。
 3. **logdump**：auto-logdump-23.sh 已在后台守（Android 一回总线即拉 `logdump-v19.bin` + keylines，含 recording/swap/三窗/crash/loader.efi size 0x12f00=v19b 验明正身 token）；`fetch-recording-23.py` v2.1 继续守提取。
 4. **主机侧**：usbipd 残留 Shared (forced) 绑定仍在 busid 2-2（WinUSB→VBoxUSB footgun，STATUS 既有记录）；管理员可清理，不紧急。

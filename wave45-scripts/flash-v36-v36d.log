@@ -1,0 +1,6 @@
+[flash-v36-v36d 06:36:17] graft pinned: e6ca0b43372634c8c8ab1a459d6c63902bcb77599415d8a9fa82696a3655b7de (payload 0a70ec0a, kernel 5b77b418 wave41 GPU fixes + wave43 fuelgauge, loader 5de055ea frozen v35 build, ramdisk 51a030c3 the wave41 GL=test carrier, verify 72/72)
+[flash-v36-v36d 06:36:17] waiting for the d00d ABL fastboot gadget (serial/name must not be xnuloader)
+[flash-v36-v36d 06:36:18] waking the distro first, then attach --wsl at 2-2
+[flash-v36-v36d 06:36:19] identity gate (getvar product must be taro)
+[flash-v36-v36d 06:36:46] STOP: not taro: getvar:product                                     FAILED (Status read failed (No such device))
+Finished. Total time: 25.927s

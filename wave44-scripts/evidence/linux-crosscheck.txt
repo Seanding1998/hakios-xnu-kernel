@@ -1,0 +1,164 @@
+##### v6.12: 2343 lines, sha256 c33479377574ed19
+--- a7xx_cp_init
+  +4:	u32 mask;
+  +7:	OUT_PKT7(ring, CP_THREAD_CONTROL, 1);
+  +8:	OUT_RING(ring, BIT(27));
+  +10:	OUT_PKT7(ring, CP_ME_INIT, 7);
+  +13:	mask = BIT(0);
+  +16:	mask |= BIT(1);
+  +19:	mask |= BIT(3);
+  +22:	mask |= BIT(6);
+  +25:	mask |= BIT(8);
+  +27:	OUT_RING(ring, mask);
+  +30:	OUT_RING(ring, 0x00000003);
+  +33:	OUT_RING(ring, 0x20000000);
+  +35:	/* Operation mode mask */
+  +36:	OUT_RING(ring, 0x00000002);
+  +40:	OUT_RING(ring, 0x00000000);
+  +42:	OUT_RING(ring, 0x00000000);
+  +44:	OUT_RING(ring, 0x00000000);
+--- a6xx_cp_init (the sixth generation's, for contrast)
+  +5:	OUT_PKT7(ring, CP_ME_INIT, 8);
+  +7:	OUT_RING(ring, 0x0000002f);
+  +10:	OUT_RING(ring, 0x00000003);
+  +13:	OUT_RING(ring, 0x20000000);
+  +16:	OUT_RING(ring, 0x00000000);
+  +17:	OUT_RING(ring, 0x00000000);
+  +20:	OUT_RING(ring, 0x00000000);
+  +23:	OUT_RING(ring, 0x00000000);
+  +24:	OUT_RING(ring, 0x00000000);
+--- GRAS_NC_MODE_CNTL / aperture in a6xx_set_ubwc_config
+602:		gpu_write(gpu, REG_A7XX_GRAS_NC_MODE_CNTL,
+--- a7xx_submit fence words
+121:		OUT_PKT7(ring, CP_WAIT_TIMESTAMP, 4);
+165:		OUT_RING(ring, CP_THREAD_CONTROL_0_SYNC_THREADS | CP_SET_THREAD_BR);
+221:	OUT_RING(ring, CP_EVENT_WRITE_0_EVENT(PC_CCU_INVALIDATE_DEPTH));
+224:	OUT_RING(ring, CP_EVENT_WRITE_0_EVENT(PC_CCU_INVALIDATE_COLOR));
+294:	OUT_RING(ring, CP_THREAD_CONTROL_0_SYNC_THREADS | CP_SET_THREAD_BR);
+304:	OUT_RING(ring, CP_SET_THREAD_BOTH);
+307:	OUT_RING(ring, 0x101); /* IFPC disable */
+354:	OUT_RING(ring, CP_SET_THREAD_BR);
+357:	OUT_RING(ring, CCU_INVALIDATE_DEPTH);
+360:	OUT_RING(ring, CCU_INVALIDATE_COLOR);
+363:	OUT_RING(ring, CP_SET_THREAD_BV);
+370:	OUT_RING(ring, CACHE_CLEAN | BIT(27));
+376:	OUT_RING(ring, CP_SET_THREAD_BR);
+383:	OUT_PKT7(ring, CP_WAIT_TIMESTAMP, 4);
+391:	OUT_RING(ring, CACHE_CLEAN | CP_EVENT_WRITE_0_IRQ | BIT(27));
+397:	OUT_RING(ring, CP_SET_THREAD_BOTH);
+400:	OUT_RING(ring, 0x100); /* IFPC enable */
+1013:		/* Turn on the IFPC counter (countable 4 on XOCLK4) */
+--- hang check: BV registers read by a6xx_progress?
+1090:			gpu_write(gpu, REG_A7XX_CP_BV_APRIV_CNTL,
+1141:		gpu_write64(gpu, REG_A7XX_CP_BV_RB_RPTR_ADDR,
+2082:static bool a6xx_progress(struct msm_gpu *gpu, struct msm_ringbuffer *ring)
+2188:		.progress = a6xx_progress,
+2217:		.progress = a6xx_progress,
+2248:		.progress = a6xx_progress,
+##### master: 2938 lines, sha256 9b725c1c56a9b6b8
+--- a7xx_cp_init
+  +6:	u32 mask;
+  +9:	OUT_PKT7(ring, CP_THREAD_CONTROL, 1);
+  +10:	OUT_RING(ring, BIT(27));
+  +12:	OUT_PKT7(ring, CP_ME_INIT, 7);
+  +15:	mask = BIT(0);
+  +18:	mask |= BIT(1);
+  +21:	mask |= BIT(3);
+  +24:	mask |= BIT(6);
+  +27:	mask |= BIT(8);
+  +29:	OUT_RING(ring, mask);
+  +32:	OUT_RING(ring, 0x00000003);
+  +35:	OUT_RING(ring, 0x20000000);
+  +37:	/* Operation mode mask */
+  +38:	OUT_RING(ring, 0x00000002);
+  +42:	OUT_RING(ring, lower_32_bits(a6xx_gpu->pwrup_reglist_iova));
+  +44:	OUT_RING(ring, upper_32_bits(a6xx_gpu->pwrup_reglist_iova));
+  +46:	OUT_RING(ring, BIT(31));
+--- a6xx_cp_init (the sixth generation's, for contrast)
+  +5:	OUT_PKT7(ring, CP_ME_INIT, 8);
+  +7:	OUT_RING(ring, 0x0000002f);
+  +10:	OUT_RING(ring, 0x00000003);
+  +13:	OUT_RING(ring, 0x20000000);
+  +16:	OUT_RING(ring, 0x00000000);
+  +17:	OUT_RING(ring, 0x00000000);
+  +20:	OUT_RING(ring, 0x00000000);
+  +23:	OUT_RING(ring, 0x00000000);
+  +24:	OUT_RING(ring, 0x00000000);
+--- GRAS_NC_MODE_CNTL / aperture in a6xx_set_ubwc_config
+792:		for (u32 pipe_id = PIPE_BR; pipe_id <= PIPE_BV; pipe_id++) {
+793:			gpu_write(gpu, REG_A7XX_CP_APERTURE_CNTL_HOST,
+794:				  A7XX_CP_APERTURE_CNTL_HOST_PIPE(pipe_id));
+795:			gpu_write(gpu, REG_A7XX_GRAS_NC_MODE_CNTL,
+798:		gpu_write(gpu, REG_A7XX_CP_APERTURE_CNTL_HOST,
+799:			  A7XX_CP_APERTURE_CNTL_HOST_PIPE(PIPE_NONE));
+862:		for (u32 pipe_id = PIPE_BR; pipe_id <= PIPE_BV; pipe_id++) {
+863:			gpu_write(gpu, REG_A7XX_CP_APERTURE_CNTL_HOST,
+864:				  A7XX_CP_APERTURE_CNTL_HOST_PIPE(pipe_id));
+868:				*dest++ = A7XX_CP_APERTURE_CNTL_HOST_PIPE(pipe_id);
+874:		gpu_write(gpu, REG_A7XX_CP_APERTURE_CNTL_HOST,
+875:			  A7XX_CP_APERTURE_CNTL_HOST_PIPE(PIPE_NONE));
+2475:		*(*reglist)++ = A8XX_CP_APERTURE_CNTL_HOST_PIPEID(pipe);
+2528:			if (pipe == PIPE_BR) {
+2530:			} else if (pipe == PIPE_BV) {
+--- a7xx_submit fence words
+252:		OUT_PKT7(ring, CP_WAIT_TIMESTAMP, 4);
+259:		OUT_RING(ring, CP_THREAD_CONTROL_0_SYNC_THREADS | CP_SET_THREAD_BOTH);
+270:		OUT_RING(ring, CP_THREAD_CONTROL_0_SYNC_THREADS | CP_SET_THREAD_BOTH);
+276:		OUT_RING(ring, CP_THREAD_CONTROL_0_SYNC_THREADS | CP_SET_THREAD_BR);
+325:		OUT_RING(ring, CP_THREAD_CONTROL_0_SYNC_THREADS | CP_SET_THREAD_BR);
+385:	OUT_RING(ring, CP_EVENT_WRITE_0_EVENT(PC_CCU_INVALIDATE_DEPTH));
+388:	OUT_RING(ring, CP_EVENT_WRITE_0_EVENT(PC_CCU_INVALIDATE_COLOR));
+500:	OUT_RING(ring, CP_THREAD_CONTROL_0_SYNC_THREADS | CP_SET_THREAD_BR);
+523:	OUT_RING(ring, CP_SET_THREAD_BOTH);
+526:	OUT_RING(ring, 0x101); /* IFPC disable */
+580:	OUT_RING(ring, CP_SET_THREAD_BR);
+583:	OUT_RING(ring, CCU_INVALIDATE_DEPTH);
+586:	OUT_RING(ring, CCU_INVALIDATE_COLOR);
+589:	OUT_RING(ring, CP_SET_THREAD_BV);
+596:	OUT_RING(ring, CACHE_CLEAN | BIT(27));
+602:	OUT_RING(ring, CP_SET_THREAD_BR);
+609:	OUT_PKT7(ring, CP_WAIT_TIMESTAMP, 4);
+619:	OUT_RING(ring, CACHE_CLEAN | CP_EVENT_WRITE_0_IRQ | BIT(27));
+625:	OUT_RING(ring, CP_SET_THREAD_BOTH);
+628:	OUT_RING(ring, 0x100); /* IFPC enable */
+847:	 * 1. Static IFPC-only registers
+848:	 * 2. Static IFPC + preemption registers
+849:	 * 3. Dynamic IFPC + preemption registers (ex: perfcounter selects)
+1336:		/* Turn on the IFPC counter (countable 4 on XOCLK4) */
+2405:	 * This is true only on an A6XX_GEN1 with GMU, has IFPC enabled and a super old SQE firmware
+2408:	WARN_ONCE((to_adreno_gpu(gpu)->info->quirks & ADRENO_QUIRK_IFPC),
+2420:	 * With IFPC, KMD doesn't know whether GX power domain is collapsed
+2425:	if (to_adreno_gpu(gpu)->info->quirks & ADRENO_QUIRK_IFPC)
+2529:				OUT_RING(ring, CP_SET_THREAD_BR);
+2531:				OUT_RING(ring, CP_SET_THREAD_BV);
+2533:				OUT_RING(ring, CP_SET_THREAD_BOTH);
+2553:		OUT_RING(ring, CP_SET_THREAD_BOTH);
+2563:	 * memory spinlock dance with SQE to avoid racing with IFPC exit.  But
+2567:	 * the SEL regs restored by SQE on IFPC exit, before sampling begins.
+--- hang check: BV registers read by a6xx_progress?
+1415:			gpu_write(gpu, REG_A7XX_CP_BV_APRIV_CNTL,
+1468:		gpu_write64(gpu, REG_A7XX_CP_BV_RB_RPTR_ADDR,
+2414:static bool a6xx_progress(struct msm_gpu *gpu, struct msm_ringbuffer *ring)
+2825:		.progress = a6xx_progress,
+2860:		.progress = a6xx_progress,
+2896:		.progress = a6xx_progress,
+##### ubwc_config.c master: 236 lines, sha256 ee1093dfa6799c45
+--- the structure the SM8450 family and SM8550 share, and who points at it
+65:static const struct qcom_ubwc_cfg_data ubwc_4_0_hbb16 = {
+66-	.ubwc_enc_version = UBWC_4_0,
+67-	.highest_bank_bit = 16,
+68-};
+69-
+70-static const struct qcom_ubwc_cfg_data ubwc_5_0_hbb15 = {
+71-	.ubwc_enc_version = UBWC_5_0,
+72-	/* TODO: highest_bank_bit = 14 for LP_DDR4 */
+175:	{ .compatible = "qcom,sm8450", .data = &ubwc_4_0_hbb16, },
+176:	{ .compatible = "qcom,sm8550", .data = &ubwc_4_0_hbb16, },
+--- every other field name the file knows (one line each)
+     17 .highest_bank_bit
+     16 .ubwc_enc_version
+curl: (22) The requested URL returned error: 429
+/mnt/c/Users/<host>/.zcode/workspace/9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7/hakios-phk110/wave44-scripts/03-linux-crosscheck.sh: line 39: /tmp/wave44-linux/ubwc.master.h: No such file or directory
+sha256sum: /tmp/wave44-linux/ubwc.master.h: No such file or directory
+##### ubwc.h master:  lines, sha256 
+grep: /tmp/wave44-linux/ubwc.master.h: No such file or directory

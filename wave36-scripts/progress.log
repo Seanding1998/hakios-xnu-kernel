@@ -1,0 +1,83 @@
+Wave 36 progress log — GPU first light (firmware real pull + v25 build + flash + device verdict)
+======================================================================
+
+[phase 1] reading + phone probe
+- wave35 doc / STATUS / wave34 §5 / pull-firmware-root.sh / 5 patch skeletons read
+- phone state at wave start: android (runbook-var-gate.sh state); usbipd shared (no attach conflicts)
+
+[phase 2] firmware real pull (wave35-scripts/pull-firmware-root.sh, first real run)
+- 3 script fixes on the real path (recorded for the record): (a) nested su -c sh -c quoting died
+  on the phone with "/system/bin/sh: no closing quote" -> flat one-liner; (b) Git-Bash MSYS path
+  conversion rewrote /data/local/tmp into C:/Program Files/Git/... -> MSYS_NO_PATHCONV=1;
+  (c) the same conversion hit the local pull destination -> relative path after cd
+- ColorOS names match the SM8475 set exactly, PLUS extras: a730_sqe.fw, gmu_gen70000.bin,
+  a730_zap.{mdt,b00,b01,b02,elf,mbn} (8 fw-gpu files; wave35 expected mdt+b01+b02 only)
+- sha256 (fw-gpu): a730_sqe.fw 4f8b288f..., gmu_gen70000.bin b2d3f0e2..., a730_zap.mdt 9df98f79...,
+  a730_zap.b00 72686cde..., a730_zap.b01 1fc98f97..., a730_zap.b02 20612230..., a730_zap.elf e84f060f...,
+  a730_zap.mbn 905b1311...
+- W36 forensic: a730_zap.mdt ELF = 3 phdrs; seg1 (b01) PT_LOAD rwx 0x8bc B = the code segment;
+  seg0 (b00, 0x94) and seg2 (b02, 0xd58) PT_NULL metadata -> the driver must load b01 (wave35's
+  [PONG]-only claim now first-hand; file sizes cross-check b01 = 2236 B)
+- wifi: /vendor/firmware/wlan/qca_cld/{kiwi,qca6490,qca6750} are EMPTY on the phone itself;
+  real MAC candidate found at /vendor/firmware_mnt/wlan_mac.bin (+ WCNSS_qcom_cfg.ini) — recorded
+  for v0.6, NOT a wave36 acceptance item
+- audio: 26 files (adsp.mdt + b00..b23, b25) pulled and hashed
+
+[phase 3] driver parameter layer (wave35 skeletons -> applied)
+- drivers/gpu/hakios.adreno.c: 44 exact-anchor replacements (apply-adreno-v25.py, each asserted;
+  combined diff -> wave36-scripts/patches/wave36-adreno-a730-parameter-layer.diff)
+- W36 increments over wave35 (grep-checked, zero prior hits):
+  * the uniform +0x800-word relative shift of the whole GMU register block (20+ vendor anchors:
+    CM3 0x50xx->0x58xx, HFI 0x518x->0x598x, GENERAL 0x51cc->0x59cc, AO/RSCC-ctrl 0x93xx->0x9bxx,
+    ICACHE 0x4c00->0x5400); DTCM 0x1c00->0x2400, versions 0x33f8
+  * step 16's RSCC/PDC program values are byte-identical to a6xx (0xeaaae5a0.., PDC 0x4520/0x4510/
+    0x4514, slave id 1) — the ONLY byte delta in step 16 is hidden_tcs_cmd2_data 0x80000021->0x80000000
+  * gen7 HFI queue header = 12 dwords already matches the driver's struct (no change); table header
+    fields change: version=0, queues=active=17 (vendor init_queues), 210 dwords, queues from 848
+  * dcvs perf table geometry identical to a6xx (16x3+4x2 dwords); semantic delta: gpu.acd field is
+    read by gen7 as the CX vote (cx_hlvl index); gmu_level_num 2->3 {0, 19200, 200000} kHz
+  * cape pwrlevels from our own DTB (13 levels 900..220 MHz, qcom,level/cx-level pairs; initial
+    0x0b = 283 MHz) replace the redwood 3-level table; default vote index 12
+- knowns kept (wave35 already had them): fence 0x32/0x8a0, GENERAL_10 chipid + GENERAL_8 log,
+  TCM retention via CX_MISC_TCM_RET_CNTL (0x39), CM3_CFG 0x4052 unchanged, firmware names, PAS13,
+  GMEM 2 MiB, HBB 16
+- build fixes: GPU_CHIP_ID forward-reference in step 2 (literal 0x7030002 in the print);
+  first make attempt failed exit 2 (hakios.adreno.o) — pipe-to-tail had masked the real rc;
+  rebuild with log captured: MAKE_RC=0
+- kernel: abecd557 -> a39c931c (a730 strings verified in the binary)
+- config: devices/phk110/configs/phk110.config + .config "# CONFIG_HAKIOS_ADRENO is not set" -> y
+- firmware staged at ~/hakios/kernel/fw-gpu/ (the tree's own channel: userland/build.sh copies it
+  into root.apfs as plain fw/ — NO new payload entry, PAYLOAD_BASE layout untouched)
+- root.apfs rebuilt (v13 recipe FLASHBOOT=1 CRYPTEXES=flash RC_JOBS=rc.jobs.ssh): 61323255 -> 156b5be1;
+  fw bytes verified inside the image (gmu/sqe/b01 all present)
+
+[phase 4] payload + graft + verify
+- payload v25 e1ef6e94 (kernel+ramdisk+cmdline swapped; loader.efi/resident/kernel.ver/usb = v24
+  bytes; cmdline 473 -> 479 B "+ gpu=1", budget 581/607)
+- graft v25 802f1aeb (FD 8924cb67 + shim 108ce972 untouched, as every graft since wave 21)
+- verify-udon-hakios-v25.py: ALL 61 CHECKS PASSED (61 '  PASS' lines, 0 FAIL)
+
+[phase 5] flash + on-device verdict
+- flash-bootb-v36.sh: gate 1 graft sha 802f1aeb PASS; gate 2 getvar product=taro PASS;
+  gate 3 current-slot=b PASS; fastboot flash boot_b OKAY x2 (5.662s); set_active b + reboot
+- FLASH CONFIRMED at 09:17:04; phone entered the v25 loader phase (kernel running the GPU steps)
+- timed-ssh-v26 (run w36a) armed 09:18 for the SSH regression knock
+- INCIDENT (wave31 zombie pattern, round 1 recorded): after the reboot the loader gadget enumerated
+  BROKEN on the bus (2-2 = 0000:0002, "descriptor request failed"); usbipd unbind/bind needs admin
+  (denied). In-band wait chosen: the kernel session still ends at 1800 s and the ABL/Android
+  fallback re-enumerates cleanly; logdump (dd of /dev/block/by-name/logdump from Android) carries
+  the full console regardless — that is the primary evidence path now.
+- root.apfs guard check: "-- writable filesystem --"/ufs_darwin_data are NOT plain bytes in EITHER
+  the v24 or the v25 ramdisk (compressed/structured APFS storage, same profile as the device-verified
+  v24) — not a regression; the console from logdump will show the guard lines as in v24
+- NEED USER protocol armed (per user directive): if the phone is not back on Android by ~09:55,
+  request power+vol-down hard reset from the user instead of waiting further
+
+[09:27:06] NEED USER: USB 线重插回电脑（手机保持 fastboot 界面）——总线当前无手机设备（2-2 口空）
+[09:43:41] v25 gen-2 live: fastboot gates (serial 3c268ac3/taro/slot b) PASS -> reboot; xnuloader up 09:33:45 clean USB; SSH HIT 09:41:05 (1.9s, WAVE21-SSH-OK, kernel banner Nov 11 08:57:07 = the v25 build); session ends ~10:03:45 -> service-window oem log first pull + logdump dd planned
+[09:57:00] HOLD: user wants hard reset NOW; session live until 10:03:45 (7 min) — console is in loader RAM, reset now loses the GPU lines; evidence pull scheduled 10:04-10:06, NEED USER release right after
+[10:13:41] NEED USER: power+vol-down 10s -> fastboot（v26 刷写：cmdline NUL bug 修复 + loader_return_after=600）
+[10:13:41] ROOT CAUSE FOUND: v25 cmdline gpu=1 was appended AFTER the v24 entry's trailing NUL (473B = 472 chars + NUL) — loader reads C string, stops at the NUL, gpu=1 never reached the kernel (echo 582/607 budget fine, zero adreno lines). v26 = fixed cmdline (strip NUL, gpu=1 before NUL, loader_return_after 1800->600 per user speed order)
+[10:25:52] NEED USER: power+vol-down 10s -> fastboot（v26 = gpu=1 NUL 修复 + loader_return_after=600，graft c55300e1，verify 61/61；用户按键最快）
+[10:28:14] v26 FLASH CONFIRMED 10:27:55 (graft c55300e1, payload 6349203c, gates taro/slot/sha PASS, OKAY x2); gpu=1 reaches the kernel for the first time; session ~600s -> service-window console pull ~10:38-10:40
+[11:21:28] v26 gen1 verdict: step-1 hang (probe line + firmware preflight PASS + zero panic; get() prints only for newest_step so hang needs adreno_only=1 adreno_fine=1 probe next wave); slot=a Android resting, boot_b=v26 in place; logdump cc0420d1 archived. HANDOFF: docs/waves/wave36-handoff.md written; committing and retiring.

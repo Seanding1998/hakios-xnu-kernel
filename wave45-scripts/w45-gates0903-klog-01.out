@@ -1,0 +1,129 @@
+==KLOG-DEV==
+ls: cannot access '/dev/logdump': No such file or directory
+crw-r----- 1 root operator 17, 100 Jan  1 08:00 /dev/rufs_logdump
+brw-r----- 1 root operator  2, 100 Jan  1 08:00 /dev/ufs_logdump
+==KLOG-END==
+adreno: steps up to 21, without those in mask 0x1c00; step 21 is the new one and waits 0 ms after each announcement
+adreno: step 1: read the GPU's clocks in the global clock controller (registers the touch screen driver uses too)
+adreno: 1: gcc pll votes (0x162000) = 0xe0257f
+adreno: 1: gcc gpu_cfg_ahb (0x181004) = 0x1
+adreno: 1: gcc gpu_memnoc_gfx (0x181010) = 0x1
+adreno: 1: gcc gpu_snoc_dvm_gfx (0x181018) = 0x80000001
+adreno: 1: gcc ddrss_gpu_axi (0x181154) = 0x300001
+adreno: step 1: look up the GPU's supply rails in the boot loader's list of RPMh resources (memory at 0x80860000)
+adreno: 1: RPMh has "gfx.lvl" at 0x30050; levels: 0 48 56 64 80 96 128 144 192 224 256 320 384 416
+adreno: 1: RPMh has "cx.lvl" at 0x30000; levels: 0 16 64 128 192 256 384 416 432 448
+adreno: 1: RPMh has "mx.lvl" at 0x30010; levels: 0 16 192 224 256 320 384 416 448
+adreno: step 1: done
+adreno: step 2: this platform exposes no fuses to the applications processor (the vendor's own driver skips them: the chip id comes from the device tree)
+adreno: 2: speed bin 0 (not read): an Adreno 730v3 (chip id 0x7030002), as the device tree declares
+adreno: step 2: done
+adreno: step 3: make sure the clock of the GPU clock controller's registers runs (gcc_gpu_cfg_ahb)
+adreno: 3: gcc gpu_cfg_ahb (0x181004) = 0x1
+adreno: step 3: read the GPU's clock controller (0x3d90000) as it is: the first access to the GPU's part of the SoC
+adreno: 3: gpucc cx_gdscr (0x3d99108) = 0x22f001
+adreno: 3: gpucc cx_hw_ctrl (0x3d9953c) = 0x5ff4
+adreno: 3: gpucc gx_gdscr (0x3d9905c) = 0x22f001
+adreno: 3: gpucc gx_sw_reset (0x3d99058) = 0
+adreno: 3: gpucc gx_domain_misc (0x3d99504) = 0x3c0001
+adreno: 3: gpucc pll0 mode (0x3d90000) = 0
+adreno: 3: gpucc pll0 multiplier (0x3d90004) = 0
+adreno: 3: gpucc pll1 mode (0x3d91000) = 0x100
+adreno: 3: gpucc pll1 multiplier (0x3d91004) = 0
+adreno: 3: gpucc gmu_clk_src command (0x3d99318) = 0x80000000
+adreno: 3: gpucc gmu_clk_src source (0x3d9931c) = 0
+adreno: 3: gpucc hub_clk_src command (0x3d993ec) = 0
+adreno: 3: gpucc hub_clk_src source (0x3d993f0) = 0
+adreno: 3: gpucc cxo_aon (0x3d99004) = 0
+adreno: 3: gpucc gx_gmu (0x3d990bc) = 0x80000000
+adreno: 3: gpucc ahb (0x3d9911c) = 0
+adreno: 3: gpucc cx_gmu (0x3d9913c) = 0x80002221
+adreno: 3: gpucc cxo (0x3d99144) = 0x80000001
+adreno: 3: gpucc cb (0x3d91170) = 0
+adreno: 3: gpucc hub_aon (0x3d993e8) = 0x1
+adreno: 3: gpucc hub_cx_int (0x3d99148) = 0x80000001
+adreno: 3: gpucc smmu vote (0x3d97000) = 0x80000000
+adreno: step 3: done
+adreno: step 4: switch the CX half of the GPU block on (gpu_cx_gdsc): clear the collapse bit of its power switch
+adreno: 4: gpucc cx_gdscr (0x3d99108) = 0x22f001
+adreno: 4: gpucc cx_hw_ctrl (0x3d9953c) = 0x5ff4
+adreno: 4: about to write gpucc cx_gdscr at 0x3d99108: 0x22f000
+adreno: 4: gpucc cx_gdscr (0x3d99108) = 0xf822f000
+adreno: 4: gpucc cx_hw_ctrl (0x3d9953c) = 0x80001fe0
+adreno: 4: CX is on
+adreno: step 4: done
+adreno: step 5: in the global clock controller: ask for the 300 MHz tap for the GPU; the GPU's bus and memory clocks on
+adreno: 5: gcc pll votes (0x162000) = 0xe0257f
+adreno: 5: about to write gcc pll votes at 0x162000: 0xe1257f
+adreno: 5: gcc pll votes (0x162000) = 0xe1257f
+adreno: 5: gcc gpu_memnoc_gfx (0x181010) = 0x1
+adreno: 5: gcc gpu_snoc_dvm_gfx (0x181018) = 0x1
+adreno: 5: gcc ddrss_gpu_axi (0x181154) = 0x300001
+adreno: step 5: in the GPU's clock controller: the GMU's clock to 200 MHz, the hub's to 150 MHz
+adreno: 5: gpucc gmu_clk_src (0x3d9931c) = 0
+adreno: 5: about to write gpucc gmu_clk_src at 0x3d9931c: 0x602
+adreno: 5: about to write gpucc gmu_clk_src at 0x3d99318: 0x11
+adreno: 5: gpucc gmu_clk_src (0x3d9931c) = 0x602
+adreno: 5: gpucc hub_clk_src (0x3d993f0) = 0
+adreno: 5: about to write gpucc hub_clk_src at 0x3d993f0: 0x603
+adreno: 5: about to write gpucc hub_clk_src at 0x3d993ec: 0x11
+adreno: 5: gpucc hub_clk_src (0x3d993f0) = 0x603
+adreno: step 5: in the GPU's clock controller: the clocks of the GMU and of the SMMU on
+adreno: 5: gpucc cxo (0x3d99144) = 0x1
+adreno: 5: gpucc ahb (0x3d9911c) = 0
+adreno: 5: about to write gpucc ahb at 0x3d9911c: 0x1
+adreno: 5: gpucc ahb (0x3d9911c) = 0
+adreno: 5: gpucc hub_aon (0x3d993e8) = 0x1
+adreno: 5: gpucc hub_cx_int (0x3d99148) = 0x1
+adreno: 5: gpucc cx_gmu (0x3d9913c) = 0x2221
+adreno: 5: gpucc smmu vote (0x3d97000) = 0
+adreno: 5: about to write gpucc smmu vote at 0x3d97000: 0x1
+adreno: 5: gpucc smmu vote (0x3d97000) = 0x1
+adreno: step 5: measure the GPU block's clocks with the SoC's frequency counter (debug registers at gcc 0x172000.., gpucc 0x3d99270, 0x3d99274, 0x3d99564)
+adreno: 5: gpucc debug mux (0x3d99564) = 0
+adreno: 5: gpucc debug divider (0x3d99270) = 0x1
+adreno: 5: gpucc debug output (0x3d99274) = 0x80000000
+adreno: 5: gcc debug mux (0x172000) = 0x14b
+adreno: 5: gcc debug divider (0x172004) = 0
+adreno: 5: gcc debug input (0x172008) = 0x80000000
+adreno: 5: gcc crystal/4 (0x17200c) = 0x80000000
+adreno: 5: gcc measure control (0x172038) = 0
+adreno: 5: about to write gpucc debug mux at 0x3d99564: 0x1f
+adreno: 5: about to write gpucc debug divider at 0x3d99270: 0x1
+adreno: 5: about to write gpucc debug output at 0x3d99274: 0x80000001
+adreno: 5: about to write gcc debug mux at 0x172000: 0x16e
+adreno: 5: about to write gcc debug divider at 0x172004: 0x1
+adreno: 5: about to write gcc debug input at 0x172008: 0x80000001
+adreno: 5: about to write gcc crystal/4 at 0x17200c: 0x80000001
+adreno: 5: gcc measure control (0x172038) = 0
+adreno: 5: about to write gcc measure control at 0x172038: 0x200000
+adreno: 5: about to write gcc measure control at 0x172038: 0x1000
+adreno: 5: about to write gcc measure control at 0x172038: 0x101000
+adreno: 5: about to write gcc measure control at 0x172038: 0x1000
+adreno: 5: gcc measure status (0x17203c) = 0x2001004
+adreno: 5: gcc measure control (0x172038) = 0x1000
+adreno: 5: about to write gcc measure control at 0x172038: 0x200000
+adreno: 5: about to write gcc measure control at 0x172038: 0x20000
+adreno: 5: about to write gcc measure control at 0x172038: 0x120000
+adreno: 5: about to write gcc measure control at 0x172038: 0x20000
+adreno: 5: gcc measure status (0x17203c) = 0x2020003
+adreno: 5: about to write gcc measure control at 0x172038: 0
+adreno: 5: about to write gcc crystal/4 at 0x17200c: 0x80000000
+adreno: 5: about to write gcc debug input at 0x172008: 0x80000000
+adreno: 5: about to write gcc debug divider at 0x172004: 0
+adreno: 5: about to write gcc debug mux at 0x172000: 0x14b
+adreno: 5: about to write gpucc debug output at 0x3d99274: 0x80000000
+adreno: 5: about to write gpucc debug divider at 0x3d99270: 0x1
+adreno: 5: about to write gpucc debug mux at 0x3d99564: 0
+adreno: 5: measured: cxo runs at 19200144 Hz (the crystal: 19200000)
+adreno: 5: measured: cx_gmu (200 MHz was asked for) runs at 200000100 Hz
+adreno: 5: measured: hub_cx_int (from 150 MHz) runs at 150000020 Hz
+adreno: 5: measured: hub_aon runs at 149999436 Hz
+adreno: 5: measured: cb runs at 0 Hz
+adreno: 5: measured: cxo_aon runs at 19199704 Hz
+adreno: 5: measured: gx_gmu (should be off) runs at 0 Hz
+adreno: 5: measured: ahb, THE ONE IN QUESTION, runs at 150000168 Hz
+==UFS-LOG-END==
+==TAIL-END==
+536870912
+==KLOG-DONE==

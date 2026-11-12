@@ -1,0 +1,310 @@
+
+loader.obj:	file format coff-arm64
+
+Disassembly of section .text:
+
+000000000000d99c <usb_pair_rebuild>:
+    d99c: d10183ff     	sub	sp, sp, #0x60
+    d9a0: 9000000a     	adrp	x10, 0xd000 <charger_poll+0x23c>
+		000000000000d9a0:  IMAGE_REL_ARM64_PAGEBASE_REL21	run_active
+    d9a4: a90153f3     	stp	x19, x20, [sp, #0x10]
+    d9a8: a9025bf5     	stp	x21, x22, [sp, #0x20]
+    d9ac: a90363f7     	stp	x23, x24, [sp, #0x30]
+    d9b0: a9046bf9     	stp	x25, x26, [sp, #0x40]
+    d9b4: f9002bfe     	str	x30, [sp, #0x50]
+    d9b8: d53be008     	mrs	x8, CNTFRQ_EL0
+    d9bc: d53be049     	mrs	x9, CNTVCT_EL0
+    d9c0: 3940014a     	ldrb	w10, [x10]
+		000000000000d9c0:  IMAGE_REL_ARM64_PAGEOFFSET_12L	run_active
+    d9c4: 370019aa     	tbnz	w10, #0x0, 0xdcf8 <usb_pair_rebuild+0x35c>
+    d9c8: 90000013     	adrp	x19, 0xd000 <charger_poll+0x23c>
+		000000000000d9c8:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_ready
+    d9cc: 3940026a     	ldrb	w10, [x19]
+		000000000000d9cc:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_ready
+    d9d0: 3400194a     	cbz	w10, 0xdcf8 <usb_pair_rebuild+0x35c>
+    d9d4: 9000000a     	adrp	x10, 0xd000 <charger_poll+0x23c>
+		000000000000d9d4:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_pair_rebuilds
+    d9d8: f940014b     	ldr	x11, [x10]
+		000000000000d9d8:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_pair_rebuilds
+    d9dc: f100057f     	cmp	x11, #0x1
+    d9e0: 540018c8     	b.hi	0xdcf8 <usb_pair_rebuild+0x35c>
+    d9e4: 9000000c     	adrp	x12, 0xd000 <charger_poll+0x23c>
+		000000000000d9e4:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_pair_born_at
+    d9e8: f940018d     	ldr	x13, [x12]
+		000000000000d9e8:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_pair_born_at
+    d9ec: b40000ed     	cbz	x13, 0xda08 <usb_pair_rebuild+0x6c>
+    d9f0: 528012cd     	mov	w13, #0x96              // =150
+    d9f4: f940018c     	ldr	x12, [x12]
+		000000000000d9f4:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_pair_born_at
+    d9f8: 9b0d7d0d     	mul	x13, x8, x13
+    d9fc: cb0c012c     	sub	x12, x9, x12
+    da00: eb0d019f     	cmp	x12, x13
+    da04: 540017a3     	b.lo	0xdcf8 <usb_pair_rebuild+0x35c>
+    da08: 9000000c     	adrp	x12, 0xd000 <charger_poll+0x23c>
+		000000000000da08:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_last_connected_at
+    da0c: f940018d     	ldr	x13, [x12]
+		000000000000da0c:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_last_connected_at
+    da10: b40000ed     	cbz	x13, 0xda2c <usb_pair_rebuild+0x90>
+    da14: d37be90d     	lsl	x13, x8, #5
+    da18: f940018c     	ldr	x12, [x12]
+		000000000000da18:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_last_connected_at
+    da1c: cb0805ad     	sub	x13, x13, x8, lsl #1
+    da20: cb0c012c     	sub	x12, x9, x12
+    da24: eb0d019f     	cmp	x12, x13
+    da28: 54001683     	b.lo	0xdcf8 <usb_pair_rebuild+0x35c>
+    da2c: 9000000c     	adrp	x12, 0xd000 <charger_poll+0x23c>
+		000000000000da2c:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_wall_last_at
+    da30: f940018d     	ldr	x13, [x12]
+		000000000000da30:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_wall_last_at
+    da34: b400162d     	cbz	x13, 0xdcf8 <usb_pair_rebuild+0x35c>
+    da38: d379e10d     	lsl	x13, x8, #7
+    da3c: f940018c     	ldr	x12, [x12]
+		000000000000da3c:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_wall_last_at
+    da40: cb080dad     	sub	x13, x13, x8, lsl #3
+    da44: cb0c012c     	sub	x12, x9, x12
+    da48: eb0d019f     	cmp	x12, x13
+    da4c: 54001568     	b.hi	0xdcf8 <usb_pair_rebuild+0x35c>
+    da50: 9000000c     	adrp	x12, 0xd000 <charger_poll+0x23c>
+		000000000000da50:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_pair_last_progress
+    da54: f940018e     	ldr	x14, [x12]
+		000000000000da54:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_pair_last_progress
+    da58: b40000ae     	cbz	x14, 0xda6c <usb_pair_rebuild+0xd0>
+    da5c: f940018e     	ldr	x14, [x12]
+		000000000000da5c:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_pair_last_progress
+    da60: cb0e012e     	sub	x14, x9, x14
+    da64: eb0d01df     	cmp	x14, x13
+    da68: 54001483     	b.lo	0xdcf8 <usb_pair_rebuild+0x35c>
+    da6c: 9000000d     	adrp	x13, 0xd000 <charger_poll+0x23c>
+		000000000000da6c:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_zombie_last
+    da70: f94001ae     	ldr	x14, [x13]
+		000000000000da70:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_zombie_last
+    da74: b40000ce     	cbz	x14, 0xda8c <usb_pair_rebuild+0xf0>
+    da78: d37ae50f     	lsl	x15, x8, #6
+    da7c: cb0e012e     	sub	x14, x9, x14
+    da80: cb0809ef     	sub	x15, x15, x8, lsl #2
+    da84: eb0f01df     	cmp	x14, x15
+    da88: 54001383     	b.lo	0xdcf8 <usb_pair_rebuild+0x35c>
+    da8c: 91000565     	add	x5, x11, #0x1
+    da90: f90001a9     	str	x9, [x13]
+		000000000000da90:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_zombie_last
+    da94: f9000145     	str	x5, [x10]
+		000000000000da94:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_pair_rebuilds
+    da98: f940018a     	ldr	x10, [x12]
+		000000000000da98:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_pair_last_progress
+    da9c: cb0a0129     	sub	x9, x9, x10
+    daa0: 9ac80924     	udiv	x4, x9, x8
+    daa4: 90000008     	adrp	x8, 0xd000 <charger_poll+0x23c>
+		000000000000daa4:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_t0
+    daa8: 90000009     	adrp	x9, 0xd000 <charger_poll+0x23c>
+		000000000000daa8:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_arm_code
+    daac: f940010a     	ldr	x10, [x8]
+		000000000000daac:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_t0
+    dab0: b9400123     	ldr	w3, [x9]
+		000000000000dab0:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_arm_code
+    dab4: b40001ea     	cbz	x10, 0xdaf0 <usb_pair_rebuild+0x154>
+    dab8: d53be049     	mrs	x9, CNTVCT_EL0
+    dabc: f940010a     	ldr	x10, [x8]
+		000000000000dabc:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_t0
+    dac0: 5280014b     	mov	w11, #0xa               // =10
+    dac4: cb0a0129     	sub	x9, x9, x10
+    dac8: d53be00a     	mrs	x10, CNTFRQ_EL0
+    dacc: 8b090929     	add	x9, x9, x9, lsl #2
+    dad0: d37ff929     	lsl	x9, x9, #1
+    dad4: 9aca0929     	udiv	x9, x9, x10
+    dad8: b202e7ea     	mov	x10, #-0x3333333333333334 // =-3689348814741910324
+    dadc: f29999aa     	movk	x10, #0xcccd
+    dae0: 9bca7d2a     	umulh	x10, x9, x10
+    dae4: d343fd4a     	lsr	x10, x10, #3
+    dae8: 9b0ba542     	msub	x2, x10, x11, x9
+    daec: 14000002     	b	0xdaf4 <usb_pair_rebuild+0x158>
+    daf0: aa1f03e2     	mov	x2, xzr
+    daf4: f9400109     	ldr	x9, [x8]
+		000000000000daf4:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_t0
+    daf8: b40001a9     	cbz	x9, 0xdb2c <usb_pair_rebuild+0x190>
+    dafc: d53be049     	mrs	x9, CNTVCT_EL0
+    db00: f9400108     	ldr	x8, [x8]
+		000000000000db00:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_t0
+    db04: cb080128     	sub	x8, x9, x8
+    db08: d53be009     	mrs	x9, CNTFRQ_EL0
+    db0c: 8b080908     	add	x8, x8, x8, lsl #2
+    db10: d37ff908     	lsl	x8, x8, #1
+    db14: 9ac90908     	udiv	x8, x8, x9
+    db18: b202e7e9     	mov	x9, #-0x3333333333333334 // =-3689348814741910324
+    db1c: f29999a9     	movk	x9, #0xcccd
+    db20: 9bc97d08     	umulh	x8, x8, x9
+    db24: d343fd01     	lsr	x1, x8, #3
+    db28: 14000002     	b	0xdb30 <usb_pair_rebuild+0x194>
+    db2c: aa1f03e1     	mov	x1, xzr
+    db30: 90000000     	adrp	x0, 0xd000 <charger_poll+0x23c>
+		000000000000db30:  IMAGE_REL_ARM64_PAGEBASE_REL21	??_C@_0ML@MGBPICDP@usb?3?5?$FLt?$CL?$CFd?4?$CFd?$FN?5the?5pair?5reads?5de@
+    db34: 91000000     	add	x0, x0, #0x0
+		000000000000db34:  IMAGE_REL_ARM64_PAGEOFFSET_12A	??_C@_0ML@MGBPICDP@usb?3?5?$FLt?$CL?$CFd?4?$CFd?$FN?5the?5pair?5reads?5de@
+    db38: 94000000     	bl	0xdb38 <usb_pair_rebuild+0x19c>
+		000000000000db38:  IMAGE_REL_ARM64_BRANCH26	print
+    db3c: 90000014     	adrp	x20, 0xd000 <charger_poll+0x23c>
+		000000000000db3c:  IMAGE_REL_ARM64_PAGEBASE_REL21	USB
+    db40: 52801020     	mov	w0, #0x81               // =129
+    db44: f9400288     	ldr	x8, [x20]
+		000000000000db44:  IMAGE_REL_ARM64_PAGEOFFSET_12L	USB
+    db48: f9401d08     	ldr	x8, [x8, #0x38]
+    db4c: d63f0100     	blr	x8
+    db50: b6f800a0     	tbz	x0, #0x3f, 0xdb64 <usb_pair_rebuild+0x1c8>
+    db54: 2a0003e1     	mov	w1, w0
+    db58: 90000000     	adrp	x0, 0xd000 <charger_poll+0x23c>
+		000000000000db58:  IMAGE_REL_ARM64_PAGEBASE_REL21	??_C@_0EK@PEFDBFNM@usb?3?5the?5recovery?8s?5IN?5abort?5was@
+    db5c: 91000000     	add	x0, x0, #0x0
+		000000000000db5c:  IMAGE_REL_ARM64_PAGEOFFSET_12A	??_C@_0EK@PEFDBFNM@usb?3?5the?5recovery?8s?5IN?5abort?5was@
+    db60: 94000000     	bl	0xdb60 <usb_pair_rebuild+0x1c4>
+		000000000000db60:  IMAGE_REL_ARM64_BRANCH26	print
+    db64: f9400288     	ldr	x8, [x20]
+		000000000000db64:  IMAGE_REL_ARM64_PAGEOFFSET_12L	USB
+    db68: 52800020     	mov	w0, #0x1                // =1
+    db6c: f9401d08     	ldr	x8, [x8, #0x38]
+    db70: d63f0100     	blr	x8
+    db74: b6f800a0     	tbz	x0, #0x3f, 0xdb88 <usb_pair_rebuild+0x1ec>
+    db78: 2a0003e1     	mov	w1, w0
+    db7c: 90000000     	adrp	x0, 0xd000 <charger_poll+0x23c>
+		000000000000db7c:  IMAGE_REL_ARM64_PAGEBASE_REL21	??_C@_0EL@FKMJAFGM@usb?3?5the?5recovery?8s?5OUT?5abort?5wa@
+    db80: 91000000     	add	x0, x0, #0x0
+		000000000000db80:  IMAGE_REL_ARM64_PAGEOFFSET_12A	??_C@_0EL@FKMJAFGM@usb?3?5the?5recovery?8s?5OUT?5abort?5wa@
+    db84: 94000000     	bl	0xdb84 <usb_pair_rebuild+0x1e8>
+		000000000000db84:  IMAGE_REL_ARM64_BRANCH26	print
+    db88: 90000008     	adrp	x8, 0xd000 <charger_poll+0x23c>
+		000000000000db88:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_rx_queued
+    db8c: 90000015     	adrp	x21, 0xd000 <charger_poll+0x23c>
+		000000000000db8c:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_in_state
+    db90: 52800049     	mov	w9, #0x2                // =2
+    db94: 90000014     	adrp	x20, 0xd000 <charger_poll+0x23c>
+		000000000000db94:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_out_state
+    db98: 52800656     	mov	w22, #0x32              // =50
+    db9c: 3900011f     	strb	wzr, [x8]
+		000000000000db9c:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_rx_queued
+    dba0: b90002a9     	str	w9, [x21]
+		000000000000dba0:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_in_state
+    dba4: b9000289     	str	w9, [x20]
+		000000000000dba4:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_out_state
+    dba8: b94002a8     	ldr	w8, [x21]
+		000000000000dba8:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_in_state
+    dbac: 7100091f     	cmp	w8, #0x2
+    dbb0: 54000081     	b.ne	0xdbc0 <usb_pair_rebuild+0x224>
+    dbb4: 94000000     	bl	0xdbb4 <usb_pair_rebuild+0x218>
+		000000000000dbb4:  IMAGE_REL_ARM64_BRANCH26	usb_pump
+    dbb8: 710006d6     	subs	w22, w22, #0x1
+    dbbc: 54ffff61     	b.ne	0xdba8 <usb_pair_rebuild+0x20c>
+    dbc0: 52800655     	mov	w21, #0x32              // =50
+    dbc4: b9400288     	ldr	w8, [x20]
+		000000000000dbc4:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_out_state
+    dbc8: 7100091f     	cmp	w8, #0x2
+    dbcc: 54000081     	b.ne	0xdbdc <usb_pair_rebuild+0x240>
+    dbd0: 94000000     	bl	0xdbd0 <usb_pair_rebuild+0x234>
+		000000000000dbd0:  IMAGE_REL_ARM64_BRANCH26	usb_pump
+    dbd4: 710006b5     	subs	w21, w21, #0x1
+    dbd8: 54ffff61     	b.ne	0xdbc4 <usb_pair_rebuild+0x228>
+    dbdc: 90000008     	adrp	x8, 0xd000 <charger_poll+0x23c>
+		000000000000dbdc:  IMAGE_REL_ARM64_PAGEBASE_REL21	gate_next
+    dbe0: 90000009     	adrp	x9, 0xd000 <charger_poll+0x23c>
+		000000000000dbe0:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_rx_gen
+    dbe4: 9000000b     	adrp	x11, 0xd000 <charger_poll+0x23c>
+		000000000000dbe4:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_init_event
+    dbe8: f900011f     	str	xzr, [x8]
+		000000000000dbe8:  IMAGE_REL_ARM64_PAGEOFFSET_12L	gate_next
+    dbec: 90000008     	adrp	x8, 0xd000 <charger_poll+0x23c>
+		000000000000dbec:  IMAGE_REL_ARM64_PAGEBASE_REL21	gate_backoff
+    dbf0: f940012a     	ldr	x10, [x9]
+		000000000000dbf0:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_rx_gen
+    dbf4: f900011f     	str	xzr, [x8]
+		000000000000dbf4:  IMAGE_REL_ARM64_PAGEOFFSET_12L	gate_backoff
+    dbf8: 90000008     	adrp	x8, 0xd000 <charger_poll+0x23c>
+		000000000000dbf8:  IMAGE_REL_ARM64_PAGEBASE_REL21	usb_in_gate_next
+    dbfc: f9400160     	ldr	x0, [x11]
+		000000000000dbfc:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_init_event
+    dc00: f900011f     	str	xzr, [x8]
+		000000000000dc00:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_in_gate_next
+    dc04: 91000548     	add	x8, x10, #0x1
+    dc08: 90000014     	adrp	x20, 0xd000 <charger_poll+0x23c>
+		000000000000dc08:  IMAGE_REL_ARM64_PAGEBASE_REL21	BS
+    dc0c: f9000128     	str	x8, [x9]
+		000000000000dc0c:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_rx_gen
+    dc10: b4000080     	cbz	x0, 0xdc20 <usb_pair_rebuild+0x284>
+    dc14: f9400288     	ldr	x8, [x20]
+		000000000000dc14:  IMAGE_REL_ARM64_PAGEOFFSET_12L	BS
+    dc18: f9403508     	ldr	x8, [x8, #0x68]
+    dc1c: d63f0100     	blr	x8
+    dc20: f9400288     	ldr	x8, [x20]
+		000000000000dc20:  IMAGE_REL_ARM64_PAGEOFFSET_12L	BS
+    dc24: 52801f37     	mov	w23, #0xf9              // =249
+    dc28: 90000018     	adrp	x24, 0xd000 <charger_poll+0x23c>
+		000000000000dc28:  IMAGE_REL_ARM64_PAGEBASE_REL21	wdt_armed
+    dc2c: 90000019     	adrp	x25, 0xd000 <charger_poll+0x23c>
+		000000000000dc2c:  IMAGE_REL_ARM64_PAGEBASE_REL21	smc_x3
+    dc30: 9000001a     	adrp	x26, 0xd000 <charger_poll+0x23c>
+		000000000000dc30:  IMAGE_REL_ARM64_PAGEBASE_REL21	other_cpu_start
+    dc34: 9100035a     	add	x26, x26, #0x0
+		000000000000dc34:  IMAGE_REL_ARM64_PAGEOFFSET_12A	other_cpu_start
+    dc38: a945d915     	ldp	x21, x22, [x8, #0x58]
+    dc3c: f9002fff     	str	xzr, [sp, #0x58]
+    dc40: 14000004     	b	0xdc50 <usb_pair_rebuild+0x2b4>
+    dc44: d10006f7     	sub	x23, x23, #0x1
+    dc48: b10006ff     	cmn	x23, #0x1
+    dc4c: 54000360     	b.eq	0xdcb8 <usb_pair_rebuild+0x31c>
+    dc50: f9402fe8     	ldr	x8, [sp, #0x58]
+    dc54: b40000c8     	cbz	x8, 0xdc6c <usb_pair_rebuild+0x2d0>
+    dc58: 910163e1     	add	x1, sp, #0x58
+    dc5c: 910023e2     	add	x2, sp, #0x8
+    dc60: 52800020     	mov	w0, #0x1                // =1
+    dc64: d63f02c0     	blr	x22
+    dc68: b6f800a0     	tbz	x0, #0x3f, 0xdc7c <usb_pair_rebuild+0x2e0>
+    dc6c: f9400288     	ldr	x8, [x20]
+		000000000000dc6c:  IMAGE_REL_ARM64_PAGEOFFSET_12L	BS
+    dc70: 5289c400     	mov	w0, #0x4e20             // =20000
+    dc74: f9407d08     	ldr	x8, [x8, #0xf8]
+    dc78: d63f0100     	blr	x8
+    dc7c: 94000000     	bl	0xdc7c <usb_pair_rebuild+0x2e0>
+		000000000000dc7c:  IMAGE_REL_ARM64_BRANCH26	usb_pump
+    dc80: 924016e8     	and	x8, x23, #0x3f
+    dc84: f100f91f     	cmp	x8, #0x3e
+    dc88: 54fffde1     	b.ne	0xdc44 <usb_pair_rebuild+0x2a8>
+    dc8c: b9400308     	ldr	w8, [x24]
+		000000000000dc8c:  IMAGE_REL_ARM64_PAGEOFFSET_12L	wdt_armed
+    dc90: 34fffda8     	cbz	w8, 0xdc44 <usb_pair_rebuild+0x2a8>
+    dc94: 39400328     	ldrb	w8, [x25]
+		000000000000dc94:  IMAGE_REL_ARM64_PAGEOFFSET_12L	smc_x3
+    dc98: 528000e0     	mov	w0, #0x7                // =7
+    dc9c: aa1f03e1     	mov	x1, xzr
+    dca0: 72b0c000     	movk	w0, #0x8600, lsl #16
+    dca4: aa1f03e2     	mov	x2, xzr
+    dca8: 7100011f     	cmp	w8, #0x0
+    dcac: 9a9f1343     	csel	x3, x26, xzr, ne
+    dcb0: d4000003     	smc	#0
+    dcb4: 17ffffe4     	b	0xdc44 <usb_pair_rebuild+0x2a8>
+    dcb8: f9402fe0     	ldr	x0, [sp, #0x58]
+    dcbc: b4000080     	cbz	x0, 0xdccc <usb_pair_rebuild+0x330>
+    dcc0: 2a1f03e1     	mov	w1, wzr
+    dcc4: aa1f03e2     	mov	x2, xzr
+    dcc8: d63f02a0     	blr	x21
+    dccc: 94000000     	bl	0xdccc <usb_pair_rebuild+0x330>
+		000000000000dccc:  IMAGE_REL_ARM64_BRANCH26	usb_start_attempt
+    dcd0: 7100001f     	cmp	w0, #0x0
+    dcd4: 540000ad     	b.le	0xdce8 <usb_pair_rebuild+0x34c>
+    dcd8: 90000000     	adrp	x0, 0xd000 <charger_poll+0x23c>
+		000000000000dcd8:  IMAGE_REL_ARM64_PAGEBASE_REL21	??_C@_0JK@HLNHMHIM@usb?3?5the?5recovery?8s?5bring?9up?5is?5@
+    dcdc: 91000000     	add	x0, x0, #0x0
+		000000000000dcdc:  IMAGE_REL_ARM64_PAGEOFFSET_12A	??_C@_0JK@HLNHMHIM@usb?3?5the?5recovery?8s?5bring?9up?5is?5@
+    dce0: 94000000     	bl	0xdce0 <usb_pair_rebuild+0x344>
+		000000000000dce0:  IMAGE_REL_ARM64_BRANCH26	print
+    dce4: 14000005     	b	0xdcf8 <usb_pair_rebuild+0x35c>
+    dce8: 90000000     	adrp	x0, 0xd000 <charger_poll+0x23c>
+		000000000000dce8:  IMAGE_REL_ARM64_PAGEBASE_REL21	??_C@_0HK@GDAEMIE@usb?3?5the?5recovery?8s?5bring?9up?5did@
+    dcec: 91000000     	add	x0, x0, #0x0
+		000000000000dcec:  IMAGE_REL_ARM64_PAGEOFFSET_12A	??_C@_0HK@GDAEMIE@usb?3?5the?5recovery?8s?5bring?9up?5did@
+    dcf0: 94000000     	bl	0xdcf0 <usb_pair_rebuild+0x354>
+		000000000000dcf0:  IMAGE_REL_ARM64_BRANCH26	print
+    dcf4: 3900027f     	strb	wzr, [x19]
+		000000000000dcf4:  IMAGE_REL_ARM64_PAGEOFFSET_12L	usb_ready
+    dcf8: a9446bf9     	ldp	x25, x26, [sp, #0x40]
+    dcfc: f9402bfe     	ldr	x30, [sp, #0x50]
+    dd00: a94363f7     	ldp	x23, x24, [sp, #0x30]
+    dd04: a9425bf5     	ldp	x21, x22, [sp, #0x20]
+    dd08: a94153f3     	ldp	x19, x20, [sp, #0x10]
+    dd0c: 910183ff     	add	sp, sp, #0x60
+    dd10: d65f03c0     	ret

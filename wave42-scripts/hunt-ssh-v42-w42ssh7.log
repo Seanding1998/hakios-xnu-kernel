@@ -1,0 +1,50 @@
+[01:53:34 t+0000.0s] wave27 wide-window SSH hunt armed (run-id w42ssh7, deadline 90 min)
+[01:53:34 t+0000.0s] knock cmd: 'uname -a && id && echo WAVE21-SSH-OK W27-w42ssh7'
+[01:53:34 t+0000.0s] report| hunt armed, run-id w42ssh7, deadline 90 min, single-owner mode
+[01:53:34 t+0000.0s] bus: d00d addrs [] (was None)
+[02:03:46 t+0611.8s] bus: d00d addrs [4] (was [])
+[02:03:46 t+0612.0s] attempt k001 -> rc=255 in 0.2s
+[02:03:46 t+0612.0s] branch: LOADER-PHASE (armed=True, ct=170)
+[02:03:46 t+0612.0s]   err| tunnel25w: round 0: d00d nodes at addr [4]
+[02:03:46 t+0612.0s]   err| tunnel25w: addr 4: LIVE (product b'taro'); this is our loader
+[02:03:46 t+0612.0s]   err| tunnel25w: loader phase (raw b'FAILunknown command'); exiting fast -- the CALLER owns the duty cycle: probing extends the loader's 240 s window forever, so the campaign must alternate active windows w
+[02:03:46 t+0612.0s]   err| Connection closed by UNKNOWN port 65535
+[02:03:46 t+0612.0s] loader answered: silence until +250 s (the exec clock)
+[02:03:58 t+0624.0s] bus: d00d addrs [] (was [4])
+[02:04:01 t+0627.0s] bus: d00d addrs [4] (was [])
+[02:04:01 t+0627.2s] attempt k002 -> rc=255 in 0.2s
+[02:04:01 t+0627.2s] branch: LOADER-PHASE (armed=True, ct=170)
+[02:04:01 t+0627.2s]   err| tunnel25w: round 0: d00d nodes at addr [4]
+[02:04:01 t+0627.2s]   err| tunnel25w: addr 4: LIVE (product b'taro'); this is our loader
+[02:04:01 t+0627.2s]   err| tunnel25w: loader phase (raw b'FAILunknown command'); exiting fast -- the CALLER owns the duty cycle: probing extends the loader's 240 s window forever, so the campaign must alternate active windows w
+[02:04:01 t+0627.2s]   err| Connection closed by UNKNOWN port 65535
+[02:04:01 t+0627.2s] loader answered: silence until +250 s (the exec clock)
+[02:05:50 t+0735.8s] bus: d00d addrs [] (was [4])
+[02:06:21 t+0767.2s] bus: d00d addrs [4] (was [])
+[02:08:34 t+0900.2s] attempt k003 -> rc=0 in 133.0s
+[02:08:34 t+0900.2s] branch: HIT (armed=True, ct=170) HIT-CANDIDATE
+[02:08:34 t+0900.2s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:24526 flags=PSH|ACK seq=1056807680 ack=268437742 win=65535 len=76 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1056807680 state=ESTABLISHED
+[02:08:34 t+0900.2s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:24526 flags=PSH|ACK seq=1056807756 ack=268437742 win=65535 len=60 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1056807756 state=ESTABLISHED
+[02:08:34 t+0900.2s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:24526 flags=PSH|ACK seq=1056807816 ack=268437742 win=65535 len=36 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1056807816 state=ESTABLISHED
+[02:08:34 t+0900.2s]   err| tunnel25w: pkt IN  10.0.0.2:22 -> 10.0.0.1:24526 flags=PSH|ACK seq=1056807852 ack=268437742 win=65535 len=140 cksum=ok | SND.UNA=268437742 SND.NXT=268437742 RCV.NXT=1056807852 state=ESTABLISHED
+[02:08:34 t+0900.2s] === ACCEPTANCE MODE (session must still be live) ===
+[02:08:34 t+0900.5s] attempt acc2 -> rc=0 in 0.3s
+[02:08:34 t+0900.5s] acceptance conn2 -> rc=0, marker OK, Darwin OK
+[02:08:53 t+0918.6s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[02:08:55 t+0921.5s] attempt acc3 -> rc=0 in 0.3s
+[02:08:55 t+0921.5s] acceptance conn3 -> rc=0, marker OK, Darwin OK
+[02:09:14 t+0939.6s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[02:10:07 t+0992.9s] attempt transfer -> rc=0 in 50.8s
+[02:10:07 t+0992.9s] acceptance transfer -> rc=0, phone counted 262144 of 262144 bytes in 50.8s
+[02:10:25 t+1011.1s] revive -> 0 getvar:product -> b'OKAYxnuloader' | drained 0 bytes total
+[02:11:31 t+1076.9s] attempt sha-rt -> rc=0 in 65.9s
+[02:11:31 t+1076.9s] step sha-rt try1 unsatisfied (rc=0) -- retrying after the attach race (8 s)
+[02:12:07 t+1113.2s] attempt sha-rt -> rc=255 in 28.3s
+[02:12:07 t+1113.2s] step sha-rt try2 unsatisfied (rc=255) -- retrying after the attach race (8 s)
+[02:12:43 t+1149.5s] attempt sha-rt -> rc=255 in 28.3s
+[02:12:43 t+1149.5s] step sha-rt try3 unsatisfied (rc=255) -- retrying after the attach race (8 s)
+[02:12:51 t+1157.5s] content sha round trip -> rc=255 in 28.3s: device hash MISMATCH, returned payload MISMATCH (0/524288 B) -- FAIL
+[02:12:52 t+1157.6s] revive -> 1 open failed: LIBUSB_ERROR_ACCESS | no openable d00d
+[02:12:52 t+1157.6s] verdict written: C:\Users\<host>\.zcode\workspace\9bfbfb72-21e9-4ab6-97a0-ac91b6869dc7\hakios-phk110\wave42-scripts\verdict42-w42ssh7.txt (transfer PASS, sha FAIL, mgmt UNVERIFIED)
+[02:12:52 t+1157.6s] report| HIT + acceptance: conn2/conn3 + transfer(PASS) + sha(FAIL) + mgmt(UNVERIFIED); verdict verdict42-w42ssh7.txt
+[02:12:52 t+1157.6s] report| === WAVE21-SSH-OK on record: verdict42-w42ssh7.txt ===

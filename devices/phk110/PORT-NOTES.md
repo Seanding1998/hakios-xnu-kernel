@@ -78,28 +78,73 @@
   控制器被带进后续每次启动），显式清除后问题不再出现
   （`docs/phk110/waves/wave24-exp1-diagnostic.md`）。这是移植期耗时最长的
   一个问题，先后有 12 篇阶段日志记录全程。
+- 错误墙的收尾（2026-11-11~12）：更高负载下错误墙以另外两种形态回归，四代
+  修复（IN 泄漏、服务窗热旋、请求生命周期、整对自愈）后解决；最深一层根因
+  不在本板而在工具链——**LLVM -O1 的跨过程常量折叠把修复函数整段优化删除**，
+  四个状态戳改 volatile 根治。全程见
+  `docs/phk110/waves/wave38-usb-selfheal.md` 与两轮外部评审
+  （`docs/phk110/review/`）。v35 判定轮的 SSH 双向内容 SHA 524288/524288
+  与 /var 复验是这条修复链的机器侧证据。
 - SSH 数据面 = loader 提供的 USB 网络：`en0` @ `10.0.0.2/30`（主机侧
   10.0.0.1），验证结论见
   `docs/phk110/waves/wave27-phaseB-wide-window.md`。
 - 超过 1800 秒的长会话会撞上 vnode 表耗尽的 panic——这是上游通用问题，
   不是本板特有，先用 `loader_return_after` 上限绕开。
 
-## 6. WiFi（未上机，工具先行）
+## 6. GPU（Adreno 730，v0.5 已达成硬件渲染首帧）
+
+上游 redwood 是 SM7325（无本节问题）；本节是 SM8475 上点亮 Adreno 730
+（a7xx 形态）时撞到的本板差异，全部修复都有本机设备树或厂商源码锚定：
+
+- **时钟**：本机 GCC 是 `qcom,cape-gcc`（厂商实为 gcc-waipio.c 的 cape
+  fixup），PLL_VOTE/GPU CBCR 偏移与 sc7280 模板不同（阶段 37 v28）。
+- **熔丝**：cape 不向 AP 暴露 qfprom 熔丝节点，驱动需按"零访问"路径走
+  （v30，活 FDT 地面真值定案）。
+- **GPUCC**：GDSC/syscon 用手机自家 DTB 的一手地址，分支时钟用
+  gpucc-waipio（v29/v30）。
+- **zap 固件**：cape 的 a730_zap.mdt 是三段式（头/代码/哈希表），按
+  sc7280 两段式读会被信任区拒收（v32）。
+- **address-mode 表**：a6xx 时代的十二寄存器 address-mode 表在 a7xx 上
+  第 6 写即挂步 20，vendor gen7_start 一个都不写——摘表（v33）。
+- **fence 完成事件**：a7xx 必须用 `CACHE_CLEAN|WRITE_ENABLED(bit27)` =
+  `0x08000031`（vendor ringbuffer / Linux v6.12 a7xx / Mesa 三方参照）；
+  同代原生驱动（UniXNU/Adreno740）逐位佐证（阶段 40/41/44）。
+- **NC_MODE 编码**：高端位按本机 HBB=16 用厂商公式 `bank_bit=(HBB-13)&3`
+  运行时计算（带 DDR 类型条件），不是 redwood 代的硬编码表（阶段 41）。
+- 用户态 = Mesa 25.0.7 freedreno（设备身份 FD725），内核接口沿用 msm DRM
+  ioctl 号，**用户态 shim 零新增代码**（阶段 39 裁决）。
+- 全程七刷七判与四门判定：`docs/phk110/waves/wave37-gpu-firstlight.md`、
+  `wave45-v36-firstframe.md`；补丁脚本与判定 runner 在
+  `wave36-scripts/`、`wave37-scripts/`、`wave41-scripts/`、`wave45-scripts/`。
+
+## 7. 电量（驱动已落地，数据链修复中）
+
+本机燃油计链路 = PM8350B 充电器块（SPMI 观察）+ TI bq27541 电量计
+（I2C bit-bang over GPIO26/27，地址 0x55）。驱动按 boot-arg `fuelgauge=1/2`
+切换静态/真实双模式；"宁可不显示不显示假值"原则 = 电量计首个有效 SOC 前
+不喂任何数据。寄存器定义全部从厂商树机械核对（零猜测），62 项自检
+（`docs/phk110/waves/wave43-battery.md`；源码快照与脚本在
+`wave43-scripts/`）。真机 PARTIAL 现状（充电块通道表布局 + 电量计无应答）
+见 `wave45-scripts/verdict45-gated.txt`。
+
+## 8. WiFi（未上机，工具先行）
 
 WCN6750 → Linux `ath11k` 路线。五个静态检查器和打包工具（`mk-ath11k.py`）
 在 `wave30-scripts/`，前置研究见
 `docs/phk110/waves/wave30-ath11k-tooling-prep.md`。
 
-## 7. 与上游代码的对应关系
+## 9. 与上游代码的对应关系
 
 本分支**不改上游任何已有文件**（README 的呈现层替换除外，见仓库首页），
 全部内容以新增形式存在。内核/loader 侧的移植改动（平台表、GIC 步进、
-S3910 驱动、按键 v7、UFS、`hw_target` 回退、loader 补丁链、en0 驱动等）
+S3910 驱动、按键 v7、UFS、`hw_target` 回退、loader 补丁链、en0 驱动、
+Adreno 730 内核驱动、fence/NC_MODE/gl_test 修复、燃油计驱动等）
 目前在我们的私有构建树里按阶段演进；本分支以文档、驱动源码快照
-（`wave12*-scripts/hakios.s3910*.c`）和补丁脚本（`patch-loader-v*.py`）
+（`wave12*-scripts/hakios.s3910*.c`、`wave43-scripts/`）和补丁脚本
+（`patch-loader-v*.py`、`wave36/37/41-scripts/apply-*.py`）
 的形式记录它们，整理成可直接套用的补丁序列是后续工作。
 
-## 8. 许可
+## 10. 许可
 
 - 文档/脚本/设备层按上游仓根 [`LICENSE`](../../LICENSE) 的 MIT 口径发布。
 - GPL 素材（OnePlusOSS sm8475 内核/设备树）**只作研究参照，本仓不分发**其

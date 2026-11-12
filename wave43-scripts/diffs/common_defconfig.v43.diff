@@ -1,0 +1,12 @@
+--- configs/common_defconfig.v43-orig	2026-11-03 23:37:22.753139920 +0800
++++ configs/common_defconfig	2026-11-12 00:00:36.251077094 +0800
+@@ -79,6 +79,9 @@
+ # the battery: kern.hakios.battery_*, and HakiosBattery, the IOPMPowerSource Darwin reads the charge from (the state ... [hakios.battery.c, hakios.battery.cpp]
+ CONFIG_HAKIOS_BATTERY=y
+ 
++# the fuel gauge of a phone with a bq27541 behind a GENI I2C (this phone's own driver, devices/phk110/drivers/power/)
++# CONFIG_HAKIOS_FUELGAUGE is not set
++
+ # the clock of the cores the kernel runs on (cpufreq=1), and the memory bus's votes (ddr=) [hakios.cpufreq.c]
+ CONFIG_HAKIOS_CPUFREQ=y
+ 
