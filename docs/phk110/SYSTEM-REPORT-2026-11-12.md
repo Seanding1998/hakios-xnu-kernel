@@ -33,6 +33,59 @@ boot_b 槽（日常安卓在 slot a，从未刷写）： graft `e6ca0b43`（v36�
 | 电力总线 | PMIC 仲裁器握手逐字命中（版本 0x70000000 / 768 通道，`verdict45-gated.txt` S1） |
 | 安全边界 | boot_a 零刷写；全程零变砖；所有刷写走三重身份门（机型/槽位/镜像 SHA）+ OKAY 断言 |
 
+### 方法链八步进度（硬件域 × 方法链，与首页 README 同步维护）
+
+方法链八步：①看同型先例 → ②对官方物料 → ③取私有实现细节 → ④广域调查 → ⑤方案成文 → ⑥深挖修复 → ⑦隔离核验 → ⑧真机判定。逐格状态（图例：**✓** 完成 · **◐** 部分 · **✗** 未完成 · **—** 未建立记录）：
+
+| 硬件域 | ① 同型 | ② 官方 | ③ 反编译 | ④ 广域 | ⑤ 方案 | ⑥ 深挖 | ⑦ 核验 | ⑧ 上机 | 当前状态 |
+|---|---|---|---|---|---|---|---|---|---|
+| 触摸（Synaptics S3910 / TouchComm v1） | ✓ | ✓ | ✓ ¹ | ✓ | ✓ | ✓ | ✓ | ✓ | 八步全通（真人点屏事件流未记录） |
+| GPU（Adreno 730 / freedreno FD725） | ✓ | ✓ | ✓ ¹ | ✓ | ✓ | ✓ | ✓ | ✓ | 八步全通（硬件渲染首帧 + 人眼目击） |
+| bootchain（ABL → boot_b → loader → XNU） | ✓ | ✓ | ✓ ¹ | ✓ | ✓ | ✓ | ✓ | ✓ | 八步全通 |
+| display（NT37705 原生面板） | ✓ | ✓ | ✓ ¹ | ✓ | ✓ | ✓ | ✓ | ✓ | 八步全通（GPU 加速另见 GPU 行） |
+| storage（UFS + APFS/HFS+ 数据卷） | ✓ | ✓ | ✓ ¹ | ✓ | ✓ | ✓ | ✓ | ✓ | 八步全通（/var 跨重启持久） |
+| buttons（SPMI v7 仲裁器） | ✓ | ✓ | ✓ ¹ | ✓ | ✓ | ✓ | ✓ | ✓ | 八步全通 |
+| USB（loader 服务窗 + en0） | ✓ | ✓ | ✓ ² | ✓ | ✓ | ✓ | ✓ | ✓ | 八步全通（gadget 韧性强化进行中） |
+| 电量（PM8350B + bq27541） | ✓ | ✓ | ✓ ¹ | ✓ | ✓ | ✓ | ◐ | ◐ | 修复中（S2/S3） |
+| wifi（WCN6750 / ath11k） | ✓ | ✓ | — | ✓ | ✓ | ◐ | ✗ | ✗ | 预备完成，待内核树排期 |
+| audio（TFA9874 / ADSP） | — | ✓ | — | ◐ | — | — | ✗ | ✗ | 案头预备中 |
+| CPU 多核 | — | — | — | — | — | — | — | ✓ | device-verified（早于八步记录） |
+| 电源 | — | — | — | — | — | — | — | ✓ | device-verified（早于八步记录） |
+| 诊断（logdump / 探针通道） | — | — | — | — | — | — | — | ✓ | device-verified（早于八步记录） |
+| 蓝牙 | — | — | — | — | — | — | — | — | planned |
+| 基带 | — | — | — | — | — | — | — | — | planned |
+| DSP | — | — | — | — | — | — | — | — | planned |
+
+**列语义**：
+
+- **① 同型**：同 SoC / 同机型的外部先例项目，公开可查（takasugl/UniXNU-udon = 同款 PHK110 在跑；MIX Fold 2 的 Adreno 730 自研驱动先例；K60 线触摸芯片 ack 全通）。
+- **② 官方**：厂商/官方公开物料对本域的覆盖确认（GPL 内核源、设备树、固件清单；USB 行以手机自带 vendor UEFI 二进制为一手物料）。
+- **③ 反编译——本仓纪律**：优先以**厂商 GPL 源码、上游公开源码或真机黑盒寄存器级探测**替代反编译取证，绝不虚标。凡标 ✓¹ 的格均属此类，**未做过反编译**。唯一例外是 USB 行（✓²）：vendor UsbFnDwc/UsbConfigDxe **无源码**，该域实际以反汇编取证（radare2 静态分析），如实标注。无官方源且无私有细节需求的域如实标 —。
+- **④ 广域**：同类移植项目普查与外部案例调查。
+- **⑤ 方案**：实施级方案 / 施工单成文。
+- **⑥ 深挖**：寄存器级 / 协议级 / 二进制级的深水定位与修复。
+- **⑦ 核验**：隔离判定（自检套件、探针、验收器、判定文件）。
+- **⑧ 上机**：真机刷写验证，有验收行 / 判定文件 / 人证背书。
+
+**各行关键证据（公开侧路径，相对仓库根）**：
+
+| 行 | 证据 |
+|---|---|
+| 触摸 | `docs/phk110/waves/` 的 wave12-touch-buttons / wave12a / wave12b / wave12c、`docs/phk110/research/research-tcm-miso.md`、`wave12*-scripts/`（驱动源码快照）、`wave1-hwmap.md`（GPL 源渠道） |
+| GPU | `docs/phk110/waves/` 的 wave35 / 36 / 36-handoff / 37 / 39 / 40 / 41 / 44 / 45、`wave45-scripts/verdict45-gate{a,b,c,d}.txt`、`wave41-scripts/diffs/`、`docs/phk110/research/f16-k60-sm8475-census.md` |
+| bootchain | `docs/phk110/waves/` 的 wave1-phk110pkg-spec / wave3-research-external / wave4 / wave5 / wave21_2 §7、`wave5-scripts/verify-udon-hakios.py`（每代自检，至 v36 = 72/72，`wave45-scripts/verify-v36.log`） |
+| display | `docs/phk110/waves/` 的 wave4 / wave5 / wave6、`docs/phk110/research/f13-virtual-display.md`、`research/landscape-2026-11-08.md`（udon 同机先例） |
+| storage | `docs/phk110/waves/` 的 wave15–wave18 / wave31 / wave34、`wave28-scripts/verdict34-var.txt`、`wave42-scripts/verdict42-var.txt` |
+| buttons | `docs/phk110/waves/wave12-touch-buttons.md`（SPMI v7 适配 + 真机按键毫秒时戳）、`wave1-hwmap.md` |
+| USB | `docs/phk110/waves/` 的 wave13 / wave21 系列 / wave22 / wave24 / wave38、`wave42-scripts/verdict42-w42ssh9.txt`（双向 SHA 524288/524288）、`docs/phk110/review/gpt-review-report-3-2026-11-11-usb.md` |
+| 电量 | `docs/phk110/research/f17-battery-display.md`、`waves/wave43-battery.md`、`wave45-scripts/verdict45-gated.txt`、`wave43-scripts/` |
+| wifi | `docs/phk110/waves/wave30-ath11k-tooling-prep.md`（施工单 7 项）、`research/f14` / `f15`、`research/ecosystem-census-2026-11-11.md`、`wave30-scripts/` |
+| audio | `docs/phk110/PLAN.md` v0.6 节（TFA9874×2 / ADSP TERT_MI2S 器件勘定）、`research/f17`（ADSP 旁注）；情报波在途，发布后补格 |
+| CPU 多核 / 电源 / 诊断 | `docs/phk110/waves/` 的 wave10 / wave11 / wave12（Boot #12–#16 判定行）、`wave45-scripts/verdict45-gated.txt`（PMIC 握手） |
+| 蓝牙 / 基带 / DSP | `docs/phk110/PLAN.md` v0.6 / v0.7 节（规划口径） |
+
+**维护规则（常设）**：这张表是活的维护物——**每次发布轮必须同步刷新状态格，新翻格必须指到当轮新增的证据文件**；没有对应证据文件的新声明不翻格。本表在首页 README 与 [docs/phk110/SYSTEM-REPORT-2026-11-12.md](docs/phk110/SYSTEM-REPORT-2026-11-12.md) 各存一份，两处须同轮同步。
+
 ## 三、主要修复史（问题 → 根因 → 结果）
 
 | 问题 | 根因 | 结果 |
