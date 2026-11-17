@@ -5,11 +5,12 @@
 把 HakiOS——让 Apple 的 XNU 内核直接跑在安卓高通手机上的开源项目——移植到一加 Ace 2（PHK110，骁龙 8+ Gen 1 / SM8475，16 GB 内存）。
 上游的参考设备是 POCO X5 Pro（SM7325）；社区在 SM8475 上已有 K60（mondrian）、MIX Fold 2、POCO F5 Pro 等同 SoC 先例，本分支把上游扩展到 PHK110，是目前唯一持续维护的 PHK110 移植。所有改动只落在备用启动槽 `boot_b` 上（手机出厂有 A/B 两个 boot 槽：`boot_a` 跑日常安卓，`boot_b` 空置，本分支把它用作实验槽）；一次失败的实验会由 bootloader 自带的 A/B 回退机制自动退回安卓，`boot_a` 从未被刷写或修改。除首页 README 的呈现层替换（上游原 README 原样保留为 [README-UPSTREAM.md](README-UPSTREAM.md)）外，本分支不改上游任何已有文件，所有内容以新增形式存在（`devices/phk110/`、`docs/phk110/`、`waveNN-scripts/`、`logs/`）。
 
-## 当前状态（2026-11-12，全部来自真机实测；"Boot #N" 是历次刷写启动的编号，全表见 [docs/phk110/STATUS.md](docs/phk110/STATUS.md)；逐项能力与证据的一页式汇总见 [docs/phk110/SYSTEM-REPORT-2026-11-12.md](docs/phk110/SYSTEM-REPORT-2026-11-12.md)）
+## 当前状态（2026-11-17 更新，全部来自真机实测；"Boot #N" 是历次刷写启动的编号，全表见 [docs/phk110/STATUS.md](docs/phk110/STATUS.md)；逐项能力与证据的一页式汇总见 [docs/phk110/SYSTEM-REPORT-2026-11-17.md](docs/phk110/SYSTEM-REPORT-2026-11-17.md)，上一版是 [SYSTEM-REPORT-2026-11-12.md](docs/phk110/SYSTEM-REPORT-2026-11-12.md)）
 
 | 部件 | 状态 | 实测依据 |
 |---|---|---|
-| 显示 | ✅ 工作 | UEFI framebuffer 1240×2772，内核帧缓冲控制台滚动输出（Boot #7 起）；iOS 桌面（SpringBoard）自 2026-11-09 出画，当前 CPU 软渲染 |
+| **日用可用性** | **✅ v0.5.1（壁纸 / 亮度 / Photos / 锁屏编辑 / 抗撕裂）** | 壁纸 `/redwood/share/wallpaper.png` 4,901,648 B 生效且锁屏/主屏可编辑；亮度滑块生效、92% 厂商上限（顶档 `0xCA3`）；409 daemons 后 Photos 可开可建库（`PhotosPosterProvider`）；抗撕裂 `panel gap: 9583 waits, 0 timeouts, 0 gave up`、最好窗口 531 frames in 5013 ms（≈105 帧/秒） |
+| 显示 | ✅ 工作 | UEFI framebuffer 1240×2772，内核帧缓冲控制台滚动输出（Boot #7 起）；iOS 桌面（SpringBoard）自 2026-11-09 出画，**自 2026-11-13 起走 GL=1 桌面（CA → EAGL → Mesa/freedreno，GPU 加速）**，面板 120Hz |
 | CPU | ✅ 工作 | 8 核全部上线，7 个应用核心 8 ms 内齐起（Boot #13/#14） |
 | 按键 | ✅ 工作 | 电源 + 双音量键，经 PMIC 的 SPMI 总线读取（仲裁器版本 v7，上游驱动原本只认 v5），真机按键事件带毫秒时戳（Boot #16） |
 | 触摸 | ◑ 驱动探针已通过 | Synaptics S3910 触摸控制器（TouchComm v1 协议）：读到部件号 "S3910PA0B0-15.2"、面板 1240×2772、报告配置读取完成（Boot #21）；真人点屏的事件流尚未记录 |
@@ -20,8 +21,8 @@
 | /var 持久化 | ✅ 工作 | 标记 / 文件 / SSH host keys 跨内核世代死亡幸存（`verdict34-var.txt` 6/6；v35 复验 `verdict42-var.txt`）；根因（init 二次运行的内存盘遮蔽）已修 |
 | GPU | ✅ 硬件渲染首帧 | 自研 Adreno 730 内核驱动（上电步进 21 步全绿）+ Mesa 25.0.7 freedreno（FD725）+ OpenGL ES 3.2：v36 上机四门判定——步进回归 PASS / fence 探针 PASS / **硬件渲染 DONE**（`RENDER backend=hw renderer=FD725`，1080×2400 三角形 19 ms，五采样点与几何真值逐字一致，面板呈现确认 + 人眼目击）/ 电量 PARTIAL（`verdict45-gate{a,b,c,d}.txt`，[wave45](docs/phk110/waves/wave45-v36-firstframe.md)） |
 | 电池 | ◑ 驱动已落地 | 燃油计驱动（PM8350B 充电器观察 + bq27541 电量计位带）已编入 v36 内核；真机判定 PARTIAL——PMIC 总线握手逐字命中，电芯数据链未通（充电块通道表布局与本机不符 + 电量计无应答），按"宁可不显示不显示假值"原则当前不显示（`verdict45-gated.txt`） |
-| WiFi | ❌ 未实现 | ath11k 路线的检查与打包工具已备好（[wave30-scripts/](wave30-scripts/)），芯片身份勘误后 = WCN6750 hw1.0；尚未上机（v0.6） |
-| 音频 / 蜂窝 / 相机 | ❌ 未实现 | 排 v0.6 及以后 |
+| WiFi | ❌ 未实现（已有实测边界） | ath11k 路线工具已备（[wave30-scripts/](wave30-scripts/)），芯片 = WCN6750 hw1.0；2026-11-15/16 把 PCIe 推进到 PHY 之后：`0x7b004 = 0xf822f001`（bit31 set，控制器可读）、`0x72c = 0x8200000`（**bit4 = 0，链路未起**）、PHY 只读探测后按设计停 `-15` 且零写；`17cb:1103` 仍 CANNOT（[SYSTEM-REPORT-2026-11-17.md](docs/phk110/SYSTEM-REPORT-2026-11-17.md) §四） |
+| 音频 / 蜂窝 / 相机 | ❌ 未实现（各自有实测边界） | **音频**：ADSP step 1（SMEM）/step 2（固件 24 段 17,652,400 B 全 whole）通过，卡在 **step 3 AOP 邮箱**（写 `0xffff` 后 1 s 不应答）；**相机**：`camera=1` 只读探测通过（四基址映射、switch off ⇒ 不读寄存器），409 plists 无 camera job（`applecamerad` 不 spawn）；**蜂窝**：排 v0.7 |
 
 ## 八步流程进度（硬件域 × 方法链）
 
@@ -80,8 +81,10 @@
 
 | 想做什么 | 去哪 |
 |---|---|
-| **下载可刷写的启动镜像**（含适用机型、刷写步骤、风险说明） | **[Releases → v0.5-gpu-firstframe](https://github.com/Seanding1998/hakios-xnu-kernel/releases/tag/v0.5-gpu-firstframe)**（上一版：[v0.4-ssh-v23](https://github.com/Seanding1998/hakios-xnu-kernel/releases/tag/v0.4-ssh-v23)） |
-| 一页看懂系统现在能做什么（能力清单 + 证据索引） | [docs/phk110/SYSTEM-REPORT-2026-11-12.md](docs/phk110/SYSTEM-REPORT-2026-11-12.md) |
+| **下载可刷写的启动镜像**（含适用机型、刷写步骤、风险说明） | **[Releases → v0.5.1-daily](https://github.com/Seanding1998/hakios-xnu-kernel/releases/tag/v0.5.1-daily)**（上一版：[v0.5-gpu-firstframe](https://github.com/Seanding1998/hakios-xnu-kernel/releases/tag/v0.5-gpu-firstframe)、[v0.4-ssh-v23](https://github.com/Seanding1998/hakios-xnu-kernel/releases/tag/v0.4-ssh-v23)） |
+| 一页看懂系统现在能做什么（v0.5.1 日用化 + v0.6 三线探测：能力清单 + 证据索引） | [docs/phk110/SYSTEM-REPORT-2026-11-17.md](docs/phk110/SYSTEM-REPORT-2026-11-17.md) |
+| 核对原始证据（分区 sha、日志原文、执行命令、镜像 sha 表） | [docs/phk110/EVIDENCE-2026-11-17.md](docs/phk110/EVIDENCE-2026-11-17.md) |
+| 一页看懂 v0.5 真·首帧（上一版能力快照） | [docs/phk110/SYSTEM-REPORT-2026-11-12.md](docs/phk110/SYSTEM-REPORT-2026-11-12.md) |
 | 5 分钟看懂整个项目（按主题分组的阶段日志索引） | [docs/phk110/READMAP.md](docs/phk110/READMAP.md) |
 | 在同机（PHK110）上复跑验证（不刷写的操作优先） | [docs/phk110/REPRODUCE.md](docs/phk110/REPRODUCE.md) |
 | 权威进度快照 | [docs/phk110/STATUS.md](docs/phk110/STATUS.md) |
@@ -95,7 +98,7 @@
 | 能做的事 | 依据 |
 |---|---|
 | 读全套移植文档，理解每一步怎么来的、为什么 | `docs/phk110/`（85+ 篇：阶段日志 59 篇 / 调研 11 篇 / 评审 7 篇 + 快照与门面） |
-| 一页对照系统能力与证据（能力 → 判定文件 → 阶段日志） | [docs/phk110/SYSTEM-REPORT-2026-11-12.md](docs/phk110/SYSTEM-REPORT-2026-11-12.md) |
+| 一页对照系统能力与证据（能力 → 判定文件 → 阶段日志） | [docs/phk110/SYSTEM-REPORT-2026-11-17.md](docs/phk110/SYSTEM-REPORT-2026-11-17.md) |
 | 在同机型或同类机型上复用主机侧工具与方法：loader USB 直连、相位探测、日志分区取证、不刷写的状态机循环、SSH 连接窗口控制、GPU 步进判定 runner、fence/电量探针 | `waveNN-scripts/`（脚本头部的工作区路径已脱敏为占位符，按 [REPRODUCE.md](docs/phk110/REPRODUCE.md) 的说明改写后可用） |
 | 用 Release 里的启动镜像在 PHK110 上复现当前内核层状态 | 见 Release 说明的前置条件与刷写步骤 |
 | 以本设备的配置与 SoC 参数为起点做自己的 SM8475 移植 | `devices/phk110/` |
@@ -122,16 +125,16 @@
 | `docs/phk110/` | 全套项目文档：系统能力快照 / 进度快照 / 计划 / 阅读地图 / 复现指南 / 59 篇阶段日志 / 11 篇调研 / 7 篇评审记录 |
 | `waveNN-scripts/` | 主机侧工具 36 组（loader 直连、SSH 连接窗口控制、日志分区拉取、镜像自检脚本、触摸驱动源码快照、WiFi 检查器、GPU 步进判定、fence 探针、电量探针、Mesa 构建脚本等） |
 | `logs/` | 内核日志关键行提取件（`*.keylines.txt`，对应日志分区二进制的文本证据） |
-| **GitHub Release** | 已在真机上验证的启动镜像：`udon-hakios-grafted-v36.img`（v0.5 真·首帧版，SHA256 `e6ca0b43…`，见 [Release v0.5-gpu-firstframe](https://github.com/Seanding1998/hakios-xnu-kernel/releases/tag/v0.5-gpu-firstframe)）与历史版 `udon-hakios-grafted-v23.img`（v0.4 SSH 版，SHA256 `9e0609fb…`）——只在 Release 资产里，不进 git 树 |
+| **GitHub Release** | 已在真机上验证的启动镜像：**`udon-hakios-grafted-v101-daily-gpu.img`（v0.5.1 日用版，192 MiB，SHA256 `68c1c6af5561dc992400f53468db6ee09308445311f842549779cb76eb95e3cb`，见 [Release v0.5.1-daily](https://github.com/Seanding1998/hakios-xnu-kernel/releases/tag/v0.5.1-daily)）**、`udon-hakios-grafted-v36.img`（v0.5 真·首帧版，`e6ca0b43…`，见 [Release v0.5-gpu-firstframe](https://github.com/Seanding1998/hakios-xnu-kernel/releases/tag/v0.5-gpu-firstframe)）与历史版 `udon-hakios-grafted-v23.img`（v0.4 SSH 版，`9e0609fb…`）——只在 Release 资产里，不进 git 树 |
 
 **git 树里不含**：其他任何镜像或固件二进制（UEFI FD、payload、厂商固件、IPSW 衍生物）、任何私钥、任何分区备份。需要的原始材料（Apple IPSW、一加固件）请自备——本仓按上游口径不含它们。
 
 ## 诚实的未解清单
 
-- **电量显示**：数据链未通（PMIC 充电块通道表布局与本机不符 + bq27541 电量计无应答）——驱动与验收链已就位（阶段 43/45），修复进行中；按"宁可不显示不显示假值"原则当前不显示
-- **桌面 GPU 加速**：GPU 硬件出图已证（v36 门 C），窗口服务器（WindowServer/CoreAnimation）仍走 CPU 渲染；接入是下一步
-- **连续驻留**：内核会话约 10 分钟一代的常驻循环制，无挂起/恢复；循环偶发被 ABL 启动回退打断（`set_active b` 即恢复，根治排后续）
-- WiFi / 蓝牙 / 音频 / 蜂窝 / 振动 / 相机未实现（WiFi 工具先行，排 v0.6）
+- **电量显示**：数据链未通（本机 SPMI 仲裁表没有 PM8350B 充电块 `0x10/0x12/0x13/0x15`，`charger_look()` 读不到 VBUS）——现行"电量计净电流判据"就是这套硬件/固件下的上限；按"宁可不显示不显示假值"原则当前不显示
+- **桌面 GPU 加速**：✅ 已接入（2026-11-13，GL=1 桌面：CA → EAGL → Mesa 25.0.7/FD725）；GPU 档位从默认 283 MHz 提到 710 MHz（`adreno_speed=5`）
+- **连续驻留**：现为 `loader_return_after=86400` 的 24 h 会话帽；无挂起/恢复；无物理按键时只能等 ABL retry 耗尽回安卓（实测 ≈61 min），**loader 窗口内主机侧 `set_active a` 两次尝试均失败**
+- WiFi / 蓝牙 / 音频 / 蜂窝 / 振动 / 相机未实现（各有实测边界：PCIe 停在 PHY 之后、ADSP 卡 AOP 邮箱、相机 `camera=2` 未上机）
 - 真人点屏的事件流未记录（触摸驱动探针已通过）
 - Windows 报"USB 描述符请求失败"：iOS 侧枚举的是自家 loader gadget，属枚举层正常现象，装驱动无效也无需装（已定性，不修）
 - 超过 1800 秒的长会话会触发一个早就存在的 vnode 表耗尽 panic——目前用会话时长上限绕开，根治需要改内核的 vnode 上限注入

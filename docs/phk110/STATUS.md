@@ -1,6 +1,6 @@
 # 项目当前状态（唯一权威快照）
 
-> 更新：2026-11-12 · 逐日记录见 `M0-PROGRESS.md`；各阶段的做法与证据在 `waves/wave*.md`（59 篇阶段日志）；能力与证据一页式汇总见 [SYSTEM-REPORT-2026-11-12.md](SYSTEM-REPORT-2026-11-12.md)
+> 更新：**2026-11-17**（v0.5.1 日用化 + v0.6 三线探测；本轮新增章节见文末「2026-11-13 → 2026-11-17」）· 逐日记录见 `M0-PROGRESS.md`；各阶段的做法与证据在 `waves/wave*.md`（59 篇阶段日志）；能力与证据一页式汇总见 [SYSTEM-REPORT-2026-11-17.md](SYSTEM-REPORT-2026-11-17.md)（上一版：[SYSTEM-REPORT-2026-11-12.md](SYSTEM-REPORT-2026-11-12.md)）
 > 工作方式：每个阶段独立成篇（`waves/`），结论一律以真机实测为准。
 
 ## 项目简介与目标
@@ -113,7 +113,17 @@
 
 | 镜像 | 状态 | 说明 |
 |---|---|---|
-| **udon-hakios-grafted-v36.img** | **已刷入（boot_b 现役；v0.5 真·首帧版）** | loader `5de055ea…`（v35 同件冻结）+ 内核 `5b77b418…`（wave41 GPU 修复 + wave43 电量驱动同树，五处字符串钉位）+ GL 载体 `51a030c3…`（gl_test 结构化验收 `802522ff…` 69408 B + libOSMesa 25.0.7）+ cmdline = v35 文本逐字节 + ` fuelgauge=2`；graft **`e6ca0b43…`** / payload `0a70ec0a`；verify **72/72**（含从 APFS 容器提取 /bin/gl_test 的内容级判定）；真机四门判定 = 阶段 45（v0.5 真·首帧）；**Release 资产**（[v0.5-gpu-firstframe](https://github.com/Seanding1998/hakios-xnu-kernel/releases/tag/v0.5-gpu-firstframe)） |
+| **udon-hakios-grafted-v101-daily-gpu.img** | **已刷入（boot_b 现役；v0.5.1 日用版）** | 基线 = v70-daily payload `d2eee9ea…`，**只改 cmdline 一个 token**（`loader_return_after` 1800 → 86400，其余一个都不动：`adreno_speed=5` / `wallpaper_pic=1` / `fb_gap_win=16` / `loader_window=60` 全保留）；cmdline 484 字符 / 485 B，sha `fad0f02b…`，预算 110+484 = 594/607；payload `40696cd827a1ea0f…`（32,836,840 B，±0）；kernel `be610f26…`（15,144,936 B）/ loader `72f947f4…` / carrier `7be75c28…` **全部原样复用**；graft **`68c1c6af5561dc992400f53468db6ee09308445311f842549779cb76eb95e3cb`**；payload×2、graft×2 逐字节一致；**Release 资产**（[v0.5.1-daily](https://github.com/Seanding1998/hakios-xnu-kernel/releases/tag/v0.5.1-daily)） |
+| udon-hakios-grafted-v108-camera-2.img | 已构建（**未上机**） | `camera=2`（上电 + 扫 chip ID）；内核 `a5904778…`（15,428,752 B）；cmdline 488 字符 / 489 B；payload `54df7815…`（33,120,648 B）；graft **`8e92ed46…`**；camera=1 线的读表仍见 [EVIDENCE-2026-11-17.md](EVIDENCE-2026-11-17.md) §5.3 |
+| udon-hakios-grafted-v107-pcie-phy-reset.img | 已构建（**未上机**） | PHY 复位→训练（`wifi_pcie=2 pcie_power=1 pcie_phy_reset=1`）；内核 `d82a32dc…`；cmdline 484 字符 / 485 B；payload `a880e3d7…`；graft **`7c3a52df…`** |
+| udon-hakios-grafted-v106-camera-probe.img | 已上机（**只读探测通过**） | `camera=1`：camcc/csiphy/cci/cpas 四基址全映射成功，switch `status 0x88000`（off）⇒ 按设计不读寄存器、不占引脚；494 s 跑满；内核 `a5904778…`；payload `b92cb326…`（33,120,648 B）；graft **`6b0b36b6…`** |
+| udon-hakios-grafted-v105-audio-aop.img | 已上机（**step 3 失败**） | v102 血统 + AOP 内核 `985e676c…`（15,411,488 B），会话压到 360 s 可直启孪生；step 1/2 通过、step 3 AOP 邮箱 1 s 内不应答 → 回滚 `0xffff0000`；payload `3c3cfd9f…`（51,142,168 B）；graft **`231d00e7…`**；本代 console 未被 compose 进 logdump（诊断 CANNOT） |
+| udon-hakios-grafted-v104-pcie-phy-probe.img | 已上机（**按设计停住，panic 消失**） | `wifi_pcie=2 pcie_power=1 pcie_phy_probe=1`：`gcc 0x7c01c = 0`（out of reset）、`parf 0x40 = 0x900`，随后停在 `-15`，ECAM/BAR0 未读、零写，496 s 无 panic；内核 `d82a32dc38d6…`（15,410,976 B）；payload `dfa752ee…`（33,102,872 B）；graft **`4ee54f4c…`** |
+| udon-hakios-grafted-v102-audio-daily.img | 已上机（真机 679 s 会话） | 音频血统（内核 `0fc424ee…`）+ ADSP 固件载体 `bea29705`（31,444,992 B）+ `loader_return_after=86400`；step 1（SMEM `0x80acf000/0x30000`；item 478/479 在，443/480/423 不在）→ step 2（`md1:/fw`，`adsp.mdt` 5,404 B + b01..b23，24 段 / 17,652,400 B 全 whole，落 `0x86300000`）→ step 3（mailbox `0x128`/`0x2d8`，写 `0xffff`，1 s 内 AOP 不应答，回滚）；graft **`0c82e52a0a8217767cddcdaee36f9a29f57564afdfd713f8bd53623ea846f630`** |
+| udon-hakios-grafted-v98-daily.img | 已刷入过（回滚候选） | v61 + `loader_return_after=86400`（v61 血统默认 3D 核 **283 MHz**，无 `adreno_speed`）；graft `1de9911a…` |
+| udon-hakios-grafted-v70-daily.img | 已刷入过（v101 的基线） | 壁纸 + 亮度 + 409 daemons + 关机快修 + 1800 s + `adreno_speed=5`（710 MHz）；graft **`256f7cf2e69be7ed067cdf2cd1a29f9e0031948ccd8537e2d1280455f19f9edb`**；payload `d2eee9ea…`（32,836,840 B） |
+| udon-hakios-grafted-v62-long.img | 已刷入过（回滚版） | 30 分钟会话；graft `ca907aab…` |
+| **udon-hakios-grafted-v36.img** | 已刷入过（上一代现役；v0.5 真·首帧版） | loader `5de055ea…`（v35 同件冻结）+ 内核 `5b77b418…`（wave41 GPU 修复 + wave43 电量驱动同树，五处字符串钉位）+ GL 载体 `51a030c3…`（gl_test 结构化验收 `802522ff…` 69408 B + libOSMesa 25.0.7）+ cmdline = v35 文本逐字节 + ` fuelgauge=2`；graft **`e6ca0b43…`** / payload `0a70ec0a`；verify **72/72**（含从 APFS 容器提取 /bin/gl_test 的内容级判定）；真机四门判定 = 阶段 45（v0.5 真·首帧）；**Release 资产**（[v0.5-gpu-firstframe](https://github.com/Seanding1998/hakios-xnu-kernel/releases/tag/v0.5-gpu-firstframe)） |
 | udon-hakios-grafted-v35.img | 上一版（阶段 42 判定轮；SSH 双向 SHA + /var 复验全绿） | v33 内核 `55a8d40f…` 字节等 + 载体 `c2780842…` + loader `5de055ea…` + cmdline gpu=1；graft `6558d303…` / payload `82add009`；verify 69/69 |
 | udon-hakios-grafted-v33.img | 上一版（阶段 37 终态；GPU 内核侧首亮版） | 内核 `55a8d40f…`（步 1-21 全绿形态）+ gpu=1 cmdline；graft `6d5efeb5…` / payload `cb447ade`；verify 62/62 |
 | udon-hakios-grafted-v26.img | 上一版（阶段 36；gpu=1 首次进内核） | 内核 `a39c931c…`（gen7 参数层 44 处，阶段 26 以来首次内核字节变化）；graft `c55300e1…` |
@@ -195,3 +205,70 @@
 1g. **【✅ 2026-11-04 交付】阶段 16c（P0 执行完成：carve 后 12G HFS+ 数据卷灌入 + verify-volume + 收尾，全 adb 通道零 fastboot）→ docs/waves/wave16c-p0-exec.md**：前代六步（preflight/backup[dm-super 重认证 1 字节放行]/resize/dryrun/carve/verify-android）已验证存档 `backups-slotb/p0-run/`，fastboot 通道（usbipd→WSL bulk）被打线事件打死弃用；强制重启回安卓后本阶段接续——**通道定位根因**：Windows adb.exe `shell` CRLF 必坏（工具 REFUSED 只读安全拒，日志 09:57:40 留证）、WSL Linux adb 无设备（usbipd 不复活）→ **新配方 = WSL Linux adb 客户端 + `ADB_SERVER_SOCKET=tcp:127.0.0.1:5037` 复用 Windows adb 服务器 USB 数据面**（.wslconfig mirrored + hostAddressLoopback 已配，零物理动作零 usbipd，1MB 探针 sha 端到端全等）；**灌卷** = RESUME-NOTE 选项 B 预暂存镜像通道原样（`darwin-write-phk110.py write ~/p0-darwin-vol.raw 2042368`，DARWIN_WRITE=yes），工具全链：prepare 范围门（2,042,368+3,200,507=5,242,875 恰收尾、≥保护区 1,374,208）→ identity×2 → 手机端 sha 复核 → guarded-dd（**3,200,507+0 records，13,109,276,672 B，47.5s @263 MB/s**）→ 读回 sha **same** → 暂存清理，EXIT=0；**verify-volume PASS**（块 2,042,368 签名 `HX` HFS+X；darwin 块 0 = 全零未触碰）+ 独立全卷重读三方 sha256 全等（`88c1cd99…bd8`）；`adb reboot` ~30s 回安卓（slot a），盘上卷头 `H X \0 005`（签名+版本5）字节级复验、PARTNAME=darwin、工具 check 全链过、/data 200G/41G/160G 数据面无损。**S3-S8 全部解锁**（S3 第一次刷写必带 `ufs_check=1`，预算余 228 字符，R1 情报见 1f 条）；footgun 登记：Windows adb.exe shell CRLF（文本通道必坏，exec-out 不坏）+ TCP 组合通道配方可复用（13GB push ~164 MB/s 稳态）；backups-slotb/p0-run 补记 darwin.simg sha `d82f845c…`。**P0 全链 0-7 子命令 PASS 完成 → 下一阶段 = S3 开写（wave15 §4 任务单照单施工）**
 1h. **【✅ 2026-11-04 交付】阶段 19 预研（v0.4 两大开放问题调研：SSH 数据面 + 真实 launchd 系统卷；纯调研零刷写，kernel/upstream 只读）→ docs/waves/wave19-prep.md**：**Q1 前提证伪**——upstream 无"USB SSH"（redwood SSH = WiFi `rc.jobs.ssh` + wifi=1；USB 全是 loader fastboot 管理面，经 vendor `EFI_USB_DEVICE_PROTOCOL`，loader.c:3713-3875），全生态（fork/upstream/UniXNU-udon/udon Binaries）**零现成 USB 网卡实现**；内核侧零 USB 栈（drivers/ 无 usb），内核原生 gadget = 与 loader USB 服务器争 DWC3 且让渡即弃救援面 → 否决。**v0.4 数据面排序：A = loader 桥接网络（主选）**——共享页 net 环（仿 loader_block 模式）+ 内核 en0 link 驱动（仿 hakios.ufs.c mailbox 读法）+ loader `oem netrx/nettx`（复用 download:/upload/staged 原语）+ 阶段 13 loader_talk.py 扩 `ssh -o ProxyCommand`（零 Windows 驱动零 TUN），三端 ≈ 内核 400-700 + loader 150-300 + 主机 300 行，风险 R-A1..A4 已登记（半双工轮询延迟/loader 3s 上界/loader.efi 需同刷）；**B = UEFI UMS 文件通道（辅助）**——UsbMsdDxe 在编（DXE.inc:99，senna_bc patched 版，EFI_USB_MSD_PROTOCOL 全链样板 = 树内现成 UdonLogExport.c:327-392），但 Windows 无 HFS+ 写 + UsbfnDwc3Dxe/UsbDeviceDxe 双栈共存未证 + 入口绕 graft → 可选后置；**C = 内核 DWC3+NCM 推 v0.5+；D/E（WiFi 提前/cellular）否决**。**Q2：切换机制 100% 现成树内**——boot-arg `root_apfs=ufs_darwin`（flash_root 换根 init.c:177-270，kern.hakios_switch_root）+ `var_hfs=ufs_darwin_data`（HFS+ /private/var init.c:834-860；切片=ufs.c:31/222，界=BLOCK_WRITE_FIRST 2042368 与 阶段 16c 灌卷逐块吻合）；任务单 8 步 = config 2 行（CONFIG_ROOT_APFS/VAR_HFS，common_defconfig:1122/1128）→ FLASHBOOT=1 CRYPTEXES=flash 构建三镜像（system.apfs 2.5G / flashboot.apfs 20M 级 md0 / root.apfs md1；/jb 嵌入 build.sh:649-668）→ darwin 前段灌卷（块 0..2,042,367 现全零就绪，darwin-write-phk110.py）→ payload 双 ramdisk（loader.c:3347-3348 原生支持，机上 loader 版本需核验）→ cmdline +40 字符（预算足）→ stub 救援 = 双镜像版本制（v11 回退保留，不做运行时切换，loader_return_after 自动回退两版都带）；风险 R-B1..B6（cryptex flash 回落路径 PHK110 首跑、staged_system_apps 存在性待镜像确认等）。**v0.4 待实施：Q2 镜像链先行（阶段 20 候选），Q1 方案 A 三端随后会合「SSH 进 Darwin shell」**
 1i. **【✅ 2026-11-04 交付】阶段 18 存储闭环两刷完成（Boot #23 v12 + Boot #24 v13）→ docs/waves/wave18-s3s8.md**：**S3 ✅ S4 ✅ S5 ✅ S6 ✅ S7 ✅ S8 ✅（S1 补行使 ✅ / R1 清白）——v0.4 存储六步全闭环**。b23（v12，cmdline-only，内核字节不变）：S3/S4/S5 验收行逐字 + ufs_check FNV 16/16 对拍（基线 = adb 第三可信路径拉 16 镜像 + 主机 FNV-1a，`wave18-scripts/fnv-compare.py`）→ R1/DALSYSDxe 清白；S6-S8 结构性缺口定位 = stub 不跑 init.c `mount_writable()`。b24（v13，真实 init 链 = 阶段 19-prep Q2 八步单执行）：机上 loader 已含 resident 双 ramdisk 支持（零 loader 重建）→ FLASHBOOT=1 CRYPTEXES=flash 三镜像（system.apfs 604,420 块 / flashboot 1024 / root 1024，5 分钟构建；jb 155 MB 超出 payload 64 MB 窗未嵌，阶段 21 改 system.apfs 侧接线）→ darwin 前段三段 guarded-dd（0/604420/1270020，读回 sha 全 same，写前块 0 全零 + 数据卷头 P0 原值双 preflight）→ 42/42 自检 → 刷写一次通过 → **S6/S7/S8 验收行 + 跨 boot journal replay + 数据卷物理 sha 改写（88c1cd99→6e40eaef）**；换根/双 cryptex 步进（c=1 @2361 MB、c=2 @4961 MB）/dyld cache 跑通 hello_dyn 全链兑现；**Apple launchd 接管 pid 1 → 0.6 s 后 `failed to query hardware target: 22` 退场**（initproc failed to start panic，stackshot 完好）= 阶段 20 的第一定位点；注记（logdump console = fb 滚动环跨周期残留）。**阶段 20 剩余**：①launchd hardware-target EINVAL 补齐（或过渡 rc 不交接）②/jb 接线（system.apfs 侧 + build.sh flashboot 守卫 1 行）③F3 专查 ④staged_system_apps 预置（美观）；**阶段 21**：loader 桥接网络 SSH（阶段 19 方案 A）。
+
+---
+
+## 2026-11-13 → 2026-11-17：v0.5.1 日用化 + v0.6 探测（本轮新增章节）
+
+> 本章是 2026-11-12 之后五天的权威增量。能力与证据的一页式汇总见 [SYSTEM-REPORT-2026-11-17.md](SYSTEM-REPORT-2026-11-17.md)；原始证据（分区 sha、日志原文、命令、镜像 sha）见 [EVIDENCE-2026-11-17.md](EVIDENCE-2026-11-17.md)。
+
+### 一句话
+
+**v0.5.1「日用化」达成**：显示四修（壁纸 / 亮度 / 抗撕裂 / 通知栏黑澄清）+ Photos 可开可建库 + GL=1 桌面 + GPU 710 MHz，并把这套做成 **24 h 会话版 `v101-daily-gpu` 正式刷进 boot_b**；**v0.6 三线**（音频 ADSP / PCIe WiFi-蓝牙 / 相机）各自推到"有实测边界的下一步"，没有一条宣告成功。
+
+### 时间线（只记有实测的动作）
+
+| 日期 | 事件 |
+|---|---|
+| 11-13 | GL=1 桌面生效；花屏修复（抄同芯 mayfly 三件）；120Hz 解锁（面板实测 119.93 Hz）；触摸换 1 ms 步进；**背光 F-15 ✅**（线性曲线 + 92% 上限 `0xCA3`）、**壁纸 F-14 ✅**（用户图预烘焙 `/redwood/share/wallpaper.png`）；撕裂改最小 panel-gap 等待（`3764 waits, 0 timeouts`，用户"好很多"） |
+| 11-14 | 00:06 部署 `v61-default` → 00:23 升级 `v62-long`（30 分钟会话）；夜间固件只读提取（modem 分区 187 文件，ADSP 全套 + bdwlan slices）；ADSP 调试（`step 2 failed (nothing written)` 的判词歧义被修正）；QEMU harness 修好但停在 `_enumerate`（缺平台桩） |
+| 11-15 | **F-11 关闭**：通知栏"纯黑"= 壁纸缺失的观感，非缺陷；用户授权 boot_b 部署/相机移植/PCIe+ADSP 长期工程；`v98-daily`（86400 s）部署 → PCIe 两档（`v100-pciesafe` PASS 到 1/6 + bit31 set；`v101-pcie2` 在 level-2 act data abort）→ **`v101-daily-gpu` 部署 boot_b**（v70 基线 + 86400，只改一个 token）；同日实测 **loader 窗内主机侧 `set_active a` 不成立**、无按键回安卓靠 ABL retry **≈61 min** |
+| 11-16 | 00:33 `v104`（PHY 只读探测：`gcc 0x7c01c = 0`、`parf 0x40 = 0x900`、停 `-15`、零写、496 s 无 panic）→ 00:43 `v105`（AOP 邮箱 step 3 失败）→ 00:58 `v106`（`camera=1` 只读，四基址映射、switch off、不读寄存器、494 s）；01:07 分区 sha 三方复核；01:08 回 iOS |
+| 11-17 | 文档轮：本报告 + 证据 + README/STATUS 同步 + Release `v0.5.1-daily` |
+
+### 能力变动（相对 2026-11-12 快照）
+
+| 项 | 之前 | 现在 |
+|---|---|---|
+| 壁纸 / 锁屏主屏可编辑 | ❌ | **✅ 真机确认**（4,901,648 B） |
+| 亮度滑块 | ❌ | **✅ 真机确认**（92% 上限） |
+| Photos | ❌ 打不开 | **✅ 409 daemons 后可开可建库** |
+| 抗撕裂 | 未处理 | **✅ `9583 waits, 0 timeouts, 0 gave up`，最好窗口 ≈105 帧/秒** |
+| 通知栏左滑纯黑（F-11） | 记为缺陷 | **✅ 关闭：壁纸缺失所致，非缺陷** |
+| GPU 档位 | 283 MHz 默认 | **710 MHz**（`adreno_speed=5`） |
+| 会话时长 | 约 10 分钟一代 | **24 h 帽**（`loader_return_after=86400`） |
+| 音频 | 未开始 | step 1/2 过、**step 3 AOP 邮箱失败**（不是固件问题） |
+| PCIe / Wi-Fi / 蓝牙 | v94–v97 连续早退（判 CANNOT） | **推进到 PHY 之后**（按设计停 `-15`、零写；链路仍 `0x72c` bit4=0） |
+| 相机 | 未开始 | `camera=1` 只读通过；**`camera=2` 未上机** |
+| 充电 / 关机卡死 / Notes | 未定位 / 未定位 / 未定位 | 充电=**净电流判据是硬件上限**；关机=根因定位（快修未验）；Notes=框架层 userabort（trace 镜像未上机） |
+
+### v0.5.1 判定线（日用四项）
+
+**壁纸 ✅ ／ 亮度 ✅ ／ Photos ✅ ／ 抗撕裂 ✅** —— 四项都有本机日志或用户真机确认。这四项是**日用观感**线；功能线（声音/相机/蜂窝/Wi-Fi）仍属 v0.6/v0.7。
+
+### v0.6 三线的三句话结论
+
+1. **音频**：SMEM 与固件都不是瓶颈（24 段 / 17,652,400 B 全 whole、落 `0x86300000`）；卡在 **AOP 邮箱 `0x128`/`0x2d8` 写下 `0xffff` 后 1 s 内不应答**。下一刀是 IPCC 基址（cape 应为 `0x0ed18000`，不是 `0x00408000`）与 `rsc`（`0x17a20000`）。
+2. **PCIe**：真正的坑是**基址加了两次**（宏已含 `gcc`）导致 4/6 data abort；收成 `gcc_read/gcc_write` + 窗口检查后，只读探测干净停住。链路仍未起（`0x72c` bit4=0），`17cb:1103` 仍 CANNOT。
+3. **相机**：`camera=1` 只证明"映射与时钟门控是对的"（switch off ⇒ 按设计不读）；要拿 chip ID 必须 `camera=2`。另有一条硬阻塞：**409 plists 没有 camera job**（`applecamerad` 不 spawn）。
+
+### 设备与回退（本章时的状态）
+
+- `boot_b` = **`v101-daily-gpu`**（`68c1c6af…`），`boot_a` **从未写**（`b573b144…`），`misc` = `85094313…`。
+- 回安卓：三键 → 按住音量下进 ABL → `fastboot set_active a` + `reboot`（零刷写）。
+- **无按键回安卓 = ABL retry 耗尽**（实测 ≈61 min）；**loader 窗内主机侧改槽两次尝试均失败**（115.9 s 超时 / 15 次 attach 全空）⇒ 别把"loader 窗里 set_active a"当兜底。
+- 24 h 会话镜像**不要直接 RAM 直启**：日志拿不回来。测试一律用"只改 `loader_return_after`"的 360 s 孪生。
+
+### 本章的 CANNOT / UNVERIFIED
+
+**CANNOT**：`17cb:1103`；`camera=1` 的 CCI/CSIPHY 寄存器读；`v105` 的 IPCC 基址/mailbox 前值/6 次轮询（本代 console 未被捕获）；loader 窗内 `set_active a`；充电 VBUS；`spurious interrupt 0x105` 上下文（8 份 console 0 命中）。
+
+**UNVERIFIED**：`v101` 自己那一代会话的 `panel gap`/710 MHz/`sound` 行（24 h 帽，logdump 只留上一世代）；`camera=2`（v108）；关机快修（v67/v68 线）；`v78-notes-trace`；`v107` 的 PHY 复位→训练。
+
+### 下一步队列（本章末）
+
+1. 音频：改 `ipcc`/`rsc` 基址 → 重跑同一 `v105` 镜像（不重建），要的是 IPCC 基址行 + mailbox 前值 + 6 次状态轮询。
+2. PCIe：`v107` PHY 复位→训练；训练成功后 `0x728` 期望值（Pong 是 `0x11`）在本机仍 UNVERIFIED。
+3. 相机：`v108`（`camera=2`）四轮 `camera_sensor=0..3`；同时把 `applecamerad` 挂进 mkjobs（否则出了驱动也没有 UI）。
+4. 关机：验证 v67/v68 快修；根治需 loader 侧 `EfiResetShutdown` + BSD 优雅关机超时。
+5. 日用回归：每个新镜像默认带壁纸/亮度/409 daemons（v60 起的规矩）。
